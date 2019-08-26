@@ -165,13 +165,10 @@ export const reRunPipelineRun = (pipelineRun: PipelineRun): ActionFunction => {
     },
   });
 };
-export const startPipeline = (
-  pipeline: Pipeline,
-  ...others
-) => (): Action => ({
+export const startPipeline = (pipeline: Pipeline, ...others) => (): Action => ({
   label: 'Start',
   callback: () => {
-    startPipelineModalForm({ pipeline });
+    startPipelineModalForm({ pipeline, modalClassName: 'modal-lg' });
   },
 });
 export const rerunPipeline = (

@@ -1,24 +1,39 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
-import { Formik } from 'formik';
-import { createModalLauncher } from '@console/internal/components/factory/modal';
+import { Formik, FormikValues } from 'formik';
+import {
+  createModalLauncher,
+  ModalComponentProps,
+} from '@console/internal/components/factory/modal';
 import { k8sCreate } from '@console/internal/module/k8s';
-import { errorModal } from '@console/internal/components/modals/error-modal';
 import { newPipelineRun } from '../../../utils/pipeline-actions';
 import { PipelineRunModel } from '../../../models';
+import { Pipeline, PipelineResource, Param } from '../../../utils/pipeline-augment';
 import { StartPipelineForm } from './startPipelineForm';
 import { validationSchema } from './pipelineForm-validation-utils';
 
+export interface PipelineModalProps {
+  pipeline: Pipeline;
+}
+export interface StartPipelineFormValues {
+  parameters: Param[];
+  resources: PipelineResource[];
+}
 
-// add props
-export const _startPipelineModalForm: React.FC<any> = ({ pipeline, close }) => {
-  const initialValues = {
+export const _startPipelineModalForm: React.FC<PipelineModalProps & ModalComponentProps> = ({
+  pipeline,
+  close,
+}) => {
+  const initialValues: StartPipelineFormValues = {
     parameters: _.get(pipeline.spec, 'params', []),
     resources: _.get(pipeline.spec, 'resources', []),
   };
-  initialValues.resources.map((resource) => _.merge(resource, { resourceRef: { name: '' } }));
+  initialValues.resources.map((resource: PipelineResource) =>
+    _.merge(resource, { resourceRef: { name: '' } }),
+  );
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: FormikValues, actions): void => {
+    actions.setSubmitting(true);
     const pipelineRunData = {
       spec: {
         pipelineRef: {
@@ -32,22 +47,22 @@ export const _startPipelineModalForm: React.FC<any> = ({ pipeline, close }) => {
       },
     };
     k8sCreate(PipelineRunModel, newPipelineRun(pipeline, pipelineRunData))
-      .then((newValue) => {
-        console.log('Subbmitted successfully', newValue);
+      .then(() => {
+        actions.setSubmitting(false);
         close();
       })
-      .catch((err) => errorModal({ error: err.message }));
-  };
-
-  const handleReset = (values) => {
-    console.log('handleReset', values);
+      .catch((err) => {
+        actions.setSubmitting(false);
+        actions.setStatus({ submitError: err.message });
+        close();
+      });
   };
 
   return (
     <Formik
       initialValues={initialValues}
+      initialStatus={{ subFormsOpened: 0 }}
       onSubmit={handleSubmit}
-      onReset={handleReset}
       validateOnBlur
       validateOnChange
       validationSchema={validationSchema}

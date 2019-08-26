@@ -3,32 +3,28 @@ import { FieldArray } from 'formik';
 import * as _ from 'lodash-es';
 import FormSection from '../../import/section/FormSection';
 import PipelineResourceDropdownField from '../../formik-fields/PipelineResourceDropdownField';
+import { PipelineResource } from '../../../utils/pipeline-augment';
 
-export const pipelineResourceForms = (type) => {
-  switch (type) {
-    case 'git':
-      return 'Git Pipeline form';
-    case 'image':
-      return 'Image Pipeline form';
-    case 'storage':
-      return 'Storage Pipeline form';
-    case 'cluster':
-      return 'Cluster Pipeline form';
-    default:
-      return 'form';
-  }
-};
-// add Resource types
-export const PipelineResourcesSection: React.FC<any> = ({ resources }) => {
+export interface ResourceSectionProps {
+  resources: {
+    types: string[];
+    git?: PipelineResource[];
+    image?: PipelineResource[];
+    cluster?: PipelineResource[];
+    storage?: PipelineResource[];
+  };
+}
+
+export const PipelineResourcesSection: React.FC<ResourceSectionProps> = ({ resources }) => {
   return (
     resources.types.length > 0 && (
-      <>
+      <React.Fragment>
         {resources.types.map((type, index) => (
           <FieldArray
             name={type}
             key={`${type}-resource-${index}-row`}
             render={(helpers) => (
-              <>
+              <React.Fragment>
                 {resources[type].length > 0 && (
                   <FormSection title={`${_.capitalize(type)} Resources`} fullWidth>
                     <div className="form-group" key={`${type}-resource-row-group-${index}`}>
@@ -40,18 +36,17 @@ export const PipelineResourcesSection: React.FC<any> = ({ resources }) => {
                             fullWidth
                             required
                             filterType={type}
-                            resourceForm={pipelineResourceForms(type)}
                           />
                         </div>
                       ))}
                     </div>
                   </FormSection>
                 )}
-              </>
+              </React.Fragment>
             )}
           />
         ))}
-      </>
+      </React.Fragment>
     )
   );
 };

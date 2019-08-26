@@ -1,10 +1,10 @@
 import * as React from 'react';
-import * as _ from 'lodash-es';
+import * as _ from 'lodash';
 import { Firehose } from '@console/internal/components/utils';
 import { PipelineResourceModel } from '../../models';
 import ResourceDropdown from './ResourceDropdown';
 
-interface PipelineResourceDropdownProps {
+export interface PipelineResourceDropdownProps {
   dropDownClassName?: string;
   menuClassName?: string;
   namespace?: string;
@@ -20,8 +20,6 @@ interface PipelineResourceDropdownProps {
   filterType?: string;
 }
 
-
-
 const PipelineResourceDropdown: React.FC<PipelineResourceDropdownProps> = (props) => {
   const resources = [
     {
@@ -34,6 +32,10 @@ const PipelineResourceDropdown: React.FC<PipelineResourceDropdownProps> = (props
   const resourceFilter = (item) => {
     return item.spec.type === props.filterType;
   };
+  const transformLabel = (resource) => {
+    const url = _.defaultTo(_.get(_.find(resource.spec.params, ['name', 'url']), 'value'), '');
+    return url.trim().length > 0 ? `${url} (${resource.metadata.name})` : resource.metadata.name;
+  };
 
   return (
     <Firehose resources={resources}>
@@ -43,11 +45,7 @@ const PipelineResourceDropdown: React.FC<PipelineResourceDropdownProps> = (props
         placeholder="Select Pipeline Resource"
         dataSelector={['metadata', 'name']}
         resourceFilter={resourceFilter}
-        transformLabel={(resource) =>
-          `${_.defaultTo(_.get(_.find(resource.spec.params, ['name', 'url']), 'value'), '')} (${
-            resource.metadata.name
-          })`
-        }
+        transformLabel={transformLabel}
       />
     </Firehose>
   );
