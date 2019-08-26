@@ -8,7 +8,7 @@ const PipelinesImageOptions: React.FC = () => (
       type={TextInputTypes.text}
       name="param.url"
       label="Name"
-      helpText="Please provide Image nam"
+      helpText="Please provide Image name"
       required
     />
   </React.Fragment>

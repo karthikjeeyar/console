@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { k8sCreate, K8sResourceKind } from '@console/internal/module/k8s';
-import { PipelinesResourceModel } from '../../../models';
+import { PipelineResourceModel } from '../../../models';
 
 // TODO add interface amd check for values
 
@@ -28,5 +28,5 @@ export const createPipelinesResource = (
     },
   };
 
-  return k8sCreate(PipelinesResourceModel, pipelineResource);
+  return k8sCreate(PipelineResourceModel, pipelineResource);
 };

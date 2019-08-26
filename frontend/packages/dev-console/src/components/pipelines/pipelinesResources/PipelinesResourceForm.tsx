@@ -10,12 +10,14 @@ import { createPipelinesResource } from './pipelinesResource-utils';
 export interface PipelineResourceFormProps {
   type: string;
   onCreate: Function;
+  onClose: Function;
   namespace: string;
 }
 
 const PipelineResourceForm: React.FC<PipelineResourceFormProps> = ({
   type,
   onCreate,
+  onClose,
   namespace,
 }) => {
   const initialValues = {
@@ -68,7 +70,8 @@ const PipelineResourceForm: React.FC<PipelineResourceFormProps> = ({
   };
 
   const handleReset = (values, actions) => {
-    actions.resetForm({ status: {} });
+    actions.resetForm({ values: initialValues[type], status: {} });
+    onClose();
   };
 
   return (

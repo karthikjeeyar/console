@@ -3,13 +3,13 @@ import cx from 'classnames';
 import { useField, useFormikContext, FormikValues } from 'formik';
 import { FormGroup } from '@patternfly/react-core';
 import PipelineResourceDropdown from '../dropdown/PipelineResourceDropdown';
+import PipelinesResourceForm from '../pipelines/pipelinesResources/PipelinesResourceForm';
 import { DropdownFieldProps } from './field-types';
 import { getFieldId } from './field-utils';
 
 export const CREATE_PIPELINE_RESOURCE = '#CREATE_PIPELINE_RESOURCE#';
 
 export interface PipelineResourceDropdownFieldProps extends DropdownFieldProps {
-  resourceForm: string;
   filterType?: string;
 }
 const PipelineResourceDropdownField: React.FC<PipelineResourceDropdownFieldProps> = ({
@@ -26,7 +26,7 @@ const PipelineResourceDropdownField: React.FC<PipelineResourceDropdownFieldProps
   const fieldId = getFieldId(props.name, 'pipeline-resource-dropdown');
   const isValid = !(touched && error);
   const errorMessage = !isValid ? error : '';
-  
+
   const handleChange = React.useCallback(
     (value: string) => {
       console.log('field', field, value);
@@ -65,10 +65,18 @@ const PipelineResourceDropdownField: React.FC<PipelineResourceDropdownFieldProps
         />
       </FormGroup>
       {field.value === CREATE_PIPELINE_RESOURCE && (
-        <div style={{ padding: '10px', border: '1px black dotted', marginTop: '10px' }}>
-          {props.resourceForm}
-          <hr />
-          <button onClick={() => setFieldValue(props.name, '')}> close</button>
+        <div style={{ marginTop: '10px' }}>
+          <PipelinesResourceForm
+            type={props.filterType}
+            onClose={() => {
+              setFieldValue(props.name, '');
+            }}
+            onCreate={(data) => {
+              setTimeout(() => {
+                setFieldValue(props.name, data.metadata.name);
+              }, 500);
+            }}
+          />
         </div>
       )}
     </React.Fragment>
