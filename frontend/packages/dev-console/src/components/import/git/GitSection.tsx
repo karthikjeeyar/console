@@ -6,6 +6,7 @@ import { GitTypes } from '../import-types';
 import { detectGitType, detectGitRepoName } from '../import-validation-utils';
 import { getSampleRepo, getSampleRef, getSampleContextDir } from '../../../utils/imagestream-utils';
 import FormSection from '../section/FormSection';
+import PipelinesResourceForm from '../../pipelines/pipelinesResources/PipelinesResourceForm';
 import SampleRepo from './SampleRepo';
 import AdvancedGitOptions from './AdvancedGitOptions';
 
@@ -82,6 +83,12 @@ const GitSection: React.FC<GitSectionProps> = ({ showSample }) => {
       )}
       {sampleRepo && <SampleRepo onClick={fillSample} />}
       <AdvancedGitOptions />
+      <PipelinesResourceForm
+        type="git"
+        onCreate={(data) => {
+          console.log(data);
+        }}
+      />
     </FormSection>
   );
 };
