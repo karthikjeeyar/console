@@ -109,7 +109,7 @@ class ResourceDropdown extends React.Component<ResourceDropdownProps, State> {
             dataValue = _.get(resource, dataSelector);
           }
           if (dataValue) {
-              acc[dataValue] = transformLabel ? transformLabel(resource) : dataValue;
+            acc[dataValue] = transformLabel ? transformLabel(resource) : dataValue;
           }
           return acc;
         },
