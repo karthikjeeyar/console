@@ -7,7 +7,7 @@ import { pipelineFilterReducer } from '../../utils/pipeline-filter-reducer';
 import { Pipeline } from '../../utils/pipeline-augment';
 import { PipelineTaskStatus } from '../pipelineruns/PipelineTaskStatus';
 import { PipelineModel, PipelineRunModel } from '../../models';
-import { rerunPipeline } from '../../utils/pipeline-actions';
+import { rerunPipeline, startPipeline } from '../../utils/pipeline-actions';
 import { tableColumnClasses } from './pipeline-table';
 
 const pipelineReference = referenceForModel(PipelineModel);
@@ -21,7 +21,7 @@ interface PipelineRowProps {
 }
 
 const PipelineRow: React.FC<PipelineRowProps> = ({ obj, index, key, style }) => {
-  const menuActions = [rerunPipeline(obj, obj.latestRun, ''), Kebab.factory.Delete];
+  const menuActions = [startPipeline(obj), rerunPipeline(obj, obj.latestRun, ''), Kebab.factory.Delete];
   return (
     <TableRow id={obj.metadata.uid} index={index} trKey={key} style={style}>
       <TableData className={tableColumnClasses[0]}>
