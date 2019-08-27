@@ -1,9 +1,9 @@
 .pipelines-resource-form {
     &__content {
-      border: 1px dashed #ccc;
-      padding: 6px;
+      border: 1px dashed var(--pf-global--BorderColor--100);
+      padding: var(--pf-global--spacer--sm);
     }
-    &__btn-group {
-      float: right;
+    &__action-btn {
+      padding: 0;
     }
   }

@@ -8,7 +8,7 @@ const PipelinesGitOptions: React.FC = () => (
       type={TextInputTypes.text}
       name="param.url"
       label="Url"
-      helpText="Please provide git url."
+      helpText="Please provide git url"
       required
     />
     <InputField

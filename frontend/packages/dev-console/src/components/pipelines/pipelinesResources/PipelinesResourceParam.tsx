@@ -15,10 +15,13 @@ export interface PipelinesResourceParamProps {
 }
 
 const PipelinesResourceParam: React.FC<PipelinesResourceParamProps> = ({ type }) => {
-  const { handleSubmit, errors, handleReset, status, isSubmitting, dirty } = useFormikContext<
+  const { errors, handleReset, status, isSubmitting, dirty, submitForm } = useFormikContext<
     FormikValues
   >();
-
+  const handleCreateFormSubmit = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+    submitForm();
+  };
   const resourceComponent = (): React.ReactElement => {
     switch (type) {
       case 'git':
@@ -38,16 +41,21 @@ const PipelinesResourceParam: React.FC<PipelinesResourceParamProps> = ({ type })
     <div className="pipelines-resource-form__content">
       {resourceComponent()}
       <ButtonBar errorMessage={status && status.submitError} inProgress={isSubmitting}>
-        <ActionGroup className="pf-c-form pipelines-resource-form__btn-group">
+        <ActionGroup className="pf-c-form pf-c-form__actions--right pf-c-form__group--no-top-margin">
           <Button
-            type="submit"
+            type="button"
             variant={ButtonVariant.link}
-            onClick={handleSubmit}
+            onClick={handleCreateFormSubmit}
             isDisabled={!dirty || !_.isEmpty(errors)}
+            className="pipelines-resource-form__action-btn"
+            icon={<CheckIcon />}
+          />
+          <Button
+            type="button"
+            className="pipelines-resource-form__action-btn"
+            variant={ButtonVariant.plain}
+            onClick={handleReset}
           >
-            <CheckIcon />
-          </Button>
-          <Button type="button" variant={ButtonVariant.link} onClick={handleReset}>
             <CloseIcon />
           </Button>
         </ActionGroup>

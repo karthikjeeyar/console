@@ -171,7 +171,7 @@ export const startPipeline = (
 ) => (): Action => ({
   label: 'Start',
   callback: () => {
-    startPipelineModalForm({ pipeline });
+    startPipelineModalForm({ pipeline, modalClassName: 'modal-lg', });
   },
 });
 export const rerunPipeline = (
