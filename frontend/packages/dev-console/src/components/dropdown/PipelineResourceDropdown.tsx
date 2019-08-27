@@ -18,6 +18,7 @@ export interface PipelineResourceDropdownProps {
   id?: string;
   autoselect?: boolean;
   filterType?: string;
+  disabled?: boolean;
 }
 
 const PipelineResourceDropdown: React.FC<PipelineResourceDropdownProps> = (props) => {

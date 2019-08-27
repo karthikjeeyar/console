@@ -1,12 +1,11 @@
 import * as React from 'react';
-import * as _ from 'lodash-es';
+import * as _ from 'lodash';
 import { Formik, FormikValues } from 'formik';
 import {
   createModalLauncher,
   ModalComponentProps,
 } from '@console/internal/components/factory/modal';
 import { k8sCreate } from '@console/internal/module/k8s';
-import { newPipelineRun } from '../../../utils/pipeline-actions';
 import { PipelineRunModel } from '../../../models';
 import { Pipeline, PipelineResource, Param } from '../../../utils/pipeline-augment';
 import { StartPipelineForm } from './startPipelineForm';
@@ -14,14 +13,16 @@ import { validationSchema } from './pipelineForm-validation-utils';
 
 export interface PipelineModalProps {
   pipeline: Pipeline;
+  newPipelineRun: Function;
 }
 export interface StartPipelineFormValues {
   parameters: Param[];
   resources: PipelineResource[];
 }
 
-export const _startPipelineModalForm: React.FC<PipelineModalProps & ModalComponentProps> = ({
+const startPipelineModalFormContainer: React.FC<PipelineModalProps & ModalComponentProps> = ({
   pipeline,
+  newPipelineRun,
   close,
 }) => {
   const initialValues: StartPipelineFormValues = {
@@ -71,4 +72,4 @@ export const _startPipelineModalForm: React.FC<PipelineModalProps & ModalCompone
   );
 };
 
-export const startPipelineModalForm = createModalLauncher(_startPipelineModalForm);
+export const startPipelineModalForm = createModalLauncher(startPipelineModalFormContainer);

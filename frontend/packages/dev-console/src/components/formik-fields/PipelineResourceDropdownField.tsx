@@ -57,6 +57,7 @@ const PipelineResourceDropdownField: React.FC<PipelineResourceDropdownFieldProps
           }}
           autoselect
           onChange={handleChange}
+          disabled={field.value === CREATE_PIPELINE_RESOURCE}
           filterType={props.filterType}
         />
       </FormGroup>

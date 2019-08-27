@@ -15,7 +15,7 @@ const getRandomChars = (digit = 6): string => {
 };
 
 const getDefinedObj = (objData: ParamData): ParamData => {
-  return _.omitBy(objData, v => _.isUndefined(v) || _.isNull(v) || v === '');
+  return _.omitBy(objData, (v) => _.isUndefined(v) || _.isNull(v) || v === '');
 };
 
 export const createPipelinesResource = (
@@ -34,7 +34,7 @@ export const createPipelinesResource = (
     },
     spec: {
       type,
-      params: _.map(getDefinedObj(params), (value, name) => ({name, value})),
+      params: _.map(getDefinedObj(params), (value, name) => ({ name, value })),
       ...(secretResp && {
         secrets: _.map(secretResp.data, (value, name) => {
           return {

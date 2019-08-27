@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FieldArray } from 'formik';
-import * as _ from 'lodash-es';
+import * as _ from 'lodash';
 import FormSection from '../../import/section/FormSection';
 import PipelineResourceDropdownField from '../../formik-fields/PipelineResourceDropdownField';
 import { PipelineResource } from '../../../utils/pipeline-augment';
@@ -22,14 +22,20 @@ export const PipelineResourcesSection: React.FC<ResourceSectionProps> = ({ resou
         {resources.types.map((type, index) => (
           <FieldArray
             name={type}
+            // eslint-disable-next-line react/no-array-index-key
             key={`${type}-resource-${index}-row`}
-            render={(helpers) => (
+            render={() => (
               <React.Fragment>
                 {resources[type].length > 0 && (
                   <FormSection title={`${_.capitalize(type)} Resources`} fullWidth>
-                    <div className="form-group" key={`${type}-resource-row-group-${index}`}>
-                      {resources[type].map((resource, index) => (
-                        <div className="form-group" key={`resource-${type}-${index}-name`}>
+                    <div
+                      className="form-group"
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={`${type}-resource-row-group-${index}`}
+                    >
+                      {resources[type].map((resource, resIndex) => (
+                        // eslint-disable-next-line react/no-array-index-key
+                        <div className="form-group" key={`resource-${type}-${resIndex}-name`}>
                           <PipelineResourceDropdownField
                             name={`resources.${resource.index}.resourceRef.name`}
                             label={resource.name}
