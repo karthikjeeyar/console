@@ -2,7 +2,7 @@ import * as yup from 'yup';
 
 export const validationSchema = yup.object().shape({
   type: yup.string(),
-  param: yup
+  params: yup
     .object()
     .when('type', {
       is: 'git',
@@ -34,4 +34,11 @@ export const validationSchema = yup.object().shape({
         insecure: yup.boolean(),
       }),
     }),
+  secrets: yup.object().when('type', {
+    is: 'cluster',
+    then: yup.object({
+      cadata: yup.string().required('Required'),
+      token: yup.string(),
+    }),
+  }),
 });

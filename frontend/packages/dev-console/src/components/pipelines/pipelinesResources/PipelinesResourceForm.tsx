@@ -5,16 +5,16 @@ import { RootState } from '@console/internal/redux';
 import { connect } from 'react-redux';
 import { validationSchema } from './pipelineResource-validation-utils';
 import PipelinesResourceParam from './PipelinesResourceParam';
-import { createPipelinesResource } from './pipelinesResource-utils';
+import { createPipelinesResource, createSecretResource } from './pipelinesResource-utils';
 
-export interface PipelineResourceFormProps {
+export interface PipelinesResourceFormProps {
   type: string;
   onCreate: Function;
   onClose: Function;
   namespace: string;
 }
 
-const PipelineResourceForm: React.FC<PipelineResourceFormProps> = ({
+const PipelinesResourceForm: React.FC<PipelinesResourceFormProps> = ({
   type,
   onCreate,
   onClose,
@@ -23,20 +23,20 @@ const PipelineResourceForm: React.FC<PipelineResourceFormProps> = ({
   const initialValues = {
     git: {
       type: 'git',
-      param: {
+      params: {
         url: '',
         revision: '',
       },
     },
     image: {
       type: 'image',
-      param: {
+      params: {
         url: '',
       },
     },
     storage: {
       type: 'storage',
-      param: {
+      params: {
         type: '',
         location: '',
         dir: false,
@@ -44,17 +44,21 @@ const PipelineResourceForm: React.FC<PipelineResourceFormProps> = ({
     },
     cluster: {
       type: 'cluster',
-      param: {
+      params: {
         url: '',
+        username: '',
         password: '',
         insecure: false,
+      },
+      secrets: {
+        cadata: '',
+        token: '',
       },
     },
   };
 
-  const handleSubmit = (values, actions) => {
-    actions.setSubmitting(true);
-    createPipelinesResource(values, namespace)
+  const piplinesResourcesData = (params, actions, secretResp?) => {
+    createPipelinesResource(params, type, namespace, secretResp)
       .then((newObj) => {
         actions.setSubmitting(false);
         onCreate(newObj);
@@ -67,6 +71,22 @@ const PipelineResourceForm: React.FC<PipelineResourceFormProps> = ({
         actions.setSubmitting(false);
         actions.setStatus({ submitError: err.message });
       });
+  };
+
+  const handleSubmit = ({ params, secret }, actions) => {
+    actions.setSubmitting(true);
+    if (!secret) {
+      piplinesResourcesData(params, actions);
+    } else {
+      createSecretResource(secret, type, namespace)
+        .then((secretResp) => {
+          piplinesResourcesData(params, actions, secretResp);
+        })
+        .catch((err) => {
+          actions.setSubmitting(false);
+          actions.setStatus({ submitError: err.message });
+        });
+    }
   };
 
   const handleReset = (values, actions) => {
@@ -89,4 +109,4 @@ const mapStateToProps = (state: RootState) => ({
   namespace: getActiveNamespace(state),
 });
 
-export default connect(mapStateToProps)(PipelineResourceForm);
+export default connect(mapStateToProps)(PipelinesResourceForm);

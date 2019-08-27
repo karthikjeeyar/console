@@ -1,8 +1,11 @@
 import * as _ from 'lodash';
 import { k8sCreate, K8sResourceKind } from '@console/internal/module/k8s';
+import { SecretModel } from '@console/internal/models';
 import { PipelineResourceModel } from '../../../models';
 
-// TODO add interface amd check for values
+export interface ParamData {
+  [key: string]: any;
+}
 
 const getRandomChars = (digit = 6): string => {
   return Math.random()
@@ -10,11 +13,18 @@ const getRandomChars = (digit = 6): string => {
     .replace(/[^a-z0-9]+/g, '')
     .substr(1, digit);
 };
+
+const getDefinedObj = (objData: ParamData): ParamData => {
+  return _.omitBy(objData, v => _.isUndefined(v) || _.isNull(v) || v === '');
+};
+
 export const createPipelinesResource = (
-  values: any,
+  params: ParamData,
+  type: string,
   namespace: string,
+  secretResp: K8sResourceKind,
 ): Promise<K8sResourceKind> => {
-  const resourceName = `${values.type}-${getRandomChars(6)}`;
+  const resourceName = `${type}-${getRandomChars(6)}`;
   const pipelineResource: K8sResourceKind = {
     apiVersion: 'tekton.dev/v1alpha1',
     kind: 'PipelineResource',
@@ -23,10 +33,37 @@ export const createPipelinesResource = (
       namespace,
     },
     spec: {
-      type: values.type,
-      params: _.map(values.param, (value, name) => ({ name, value })),
+      type,
+      params: _.map(getDefinedObj(params), (value, name) => ({name, value})),
+      ...(secretResp && {
+        secrets: _.map(secretResp.data, (value, name) => {
+          return {
+            fieldName: name,
+            secretKey: name,
+            secretName: secretResp.metadata.name,
+          };
+        }),
+      }),
     },
   };
 
   return k8sCreate(PipelineResourceModel, pipelineResource);
+};
+
+export const createSecretResource = (
+  secret: ParamData,
+  type: string,
+  namespace: string,
+): Promise<K8sResourceKind> => {
+  const resourceName = `${type}-secret-${getRandomChars(6)}`;
+  const secretResource = {
+    apiVersion: 'v1',
+    kind: 'Secret',
+    metadata: {
+      name: resourceName,
+      namespace,
+    },
+    stringData: getDefinedObj(secret),
+  };
+  return k8sCreate(SecretModel, secretResource);
 };

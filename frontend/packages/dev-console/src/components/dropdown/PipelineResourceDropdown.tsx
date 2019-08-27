@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as _ from 'lodash-es';
+import * as _ from 'lodash';
 import { Firehose } from '@console/internal/components/utils';
 import { PipelineResourceModel } from '../../models';
 import ResourceDropdown from './ResourceDropdown';

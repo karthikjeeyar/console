@@ -73,3 +73,9 @@ export interface SecretKeyRef {
     name: string;
   };
 }
+
+export interface InputTextAreaFieldProps extends FieldProps {
+  placeholder?: string;
+  onChange?: (event) => void;
+  onBlur?: (event) => void;
+}

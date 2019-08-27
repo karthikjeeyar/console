@@ -6,14 +6,14 @@ const PipelinesGitOptions: React.FC = () => (
   <React.Fragment>
     <InputField
       type={TextInputTypes.text}
-      name="param.url"
+      name="params.url"
       label="Url"
       helpText="Please provide git url"
       required
     />
     <InputField
       type={TextInputTypes.text}
-      name="param.revision"
+      name="params.revision"
       label="Revisions"
       helpText="Please provide Revisions i.e master"
     />

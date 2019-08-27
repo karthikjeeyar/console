@@ -6,20 +6,20 @@ const PipelinesStorageOptions: React.FC = () => (
   <React.Fragment>
     <InputField
       type={TextInputTypes.text}
-      name="param.type"
+      name="params.type"
       label="type"
       helpText="Represents the type of blob storage i.e gcs"
       required
     />
     <InputField
       type={TextInputTypes.text}
-      name="param.location"
+      name="params.location"
       label="location"
       helpText="Represents the location of the blob storage i.e gs://some-private-bucket"
       required
     />
     <CheckboxField
-      name="param.dir"
+      name="params.dir"
       label="dir"
       helpText="Represents whether the blob storage is a directory or not"
     />
