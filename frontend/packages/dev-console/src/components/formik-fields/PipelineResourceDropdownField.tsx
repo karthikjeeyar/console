@@ -27,14 +27,13 @@ const PipelineResourceDropdownField: React.FC<PipelineResourceDropdownFieldProps
 
   const handleChange = React.useCallback(
     (value: string) => {
-      console.log('field', field, value);
       setFieldValue(props.name, value);
       if (value === CREATE_PIPELINE_RESOURCE) {
         setStatus({ subFormsOpened: status.subFormsOpened + 1 });
       }
       setFieldTouched(props.name, true);
     },
-    [field, setFieldValue, props.name, setFieldTouched, setStatus, status.subFormsOpened],
+    [setFieldValue, props.name, setFieldTouched, setStatus, status.subFormsOpened],
   );
 
   return (

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
 import { Form } from '@patternfly/react-core';
+import { FormikValues } from 'formik';
 import {
   ModalTitle,
   ModalBody,
@@ -9,12 +10,10 @@ import {
 import { PipelineResourcesSection } from './PipelineResourcesSection';
 import { PipelineParametersSection } from './PipelineParametersSection';
 
-// add props
-export const StartPipelineForm: React.FC<any> = ({
+export const StartPipelineForm: React.FC<FormikValues> = ({
   values,
   errors,
   handleSubmit,
-  handleReset,
   status,
   isSubmitting,
   dirty,
@@ -42,7 +41,7 @@ export const StartPipelineForm: React.FC<any> = ({
           <PipelineResourcesSection resources={resources} />
         </ModalBody>
         <ModalSubmitFooter
-          errorMessage=""
+          errorMessage={status && status.submitError}
           inProgress={isSubmitting}
           submitText="Start"
           submitDisabled={!dirty || !_.isEmpty(errors) || status.subFormsOpened}

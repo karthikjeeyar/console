@@ -4,13 +4,20 @@ import { TextInputTypes } from '@patternfly/react-core';
 import FormSection from '../../import/section/FormSection';
 import { InputField } from '../../formik-fields';
 
-// add parameters props
-export const PipelineParametersSection: React.FC<any> = ({ parameters }) => (
+export interface ParamertersSectionProps {
+  parameters: {
+    name: string;
+    description?: string;
+    default: string;
+  }[];
+}
+
+export const PipelineParametersSection: React.FC<ParamertersSectionProps> = ({ parameters }) => (
   <FieldArray
     name="parameters"
     key="parameters-row"
-    render={(helpers) => (
-      <>
+    render={() => (
+      <React.Fragment>
         {parameters.length > 0 && (
           <FormSection title="Parameters" fullWidth>
             {parameters.map((parameter, index) => (
@@ -26,7 +33,7 @@ export const PipelineParametersSection: React.FC<any> = ({ parameters }) => (
             ))}
           </FormSection>
         )}
-      </>
+      </React.Fragment>
     )}
   />
 );
