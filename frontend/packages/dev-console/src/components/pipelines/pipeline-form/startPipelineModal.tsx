@@ -46,6 +46,7 @@ export const _startPipelineModalForm: React.FC<any> = ({ pipeline, close }) => {
   return (
     <Formik
       initialValues={initialValues}
+      initialStatus={{subFormsOpened: 0}}
       onSubmit={handleSubmit}
       onReset={handleReset}
       validateOnBlur

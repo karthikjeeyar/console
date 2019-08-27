@@ -45,7 +45,7 @@ export const StartPipelineForm: React.FC<any> = ({
           errorMessage=""
           inProgress={isSubmitting}
           submitText="Start"
-          submitDisabled={!dirty || !_.isEmpty(errors)}
+          submitDisabled={!dirty || !_.isEmpty(errors) || status.subFormsOpened}
           cancel={() => close()}
         />
       </div>

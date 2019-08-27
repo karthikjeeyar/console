@@ -20,9 +20,7 @@ const PipelineResourceDropdownField: React.FC<PipelineResourceDropdownFieldProps
   ...props
 }) => {
   const [field, { touched, error }] = useField(props.name);
-  const { setFieldValue, setFieldTouched, validateField, setFieldError } = useFormikContext<
-    FormikValues
-  >();
+  const { setFieldValue, setFieldTouched, setStatus, status } = useFormikContext<FormikValues>();
   const fieldId = getFieldId(props.name, 'pipeline-resource-dropdown');
   const isValid = !(touched && error);
   const errorMessage = !isValid ? error : '';
@@ -32,12 +30,11 @@ const PipelineResourceDropdownField: React.FC<PipelineResourceDropdownFieldProps
       console.log('field', field, value);
       setFieldValue(props.name, value);
       if (value === CREATE_PIPELINE_RESOURCE) {
-        setFieldError(props.name, 'Complete the form creation');
+        setStatus({ subFormsOpened: status.subFormsOpened + 1 });
       }
       setFieldTouched(props.name, true);
-      validateField(props.name);
     },
-    [field, setFieldValue, props.name, setFieldTouched, validateField, setFieldError],
+    [field, setFieldValue, props.name, setFieldTouched, setStatus, status.subFormsOpened],
   );
 
   return (
@@ -65,15 +62,17 @@ const PipelineResourceDropdownField: React.FC<PipelineResourceDropdownFieldProps
         />
       </FormGroup>
       {field.value === CREATE_PIPELINE_RESOURCE && (
-        <div style={{ marginTop: '10px' }}>
+        <div style={{ marginTop: 'var(--pf-global--spacer--sm)' }}>
           <PipelinesResourceForm
             type={props.filterType}
             onClose={() => {
               setFieldValue(props.name, '');
+              setStatus({ subFormsOpened: status.subFormsOpened - 1 });
             }}
             onCreate={(data) => {
               setTimeout(() => {
                 setFieldValue(props.name, data.metadata.name);
+                setStatus({ subFormsOpened: status.subFormsOpened - 1 });
               }, 500);
             }}
           />
