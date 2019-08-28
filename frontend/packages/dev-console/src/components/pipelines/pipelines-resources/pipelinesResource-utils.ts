@@ -7,14 +7,14 @@ export interface ParamData {
   [key: string]: any;
 }
 
-const getRandomChars = (digit = 6): string => {
+export const getRandomChars = (digit = 6): string => {
   return Math.random()
     .toString(36)
     .replace(/[^a-z0-9]+/g, '')
     .substr(1, digit);
 };
 
-const getDefinedObj = (objData: ParamData): ParamData => {
+export const getDefinedObj = (objData: ParamData): ParamData => {
   return _.omitBy(objData, (v) => _.isUndefined(v) || _.isNull(v) || v === '');
 };
 
