@@ -1,9 +1,16 @@
 import * as React from 'react';
 import { TextInputTypes } from '@patternfly/react-core';
-import { InputField, CheckboxField, InputTextAreaField } from '../../formik-fields';
+import { InputField, DroppableFileInputField } from '../../formik-fields';
 
 const PipelinesClusterOptions: React.FC = () => (
   <React.Fragment>
+    <InputField
+      type={TextInputTypes.text}
+      name="params.name"
+      label="Name"
+      helpText="Name of the cluster."
+      required
+    />
     <InputField
       type={TextInputTypes.text}
       name="params.url"
@@ -24,18 +31,24 @@ const PipelinesClusterOptions: React.FC = () => (
       label="Password"
       helpText="Please provide Password."
     />
-    <CheckboxField
+    <InputField
+      type={TextInputTypes.text}
       name="params.insecure"
       label="Insecure"
-      helpText="Indicate server should be accessed without verifying the TLS certificate"
+      helpText="Indicate server should be accessed without verifying the TLS certificate."
     />
-    <InputTextAreaField
+    <DroppableFileInputField
       name="secrets.cadata"
       label="Cadata"
-      helpText="Please provide CADATA."
+      helpText="The PEM format certificate. Upload file by dragging &amp; dropping, selecting it, or pasting from the clipboard."
       required
     />
-    <InputTextAreaField name="secrets.token" label="Token" helpText="Please provide Token." />
+    <DroppableFileInputField
+      name="secrets.token"
+      label="Token"
+      helpText="Upload file by dragging &amp; dropping, selecting it, or pasting from the clipboard."
+      required
+    />
   </React.Fragment>
 );
 

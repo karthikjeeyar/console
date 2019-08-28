@@ -50,7 +50,7 @@ export const createPipelinesResource = (
   return k8sCreate(PipelineResourceModel, pipelineResource);
 };
 
-export const createSecretResource = ( 
+export const createSecretResource = (
   secret: ParamData,
   type: string,
   namespace: string,

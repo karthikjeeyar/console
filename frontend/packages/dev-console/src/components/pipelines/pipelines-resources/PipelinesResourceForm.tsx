@@ -39,16 +39,17 @@ const PipelinesResourceForm: React.FC<PipelinesResourceFormProps> = ({
       params: {
         type: '',
         location: '',
-        dir: false,
+        dir: '',
       },
     },
     cluster: {
       type: 'cluster',
       params: {
+        name: '',
         url: '',
         username: '',
         password: '',
-        insecure: false,
+        insecure: '',
       },
       secrets: {
         cadata: '',
@@ -57,7 +58,7 @@ const PipelinesResourceForm: React.FC<PipelinesResourceFormProps> = ({
     },
   };
 
-  const piplinesResourcesData = (params, actions, secretResp?) => {
+  const pipelinesResourcesData = (params, actions, secretResp?) => {
     createPipelinesResource(params, type, namespace, secretResp)
       .then((newObj) => {
         actions.setSubmitting(false);
@@ -73,14 +74,14 @@ const PipelinesResourceForm: React.FC<PipelinesResourceFormProps> = ({
       });
   };
 
-  const handleSubmit = ({ params, secret }, actions) => {
+  const handleSubmit = ({ params, secrets }, actions) => {
     actions.setSubmitting(true);
-    if (!secret) {
-      piplinesResourcesData(params, actions);
+    if (!secrets) {
+      pipelinesResourcesData(params, actions);
     } else {
-      createSecretResource(secret, type, namespace)
+      createSecretResource(secrets, type, namespace)
         .then((secretResp) => {
-          piplinesResourcesData(params, actions, secretResp);
+          pipelinesResourcesData(params, actions, secretResp);
         })
         .catch((err) => {
           actions.setSubmitting(false);

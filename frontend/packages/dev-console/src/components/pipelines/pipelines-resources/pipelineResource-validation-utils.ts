@@ -22,16 +22,17 @@ export const validationSchema = yup.object().shape({
       then: yup.object({
         type: yup.string().required('Required'),
         location: yup.string().required('Required'),
-        dir: yup.boolean(),
+        dir: yup.string(),
       }),
     })
     .when('type', {
       is: 'cluster',
       then: yup.object({
+        name: yup.string().required('Required'),
         url: yup.string().required('Required'),
         username: yup.string().required('Required'),
         password: yup.string(),
-        insecure: yup.boolean(),
+        insecure: yup.string(),
       }),
     }),
   secrets: yup.object().when('type', {

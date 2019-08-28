@@ -6,8 +6,8 @@ import { useFormikContext, FormikValues } from 'formik';
 import { ButtonBar } from '@console/internal/components/utils';
 import PipelinesGitOptions from './PipelinesGitOptions';
 import PipelinesImageOptions from './PipelinesImageOptions';
-import PipelinesClusterOptions from './pipelinesClusterOptions';
-import PipelinesStorageOptions from './pipelinesStorageOptions';
+import PipelinesClusterOptions from './PipelinesClusterOptions';
+import PipelinesStorageOptions from './PipelinesStorageOptions';
 import './PipelinesResourceForm.scss';
 
 export interface PipelinesResourceParamProps {
