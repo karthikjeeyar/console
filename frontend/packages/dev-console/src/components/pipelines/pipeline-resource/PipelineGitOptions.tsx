@@ -2,22 +2,22 @@ import * as React from 'react';
 import { TextInputTypes } from '@patternfly/react-core';
 import { InputField } from '../../formik-fields';
 
-const PipelinesGitOptions: React.FC = () => (
+const PipelineGitOptions: React.FC = () => (
   <React.Fragment>
     <InputField
       type={TextInputTypes.text}
       name="params.url"
-      label="Url"
-      helpText="Please provide git url"
+      label="URL"
+      helpText="Please provide git URL."
       required
     />
     <InputField
       type={TextInputTypes.text}
       name="params.revision"
       label="Revisions"
-      helpText="Please provide Revisions i.e master"
+      helpText="Please provide Revisions. i.e master"
     />
   </React.Fragment>
 );
 
-export default PipelinesGitOptions;
+export default PipelineGitOptions;

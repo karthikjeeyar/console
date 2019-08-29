@@ -2,7 +2,7 @@ import * as React from 'react';
 import { TextInputTypes } from '@patternfly/react-core';
 import { InputField, DroppableFileInputField } from '../../formik-fields';
 
-const PipelinesClusterOptions: React.FC = () => (
+const PipelineClusterOptions: React.FC = () => (
   <React.Fragment>
     <InputField
       type={TextInputTypes.text}
@@ -14,8 +14,8 @@ const PipelinesClusterOptions: React.FC = () => (
     <InputField
       type={TextInputTypes.text}
       name="params.url"
-      label="Url"
-      helpText="Host url of the master node."
+      label="URL"
+      helpText="Host URL of the master node."
       required
     />
     <InputField
@@ -52,4 +52,4 @@ const PipelinesClusterOptions: React.FC = () => (
   </React.Fragment>
 );
 
-export default PipelinesClusterOptions;
+export default PipelineClusterOptions;

@@ -1,9 +1,9 @@
 import { cloneDeep } from 'lodash';
-import { validationSchema } from '../pipelines-resources/pipelineResource-validation-utils';
-import { getDefinedObj, getRandomChars } from '../pipelines-resources/pipelinesResource-utils';
+import { validationSchema } from '../pipeline-resource/pipelineResource-validation-utils';
+import { getDefinedObj, getRandomChars } from '../pipeline-resource/pipelineResource-utils';
 import { mockPipelineResourceData } from '../__mocks__/pipeline-resource-mock';
 
-describe('Validation Pipelines Resource', () => {
+describe('Validation Pipeline Resource', () => {
   describe('Validation utils', () => {
     it('should omit properties with empty , undefined values', () => {
       const sampleInput = { a: 1, b: 'test', c: '' };

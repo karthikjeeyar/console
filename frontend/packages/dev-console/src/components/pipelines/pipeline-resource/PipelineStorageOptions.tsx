@@ -2,7 +2,7 @@ import * as React from 'react';
 import { TextInputTypes } from '@patternfly/react-core';
 import { InputField } from '../../formik-fields';
 
-const PipelinesStorageOptions: React.FC = () => (
+const PipelineStorageOptions: React.FC = () => (
   <React.Fragment>
     <InputField
       type={TextInputTypes.text}
@@ -27,4 +27,4 @@ const PipelinesStorageOptions: React.FC = () => (
   </React.Fragment>
 );
 
-export default PipelinesStorageOptions;
+export default PipelineStorageOptions;

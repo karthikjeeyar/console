@@ -18,7 +18,7 @@ export const getDefinedObj = (objData: ParamData): ParamData => {
   return _.omitBy(objData, (v) => _.isUndefined(v) || _.isNull(v) || v === '');
 };
 
-export const createPipelinesResource = (
+export const createPipelineResource = (
   params: ParamData,
   type: string,
   namespace: string,

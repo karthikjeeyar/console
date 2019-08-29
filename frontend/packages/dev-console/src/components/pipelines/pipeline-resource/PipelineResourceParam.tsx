@@ -4,17 +4,17 @@ import { ActionGroup, ButtonVariant, Button } from '@patternfly/react-core';
 import { CheckIcon, CloseIcon } from '@patternfly/react-icons';
 import { useFormikContext, FormikValues } from 'formik';
 import { ButtonBar } from '@console/internal/components/utils';
-import PipelinesGitOptions from './PipelinesGitOptions';
-import PipelinesImageOptions from './PipelinesImageOptions';
-import PipelinesClusterOptions from './PipelinesClusterOptions';
-import PipelinesStorageOptions from './PipelinesStorageOptions';
-import './PipelinesResourceForm.scss';
+import PipelineGitOptions from './PipelineGitOptions';
+import PipelineImageOptions from './PipelineImageOptions';
+import PipelineClusterOptions from './PipelineClusterOptions';
+import PipelineStorageOptions from './PipelineStorageOptions';
+import './PipelineResourceParam.scss';
 
-export interface PipelinesResourceParamProps {
+export interface PipelineResourceParamProps {
   type: string;
 }
 
-const PipelinesResourceParam: React.FC<PipelinesResourceParamProps> = ({ type }) => {
+const PipelineResourceParam: React.FC<PipelineResourceParamProps> = ({ type }) => {
   const { errors, handleReset, status, isSubmitting, dirty, submitForm } = useFormikContext<
     FormikValues
   >();
@@ -25,20 +25,20 @@ const PipelinesResourceParam: React.FC<PipelinesResourceParamProps> = ({ type })
   const resourceComponent = (): React.ReactElement => {
     switch (type) {
       case 'git':
-        return <PipelinesGitOptions />;
+        return <PipelineGitOptions />;
       case 'image':
-        return <PipelinesImageOptions />;
+        return <PipelineImageOptions />;
       case 'cluster':
-        return <PipelinesClusterOptions />;
+        return <PipelineClusterOptions />;
       case 'storage':
-        return <PipelinesStorageOptions />;
+        return <PipelineStorageOptions />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="pipelines-resource-form__content">
+    <div className="odc-pipeline-resource-param__content">
       {resourceComponent()}
       <ButtonBar errorMessage={status && status.submitError} inProgress={isSubmitting}>
         <ActionGroup className="pf-c-form pf-c-form__actions--right pf-c-form__group--no-top-margin">
@@ -47,12 +47,12 @@ const PipelinesResourceParam: React.FC<PipelinesResourceParamProps> = ({ type })
             variant={ButtonVariant.link}
             onClick={handleCreateFormSubmit}
             isDisabled={!dirty || !_.isEmpty(errors)}
-            className="pipelines-resource-form__action-btn"
+            className="odc-pipeline-resource-param__action-btn"
             icon={<CheckIcon />}
           />
           <Button
             type="button"
-            className="pipelines-resource-form__action-btn"
+            className="odc-pipeline-resource-param__action-btn"
             variant={ButtonVariant.plain}
             onClick={handleReset}
           >
@@ -64,4 +64,4 @@ const PipelinesResourceParam: React.FC<PipelinesResourceParamProps> = ({ type })
   );
 };
 
-export default PipelinesResourceParam;
+export default PipelineResourceParam;

@@ -4,17 +4,17 @@ import { getActiveNamespace } from '@console/internal/reducers/ui';
 import { RootState } from '@console/internal/redux';
 import { connect } from 'react-redux';
 import { validationSchema } from './pipelineResource-validation-utils';
-import PipelinesResourceParam from './PipelinesResourceParam';
-import { createPipelinesResource, createSecretResource } from './pipelinesResource-utils';
+import PipelineResourceParam from './PipelineResourceParam';
+import { createPipelineResource, createSecretResource } from './pipelineResource-utils';
 
-export interface PipelinesResourceFormProps {
+export interface PipelineResourceFormProps {
   type: string;
   onCreate: Function;
   onClose: Function;
   namespace: string;
 }
 
-const PipelinesResourceForm: React.FC<PipelinesResourceFormProps> = ({
+const PipelineResourceForm: React.FC<PipelineResourceFormProps> = ({
   type,
   onCreate,
   onClose,
@@ -58,8 +58,8 @@ const PipelinesResourceForm: React.FC<PipelinesResourceFormProps> = ({
     },
   };
 
-  const pipelinesResourcesData = (params, actions, secretResp?) => {
-    createPipelinesResource(params, type, namespace, secretResp)
+  const pipelineResourceData = (params, actions, secretResp?) => {
+    createPipelineResource(params, type, namespace, secretResp)
       .then((newObj) => {
         actions.setSubmitting(false);
         onCreate(newObj);
@@ -77,11 +77,11 @@ const PipelinesResourceForm: React.FC<PipelinesResourceFormProps> = ({
   const handleSubmit = ({ params, secrets }, actions) => {
     actions.setSubmitting(true);
     if (!secrets) {
-      pipelinesResourcesData(params, actions);
+      pipelineResourceData(params, actions);
     } else {
       createSecretResource(secrets, type, namespace)
         .then((secretResp) => {
-          pipelinesResourcesData(params, actions, secretResp);
+          pipelineResourceData(params, actions, secretResp);
         })
         .catch((err) => {
           actions.setSubmitting(false);
@@ -101,7 +101,7 @@ const PipelinesResourceForm: React.FC<PipelinesResourceFormProps> = ({
       onSubmit={handleSubmit}
       onReset={handleReset}
       validationSchema={validationSchema}
-      render={(props) => <PipelinesResourceParam {...props} type={type} />}
+      render={(props) => <PipelineResourceParam {...props} type={type} />}
     />
   );
 };
@@ -110,4 +110,4 @@ const mapStateToProps = (state: RootState) => ({
   namespace: getActiveNamespace(state),
 });
 
-export default connect(mapStateToProps)(PipelinesResourceForm);
+export default connect(mapStateToProps)(PipelineResourceForm);

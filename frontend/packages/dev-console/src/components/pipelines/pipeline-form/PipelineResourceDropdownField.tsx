@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { useField, useFormikContext, FormikValues } from 'formik';
 import { FormGroup } from '@patternfly/react-core';
 import PipelineResourceDropdown from '../../dropdown/PipelineResourceDropdown';
-import PipelinesResourceForm from '../pipelines-resources/PipelinesResourceForm';
+import PipelineResourceForm from '../pipeline-resource/PipelineResourceForm';
 import { DropdownFieldProps } from '../../formik-fields/field-types';
 import { getFieldId } from '../../formik-fields/field-utils';
 
@@ -63,7 +63,7 @@ const PipelineResourceDropdownField: React.FC<PipelineResourceDropdownFieldProps
       </FormGroup>
       {field.value === CREATE_PIPELINE_RESOURCE && (
         <div style={{ marginTop: 'var(--pf-global--spacer--sm)' }}>
-          <PipelinesResourceForm
+          <PipelineResourceForm
             type={props.filterType}
             onClose={() => {
               setFieldValue(props.name, '');
