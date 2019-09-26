@@ -10,8 +10,6 @@ import {
   ElementEntity,
   EntityFactory,
   Graph,
-  Node,
-  Edge,
   Element,
   isEdgeEntity,
   isNodeEntity,
@@ -19,7 +17,7 @@ import {
   State,
   InteractionHandlerFactory,
 } from './types';
-import DefaultEntityFactory from './entities/DefaultEntityFactory';
+import defaultEntityFactory from './entities/defaultEntityFactory';
 
 export default class VisualizationController implements Controller {
   @observable.shallow
@@ -30,7 +28,7 @@ export default class VisualizationController implements Controller {
 
   private widgetFactories: WidgetFactory[] = [];
 
-  private entityFactories: EntityFactory[] = [new DefaultEntityFactory()];
+  private entityFactories: EntityFactory[] = [defaultEntityFactory];
 
   private interactionHandlerFactories: InteractionHandlerFactory[] = [];
 
@@ -50,10 +48,10 @@ export default class VisualizationController implements Controller {
   fromModel(model: Model): void {
     // create entities
     if (model.graph) {
-      this.graph = this.createGraphEntity(model.graph);
+      this.graph = this.createEntity<GraphEntity>(model.graph);
     }
-    model.nodes && model.nodes.forEach((n) => this.createNodeEntity(n));
-    model.edges && model.edges.forEach((e) => this.createEdgeEntity(e));
+    model.nodes && model.nodes.forEach((n) => this.createEntity<NodeEntity>(n));
+    model.edges && model.edges.forEach((e) => this.createEntity<EdgeEntity>(e));
 
     // merge data
     if (model.graph && this.graph) {
@@ -123,7 +121,7 @@ export default class VisualizationController implements Controller {
 
   getWidget(entity: ElementEntity): ComponentType<{ entity: ElementEntity }> {
     for (const factory of this.widgetFactories) {
-      const widget = factory.getWidget(entity);
+      const widget = factory(entity);
       if (widget) {
         return widget;
       }
@@ -143,34 +141,13 @@ export default class VisualizationController implements Controller {
     this.interactionHandlerFactories.push(factory);
   }
 
-  private createGraphEntity(element: Graph): GraphEntity {
+  private createEntity<E extends ElementEntity>(element: Graph): E {
     for (const factory of this.entityFactories) {
-      const entity = factory.createGraphEntity(element.type);
+      const entity = factory(element.type);
       if (entity) {
         this.initEntity(entity, element);
-        return entity;
-      }
-    }
-    throw new Error(`Could not graph entity for: ${JSON.stringify(element)}`);
-  }
-
-  private createNodeEntity(element: Node): NodeEntity {
-    for (const factory of this.entityFactories.reverse()) {
-      const entity = factory.createNodeEntity(element.type);
-      if (entity) {
-        this.initEntity(entity, element);
-        return entity;
-      }
-    }
-    throw new Error(`Could not node entity for: ${JSON.stringify(element)}`);
-  }
-
-  private createEdgeEntity(element: Edge): EdgeEntity {
-    for (const factory of this.entityFactories.reverse()) {
-      const entity = factory.createEdgeEntity(element.type);
-      if (entity) {
-        this.initEntity(entity, element);
-        return entity;
+        // cast to return type
+        return entity as E;
       }
     }
     throw new Error(`Could not graph entity for: ${JSON.stringify(element)}`);
@@ -187,7 +164,7 @@ export default class VisualizationController implements Controller {
 
   private installInteractionHandlers(entity: ElementEntity): void {
     this.interactionHandlerFactories.forEach((f) => {
-      const handlers = f.getInteractionHandlers(entity);
+      const handlers = f(entity);
       if (handlers) {
         handlers.forEach((h) => entity.installInteractionHandler(h));
       }

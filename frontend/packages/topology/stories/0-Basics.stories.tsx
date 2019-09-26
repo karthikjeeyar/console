@@ -1,8 +1,8 @@
 import * as React from 'react';
 import Visualization from '../src/Visualization';
-import DefaultWidgetFactory from '../src/widgets/DefaultWidgetFactory';
+import defaultWidgetFactory from '../src/widgets/defaultWidgetFactory';
 import VisualizationWidget from '../src/VisualizationWidget';
-import { Model, ElementEntity, InteractionHandler } from '../src/types';
+import { Model } from '../src/types';
 import SelectionHandler from '../src/handlers/SelectionHandler';
 
 export default {
@@ -27,7 +27,7 @@ export const singleNode = () => {
     ],
   };
   vis.fromModel(model);
-  vis.registerWidgetFactory(new DefaultWidgetFactory());
+  vis.registerWidgetFactory(defaultWidgetFactory);
   return <VisualizationWidget visualization={vis} />;
 };
 
@@ -64,7 +64,7 @@ export const singleEdge = () => {
     ],
   };
   vis.fromModel(model);
-  vis.registerWidgetFactory(new DefaultWidgetFactory());
+  vis.registerWidgetFactory(defaultWidgetFactory);
   return <VisualizationWidget visualization={vis} />;
 };
 
@@ -91,14 +91,12 @@ export const selection = () => {
       },
     ],
   };
-  vis.registerWidgetFactory(new DefaultWidgetFactory());
-  vis.registerInteractionHandlerFactory({
-    getInteractionHandlers(entity: ElementEntity): InteractionHandler[] | undefined {
-      if (entity.kind === 'node') {
-        return [new SelectionHandler()];
-      }
-      return undefined;
-    },
+  vis.registerWidgetFactory(defaultWidgetFactory);
+  vis.registerInteractionHandlerFactory((entity) => {
+    if (entity.kind === 'node') {
+      return [new SelectionHandler()];
+    }
+    return undefined;
   });
   vis.fromModel(model);
   return <VisualizationWidget visualization={vis} />;

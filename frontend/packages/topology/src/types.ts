@@ -127,7 +127,7 @@ export interface GraphEntity<E extends Graph = Graph, D = any> extends ElementEn
 
 export type State = { [key: string]: any };
 
-export interface Controller extends WidgetFactory {
+export interface Controller {
   getState<S>(): S;
   setState(state: State): void;
   fromModel(model: Model): void;
@@ -145,16 +145,10 @@ export interface Controller extends WidgetFactory {
   registerInteractionHandlerFactory(factory: InteractionHandlerFactory): void;
 }
 
-export interface WidgetFactory {
-  getWidget(entity: ElementEntity): ComponentType<{ entity: ElementEntity }> | undefined;
-}
+export type WidgetFactory = (
+  entity: ElementEntity,
+) => ComponentType<{ entity: ElementEntity }> | undefined;
 
-export interface InteractionHandlerFactory {
-  getInteractionHandlers(entity: ElementEntity): InteractionHandler[] | undefined;
-}
+export type InteractionHandlerFactory = (entity: ElementEntity) => InteractionHandler[] | undefined;
 
-export interface EntityFactory {
-  createGraphEntity<E extends Graph>(type: string): GraphEntity<E> | undefined;
-  createNodeEntity<E extends Node>(type: string): NodeEntity<E> | undefined;
-  createEdgeEntity<E extends Edge>(type: string): EdgeEntity<E> | undefined;
-}
+export type EntityFactory = (type: string) => ElementEntity | undefined;

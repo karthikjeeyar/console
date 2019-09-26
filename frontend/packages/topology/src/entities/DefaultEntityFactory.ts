@@ -1,18 +1,19 @@
-import { GraphEntity, Graph, NodeEntity, EdgeEntity, Node, Edge, EntityFactory } from '../types';
+import { EntityFactory, ElementEntity } from '../types';
 import BaseEdgeEntity from './BaseEdgeEntity';
 import BaseGraphEntity from './BaseGraphEntity';
 import BaseNodeEntity from './BaseNodeEntity';
 
-export default class DefaultEntityFactory implements EntityFactory {
-  createGraphEntity<E extends Graph>(type: string): GraphEntity<E> | undefined {
-    return type === 'graph' ? new BaseGraphEntity() : undefined;
+const defaultEntityFactory: EntityFactory = (type: string): ElementEntity | undefined => {
+  switch (type) {
+    case 'graph':
+      return new BaseGraphEntity();
+    case 'node':
+      return new BaseNodeEntity();
+    case 'edge':
+      return new BaseEdgeEntity();
+    default:
+      return undefined;
   }
+};
 
-  createNodeEntity<E extends Node>(type: string): NodeEntity<E> | undefined {
-    return type === 'node' ? new BaseNodeEntity() : undefined;
-  }
-
-  createEdgeEntity<E extends Edge>(type: string): EdgeEntity<E> | undefined {
-    return type === 'edge' ? new BaseEdgeEntity() : undefined;
-  }
-}
+export default defaultEntityFactory;
