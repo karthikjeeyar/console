@@ -1,4 +1,12 @@
-import { Controller, Model, GraphEntity, WidgetFactory, EntityFactory } from './types';
+import {
+  Controller,
+  Model,
+  GraphEntity,
+  WidgetFactory,
+  EntityFactory,
+  State,
+  InteractionHandlerFactory,
+} from './types';
 import VisualizationController from './VisualizationController';
 
 export default class Visualization {
@@ -26,5 +34,13 @@ export default class Visualization {
 
   registerEntityFactory(factory: EntityFactory): void {
     this.controller.registerEntityFactory(factory);
+  }
+
+  registerInteractionHandlerFactory(factory: InteractionHandlerFactory): void {
+    this.controller.registerInteractionHandlerFactory(factory);
+  }
+
+  setState(state: State): void {
+    this.controller.setState(state);
   }
 }

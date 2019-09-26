@@ -16,6 +16,8 @@ import {
   isEdgeEntity,
   isNodeEntity,
   Model,
+  State,
+  InteractionHandlerFactory,
 } from './types';
 import DefaultEntityFactory from './entities/DefaultEntityFactory';
 
@@ -29,6 +31,21 @@ export default class VisualizationController implements Controller {
   private widgetFactories: WidgetFactory[] = [];
 
   private entityFactories: EntityFactory[] = [new DefaultEntityFactory()];
+
+  private interactionHandlerFactories: InteractionHandlerFactory[] = [];
+
+  @observable.shallow
+  private state = {};
+
+  getState<S = any>(): S {
+    return this.state as S;
+  }
+
+  setState(state: State): void {
+    if (state) {
+      _.assign(this.state, state);
+    }
+  }
 
   fromModel(model: Model): void {
     // create entities
@@ -122,6 +139,10 @@ export default class VisualizationController implements Controller {
     this.entityFactories.push(factory);
   }
 
+  registerInteractionHandlerFactory(factory: InteractionHandlerFactory): void {
+    this.interactionHandlerFactories.push(factory);
+  }
+
   private createGraphEntity(element: Graph): GraphEntity {
     for (const factory of this.entityFactories) {
       const entity = factory.createGraphEntity(element.type);
@@ -161,5 +182,15 @@ export default class VisualizationController implements Controller {
     entity.setType(model.type);
     entity.setController(this);
     this.addEntity(entity);
+    this.installInteractionHandlers(entity);
+  }
+
+  private installInteractionHandlers(entity: ElementEntity): void {
+    this.interactionHandlerFactories.forEach((f) => {
+      const handlers = f.getInteractionHandlers(entity);
+      if (handlers) {
+        handlers.forEach((h) => entity.installInteractionHandler(h));
+      }
+    });
   }
 }

@@ -8,6 +8,7 @@ import {
   isNodeEntity,
   NodeEntity,
   Controller,
+  InteractionHandler,
 } from '../types';
 
 export default abstract class BaseElementEntity<E extends Element = Element, D = any>
@@ -31,16 +32,23 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   @observable.ref
   private controller: Controller;
 
+  @observable.shallow
+  private interactionHandlers: InteractionHandler[];
+
   get kind() {
     return 'node';
   }
 
-  activate(): void {
-    // do nothing
+  installInteractionHandler(handler: InteractionHandler): void {
+    if (!this.interactionHandlers) {
+      this.interactionHandlers = [];
+    }
+    this.interactionHandlers.push(handler);
+    handler.setOwner(this);
   }
 
-  deactivate(): void {
-    // do nothing
+  getInteractionHandlers(): InteractionHandler[] {
+    return this.interactionHandlers || [];
   }
 
   getController(): Controller {

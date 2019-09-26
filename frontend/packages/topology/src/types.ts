@@ -56,6 +56,11 @@ export interface Anchor {
   getReferencePoint(): Point;
 }
 
+export interface InteractionHandler<E extends ElementEntity = ElementEntity> {
+  setOwner(owner: E): void;
+  getProps(): {} | undefined;
+}
+
 export const isGraphEntity = (entity: ElementEntity): entity is GraphEntity => {
   return entity && entity.kind === 'graph';
 };
@@ -70,8 +75,9 @@ export const isEdgeEntity = (entity: ElementEntity): entity is EdgeEntity => {
 
 export interface ElementEntity<E extends Element = Element, D = any> {
   readonly kind: string | 'graph' | 'edge' | 'node';
-  activate(): void;
-  deactivate(): void;
+  // TODO fixed: boolean ?
+  installInteractionHandler(handler: InteractionHandler): void;
+  getInteractionHandlers(): InteractionHandler[];
   isDetached(): boolean;
   getController(): Controller;
   setController(controller?: Controller): void;
@@ -119,7 +125,11 @@ export interface GraphEntity<E extends Graph = Graph, D = any> extends ElementEn
   removeEdge(edge: EdgeEntity): void;
 }
 
+export type State = { [key: string]: any };
+
 export interface Controller extends WidgetFactory {
+  getState<S>(): S;
+  setState(state: State): void;
   fromModel(model: Model): void;
   getGraph(): GraphEntity;
   setGraph(Graph: GraphEntity): void;
@@ -132,10 +142,15 @@ export interface Controller extends WidgetFactory {
   getWidget(entity: ElementEntity): ComponentType<{ entity: ElementEntity }>;
   registerWidgetFactory(factory: WidgetFactory): void;
   registerEntityFactory(factory: EntityFactory): void;
+  registerInteractionHandlerFactory(factory: InteractionHandlerFactory): void;
 }
 
 export interface WidgetFactory {
   getWidget(entity: ElementEntity): ComponentType<{ entity: ElementEntity }> | undefined;
+}
+
+export interface InteractionHandlerFactory {
+  getInteractionHandlers(entity: ElementEntity): InteractionHandler[] | undefined;
 }
 
 export interface EntityFactory {
