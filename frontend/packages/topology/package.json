@@ -1,0 +1,27 @@
+{
+  "name": "@console/topology",
+  "version": "0.0.0-fixed",
+  "description": "Topology",
+  "private": true,
+  "dependencies": {
+    "mobx": "5.13.0",
+    "mobx-react": "5.4.4"
+  },
+  "consolePlugin": {
+    "entry": "src/plugin.tsx"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.0",
+    "@storybook/addon-actions": "^5.2.1",
+    "@storybook/addon-info": "^5.2.1",
+    "@storybook/addon-links": "^5.2.1",
+    "@storybook/addons": "^5.2.1",
+    "@storybook/react": "^5.2.1",
+    "babel-loader": "^8.0.6",
+    "react-docgen-typescript-loader": "^3.2.1"
+  },
+  "scripts": {
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  }
+}
