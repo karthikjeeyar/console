@@ -98,5 +98,8 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     if (model.target) {
       this.target = model.target;
     }
+    if ('bendpoints' in model) {
+      this.bendpoints = model.bendpoints ? model.bendpoints.map((b) => new Point(b[0], b[1])) : [];
+    }
   }
 }

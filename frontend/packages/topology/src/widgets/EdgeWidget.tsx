@@ -9,16 +9,10 @@ type EdgeWidgetProps = {
 const EdgeWidget: React.FC<EdgeWidgetProps> = ({ entity }) => {
   const startPoint = entity.getStartPoint();
   const endPoint = entity.getEndPoint();
-  return (
-    <line
-      strokeWidth={1}
-      stroke="red"
-      x1={startPoint.x}
-      y1={startPoint.y}
-      x2={endPoint.x}
-      y2={endPoint.y}
-    />
-  );
+  const d = `M${startPoint.x} ${startPoint.y} ${entity
+    .getBendpoints()
+    .map((b) => `L${b.x} ${b.y}`)} L${endPoint.x} ${endPoint.y}`;
+  return <path strokeWidth={1} stroke="red" d={d} fill="none" />;
 };
 
 export default widget(EdgeWidget);

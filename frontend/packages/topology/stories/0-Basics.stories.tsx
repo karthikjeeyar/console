@@ -59,6 +59,7 @@ export const singleEdge = () => {
         type: 'edge',
         source: 'n1',
         target: 'n2',
+        bendpoints: [[50, 30], [110, 10]],
       },
     ],
   };
