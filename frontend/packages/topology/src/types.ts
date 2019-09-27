@@ -1,6 +1,7 @@
 import { ComponentType } from 'react';
 import Point from './geom/Point';
 import Rect from './geom/Rect';
+import Dimensions from './geom/Dimensions';
 
 // x, y
 export type PointTuple = [number, number];
@@ -100,11 +101,12 @@ export interface ElementEntity<E extends Element = Element, D = any> {
 }
 
 export interface NodeEntity<E extends Node = Node, D = any> extends ElementEntity<E, D> {
-  // width: number;
-  // height: number;
-  // getPosition(): Point;
-  // setPosition(point: Point): void;
+  getPosition(): Point;
+  setPosition(point: Point): void;
+  getDimensions(): Dimensions;
+  setDimensions(dimensions: Dimensions): void;
   getBoundingBox(): Rect;
+  setBoundingBox(bbox: Rect): void;
   getAnchor(): Anchor;
 }
 

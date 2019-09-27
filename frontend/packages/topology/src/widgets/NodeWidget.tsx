@@ -8,18 +8,16 @@ type NodeWidgetProps = {
 } & SelectionHandlerProps;
 
 const NodeWidget: React.FC<NodeWidgetProps> = ({ entity, selected, onSelect }) => {
-  const bbox = entity.getBoundingBox();
-  const position = bbox.getCenter();
+  const { width, height } = entity.getDimensions();
   return (
-    <g transform={`translate(${position.x}, ${position.y})`} onClick={onSelect}>
-      <ellipse
-        cx={0}
-        cy={0}
-        rx={bbox.width / 2}
-        ry={bbox.height / 2}
-        fill={selected ? 'blue' : 'black'}
-      />
-    </g>
+    <ellipse
+      onClick={onSelect}
+      cx={0}
+      cy={0}
+      rx={width / 2}
+      ry={height / 2}
+      fill={selected ? 'blue' : 'black'}
+    />
   );
 };
 
