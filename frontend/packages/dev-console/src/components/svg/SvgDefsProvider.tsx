@@ -13,7 +13,7 @@ export interface DefsState {
 }
 
 export class Defs extends React.PureComponent<{}, DefsState> {
-  constructor(props) {
+  constructor(props: {}) {
     super(props);
     this.state = {};
   }

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import SvgDefsProvider from '@console/dev-console/src/components/svg/SvgDefsProvider';
 import { GraphEntity } from '../types';
 import widget from './widget';
 import EntityWidget from './EntityWidget';
@@ -9,12 +10,14 @@ type GraphWidgetProps = {
 
 const GraphWidget: React.FC<GraphWidgetProps> = ({ entity }) => (
   <svg style={{ width: '100%', height: '100%', flexGrow: 1, flexShrink: 1 }}>
-    {entity.getNodes().map((e) => (
-      <EntityWidget key={e.getId()} entity={e} />
-    ))}
-    {entity.getEdges().map((e) => (
-      <EntityWidget key={e.getId()} entity={e} />
-    ))}
+    <SvgDefsProvider>
+      {entity.getNodes().map((e) => (
+        <EntityWidget key={e.getId()} entity={e} />
+      ))}
+      {entity.getEdges().map((e) => (
+        <EntityWidget key={e.getId()} entity={e} />
+      ))}
+    </SvgDefsProvider>
   </svg>
 );
 
