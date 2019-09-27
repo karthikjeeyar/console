@@ -4,7 +4,7 @@ import Rect from './geom/Rect';
 
 // x, y
 export type PointTuple = [number, number];
-
+// width, height
 export type DimensionsTuple = [number, number];
 
 export interface Layout {
@@ -125,6 +125,8 @@ export interface GraphEntity<E extends Graph = Graph, D = any> extends ElementEn
   removeEdge(edge: EdgeEntity): void;
 }
 
+export type EventListener<Args extends any[] = any[]> = (...args: Args) => void;
+
 export type State = { [key: string]: any };
 
 export interface Controller {
@@ -143,6 +145,9 @@ export interface Controller {
   registerWidgetFactory(factory: WidgetFactory): void;
   registerEntityFactory(factory: EntityFactory): void;
   registerInteractionHandlerFactory(factory: InteractionHandlerFactory): void;
+  addEventListener<L extends EventListener = EventListener>(type: string, listener: L): void;
+  removeEventListener(type: string, listener: EventListener): void;
+  fireEvent(type: string, ...args: any): void;
 }
 
 export type WidgetFactory = (

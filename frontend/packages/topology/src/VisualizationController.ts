@@ -16,6 +16,7 @@ import {
   Model,
   State,
   InteractionHandlerFactory,
+  EventListener,
 } from './types';
 import defaultEntityFactory from './entities/defaultEntityFactory';
 
@@ -26,14 +27,16 @@ export default class VisualizationController implements Controller {
   @observable.ref
   private graph: GraphEntity | undefined;
 
+  @observable.shallow
+  private state = {};
+
   private widgetFactories: WidgetFactory[] = [];
 
   private entityFactories: EntityFactory[] = [defaultEntityFactory];
 
   private interactionHandlerFactories: InteractionHandlerFactory[] = [];
 
-  @observable.shallow
-  private state = {};
+  private eventListeners: { [type: string]: EventListener[] } = {};
 
   getState<S = any>(): S {
     return this.state as S;
@@ -139,6 +142,41 @@ export default class VisualizationController implements Controller {
 
   registerInteractionHandlerFactory(factory: InteractionHandlerFactory): void {
     this.interactionHandlerFactories.push(factory);
+  }
+
+  addEventListener<L extends EventListener = EventListener>(type: string, listener: L): void {
+    if (!this.eventListeners[type]) {
+      this.eventListeners[type] = [listener];
+    } else {
+      this.eventListeners[type].push(listener);
+    }
+  }
+
+  removeEventListener(type: string, listener: EventListener): void {
+    if (!this.eventListeners[type]) {
+      return;
+    }
+    const listeners = this.eventListeners[type];
+    const l = [];
+    for (let i = 0, { length } = listeners; i < length; i++) {
+      if (listeners[i] !== listener) {
+        l.push(listeners[i]);
+      }
+    }
+    if (l.length) {
+      this.eventListeners[type] = l;
+    } else {
+      delete this.eventListeners[type];
+    }
+  }
+
+  fireEvent(type: string, ...args: any): void {
+    const listeners = this.eventListeners[type];
+    if (listeners) {
+      for (let i = 0, { length } = listeners; i < length; i++) {
+        listeners[i](...args);
+      }
+    }
   }
 
   private createEntity<E extends ElementEntity>(element: Graph): E {

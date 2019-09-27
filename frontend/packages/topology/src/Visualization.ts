@@ -6,6 +6,7 @@ import {
   EntityFactory,
   State,
   InteractionHandlerFactory,
+  EventListener,
 } from './types';
 import VisualizationController from './VisualizationController';
 
@@ -38,6 +39,14 @@ export default class Visualization {
 
   registerInteractionHandlerFactory(factory: InteractionHandlerFactory): void {
     this.controller.registerInteractionHandlerFactory(factory);
+  }
+
+  addEventListener<L extends EventListener = EventListener>(type: string, listener: L): void {
+    this.controller.addEventListener(type, listener);
+  }
+
+  removeEventListener(type: string, listener: EventListener): void {
+    this.controller.removeEventListener(type, listener);
   }
 
   setState(state: State): void {
