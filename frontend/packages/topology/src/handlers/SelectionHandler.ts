@@ -1,4 +1,9 @@
+import { EventListener } from '../types';
 import AbstractInteractionHandler from './AbstractInteractionHandler';
+
+export const SELECTION_EVENT = 'selection';
+
+export type SelectionEventListener = EventListener<[string]>;
 
 // TODO supprt multi selection in the future
 export type SelectionHandlerState = {
@@ -11,6 +16,13 @@ export type SelectionHandlerProps = {
 };
 
 export default class SelectionHandler extends AbstractInteractionHandler<SelectionHandlerState> {
+  private controlled: boolean;
+
+  constructor(controlled: boolean = false) {
+    super();
+    this.controlled = controlled;
+  }
+
   getProps() {
     return {
       selected: this.getOwner().getId() === this.getState().selectedId,
@@ -18,11 +30,20 @@ export default class SelectionHandler extends AbstractInteractionHandler<Selecti
         const id = this.getOwner().getId();
         const state = this.getState();
         const { selectedId } = state;
-        // TODO emit event instead of controlling state here
         if (id === selectedId) {
-          delete state.selectedId;
+          if (!this.controlled) {
+            delete state.selectedId;
+          }
+          this.getOwner()
+            .getController()
+            .fireEvent(SELECTION_EVENT, undefined);
         } else {
-          state.selectedId = id;
+          if (!this.controlled) {
+            state.selectedId = id;
+          }
+          this.getOwner()
+            .getController()
+            .fireEvent(SELECTION_EVENT, id);
         }
       },
     };
