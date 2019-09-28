@@ -67,7 +67,7 @@ export const controlled: React.FC = () => {
   vis.registerWidgetFactory(defaultWidgetFactory);
   vis.registerInteractionHandlerFactory((entity) => {
     if (entity.kind === ModelKind.graph) {
-      return [new PanZoomHandler()];
+      return [new PanZoomHandler(true)];
     }
     return undefined;
   });
