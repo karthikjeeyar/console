@@ -96,9 +96,8 @@ export function hullPath(polyPoints: Point[], hullPadding: number | HullPaddingG
   return segments
     .map((segment, index) => {
       const p0 = index === 0 ? polyPoints[polyPoints.length - 1] : polyPoints[index - 1];
-      const p1 = polyPoints[index];
       return `${index === 0 ? `M ${segments[segments.length - 1][1]} ` : ''}A ${hp(p0)},${hp(
-        p1,
+        p0,
       )},0,0,0,${segment[0]} L ${segment[1]}`;
     })
     .join(' ');

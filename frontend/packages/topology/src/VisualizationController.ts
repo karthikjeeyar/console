@@ -9,26 +9,23 @@ import {
   WidgetFactory,
   ElementEntity,
   EntityFactory,
-  Graph,
   Element,
   isEdgeEntity,
   isNodeEntity,
   Model,
-  State,
   InteractionHandlerFactory,
   EventListener,
+  ModelKind,
 } from './types';
 import defaultEntityFactory from './entities/defaultEntityFactory';
+import Stateful from './utils/Stateful';
 
-export default class VisualizationController implements Controller {
+export default class VisualizationController extends Stateful implements Controller {
   @observable.shallow
   entities: { [id: string]: ElementEntity } = {};
 
   @observable.ref
   private graph: GraphEntity | undefined;
-
-  @observable.shallow
-  private state = {};
 
   private widgetFactories: WidgetFactory[] = [];
 
@@ -38,23 +35,19 @@ export default class VisualizationController implements Controller {
 
   private eventListeners: { [type: string]: EventListener[] } = {};
 
-  getState<S = any>(): S {
-    return this.state as S;
-  }
+  private readonly store = {};
 
-  setState(state: State): void {
-    if (state) {
-      _.assign(this.state, state);
-    }
+  getStore<S = {}>(): S {
+    return this.store as S;
   }
 
   fromModel(model: Model): void {
     // create entities
     if (model.graph) {
-      this.graph = this.createEntity<GraphEntity>(model.graph);
+      this.graph = this.createEntity<GraphEntity>(ModelKind.graph, model.graph);
     }
-    model.nodes && model.nodes.forEach((n) => this.createEntity<NodeEntity>(n));
-    model.edges && model.edges.forEach((e) => this.createEntity<EdgeEntity>(e));
+    model.nodes && model.nodes.forEach((n) => this.createEntity<NodeEntity>(ModelKind.node, n));
+    model.edges && model.edges.forEach((e) => this.createEntity<EdgeEntity>(ModelKind.edge, e));
 
     // merge data
     if (model.graph && this.graph) {
@@ -73,6 +66,11 @@ export default class VisualizationController implements Controller {
         this.removeEntity(entity);
       }
     });
+
+    // TODO where to activate the graph?
+    if (this.graph) {
+      this.graph.activate();
+    }
   }
 
   getGraph(): GraphEntity {
@@ -179,16 +177,16 @@ export default class VisualizationController implements Controller {
     }
   }
 
-  private createEntity<E extends ElementEntity>(element: Graph): E {
+  private createEntity<E extends ElementEntity>(kind: ModelKind, element: Element): E {
     for (const factory of this.entityFactories) {
-      const entity = factory(element.type);
+      const entity = factory(kind, element.type);
       if (entity) {
         this.initEntity(entity, element);
         // cast to return type
         return entity as E;
       }
     }
-    throw new Error(`Could not graph entity for: ${JSON.stringify(element)}`);
+    throw new Error(`Could not create entity for: ${JSON.stringify(element)}`);
   }
 
   private initEntity(entity: ElementEntity, model: Element): void {

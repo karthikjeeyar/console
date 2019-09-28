@@ -8,7 +8,7 @@ type NodeWidgetProps = {
 } & SelectionHandlerProps;
 
 const NodeWidget: React.FC<NodeWidgetProps> = ({ entity, selected, onSelect }) => {
-  const { width, height } = entity.getDimensions();
+  const { width, height } = entity.getBoundingBox();
   return (
     <ellipse
       onClick={onSelect}
@@ -16,7 +16,7 @@ const NodeWidget: React.FC<NodeWidgetProps> = ({ entity, selected, onSelect }) =
       cy={0}
       rx={width / 2}
       ry={height / 2}
-      fill={selected ? 'blue' : 'black'}
+      fill={selected ? 'blue' : 'grey'}
     />
   );
 };

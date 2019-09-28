@@ -1,6 +1,8 @@
 import Point from './Point';
 
 export default class Rect {
+  static readonly EMPTY = new Rect();
+
   width: number = 0;
 
   height: number = 0;
@@ -68,6 +70,24 @@ export default class Rect {
 
   right(): number {
     return this.x + this.width;
+  }
+
+  union({ x, y, width, height }: Rect): Rect {
+    const right = Math.max(this.x + this.width, x + width);
+    const bottom = Math.max(this.y + this.height, y + height);
+    this.x = Math.min(this.x, x);
+    this.y = Math.min(this.y, y);
+    this.width = right - this.x;
+    this.height = bottom - this.y;
+    return this;
+  }
+
+  expand(h: number, v: number): Rect {
+    this.x -= h;
+    this.width += h * 2;
+    this.y -= v;
+    this.height += v * 2;
+    return this;
   }
 
   clone(): Rect {

@@ -1,4 +1,6 @@
 export default class Point {
+  static readonly EMPTY = new Point();
+
   x: number;
 
   y: number;

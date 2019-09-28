@@ -3,46 +3,27 @@ import Rect from '../geom/Rect';
 import { NodeEntity, Anchor, Node } from '../types';
 import EllipseAnchor from '../anchors/EllipseAnchor';
 import Point from '../geom/Point';
-import Dimensions from '../geom/Dimensions';
 import BaseElementEntity from './BaseElementEntity';
 
 export default class BaseNodeEntity<E extends Node = Node, D = any> extends BaseElementEntity<E, D>
   implements NodeEntity<E, D> {
   @observable
-  private position: Point = new Point();
-
-  @observable
-  private dimensions: Dimensions = new Dimensions();
-
-  @observable
-  private bbox: Rect;
+  private bbox: Rect = new Rect();
 
   @observable.ref
   private anchor: Anchor = new EllipseAnchor(this);
 
   getPosition(): Point {
-    return this.position;
+    // TODO make efficient
+    return this.bbox.getCenter();
   }
 
-  setPosition(position: Point): void {
-    this.position = position;
-  }
-
-  getDimensions(): Dimensions {
-    return this.dimensions;
-  }
-
-  setDimensions(dimensions: Dimensions): void {
-    this.dimensions = dimensions;
+  setPosition({ x, y }: Point): void {
+    this.bbox.setCenter(x, y);
   }
 
   getBoundingBox(): Rect {
-    if (this.bbox) {
-      return this.bbox;
-    }
-    const bbox = new Rect(0, 0, this.dimensions.width, this.dimensions.height);
-    bbox.setCenter(this.position.x, this.position.y);
-    return bbox;
+    return this.bbox;
   }
 
   setBoundingBox(bbox: Rect): void {
@@ -55,11 +36,17 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
 
   setModel(model: E): void {
     super.setModel(model);
-    if (model.position) {
-      this.position.setLocation(model.position[0], model.position[1]);
+    if ('x' in model && model.x != null) {
+      this.bbox.x = model.x;
     }
-    if (model.dimensions) {
-      this.dimensions.setSize(model.dimensions[0], model.dimensions[1]);
+    if ('y' in model && model.y != null) {
+      this.bbox.y = model.y;
+    }
+    if ('width' in model && model.width != null) {
+      this.bbox.width = model.width;
+    }
+    if ('height' in model && model.height != null) {
+      this.bbox.height = model.height;
     }
   }
 }

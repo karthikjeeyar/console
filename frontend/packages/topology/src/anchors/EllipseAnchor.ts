@@ -3,13 +3,10 @@ import AbstractAnchor from './AbstractAnchor';
 
 export default class EllipseAnchor extends AbstractAnchor {
   getLocation(reference: Point): Point {
-    const bbox = this.getOwner().getBoundingBox();
-    if (bbox.isEmpty()) {
-      return bbox.getLocation();
+    const r = this.getOwner().getBoundingBox();
+    if (r.isEmpty()) {
+      return r.getLocation();
     }
-    const r = bbox.clone();
-    r.translate(-1, -1);
-    r.resize(1, 1);
     const ref = r
       .getCenter()
       .negate()
@@ -26,9 +23,9 @@ export default class EllipseAnchor extends AbstractAnchor {
     k *= k;
     return r.getCenter().translate(
       // eslint-disable-next-line no-bitwise
-      ~~((r.width * dx) / Math.sqrt(1 + k)),
+      (r.width * dx) / Math.sqrt(1 + k),
       // eslint-disable-next-line no-bitwise
-      ~~((r.height * dy) / Math.sqrt(1 + 1 / k)),
+      (r.height * dy) / Math.sqrt(1 + 1 / k),
     );
   }
 }

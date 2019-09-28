@@ -1,6 +1,6 @@
 import { observable } from 'mobx';
 import * as _ from 'lodash';
-import { GraphEntity, EdgeEntity, NodeEntity, Graph } from '../types';
+import { GraphEntity, EdgeEntity, NodeEntity, Graph, ModelKind } from '../types';
 import BaseElementEntity from './BaseElementEntity';
 
 export default class BaseGraphEntity<E extends Graph = Graph, D = any>
@@ -10,7 +10,7 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
   private edges: string[];
 
   get kind() {
-    return 'graph';
+    return ModelKind.graph;
   }
 
   getNodes(): NodeEntity[] {

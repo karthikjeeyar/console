@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import Visualization from './Visualization';
 import EntityWidget from './widgets/EntityWidget';
 import { State } from './types';
@@ -9,6 +10,7 @@ interface VisualizationWidgetProps {
 }
 
 // eslint-disable-next-line react/prefer-stateless-function
+@observer
 export default class VisualizationWidget extends React.Component<VisualizationWidgetProps> {
   constructor(props: VisualizationWidgetProps) {
     super(props);
@@ -16,7 +18,9 @@ export default class VisualizationWidget extends React.Component<VisualizationWi
   }
 
   componentDidUpdate() {
-    this.props.state && this.props.visualization.setState(this.props.state);
+    setTimeout(() => {
+      this.props.state && this.props.visualization.setState(this.props.state);
+    }, 0);
   }
 
   render() {

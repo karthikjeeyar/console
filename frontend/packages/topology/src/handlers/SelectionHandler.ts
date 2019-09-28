@@ -1,13 +1,14 @@
+import { computed } from 'mobx';
+import { MouseEvent } from 'react';
 import { EventListener } from '../types';
 import AbstractInteractionHandler from './AbstractInteractionHandler';
 
 export const SELECTION_EVENT = 'selection';
 
-export type SelectionEventListener = EventListener<[string]>;
+export type SelectionEventListener = EventListener<[string[]]>;
 
-// TODO supprt multi selection in the future
-export type SelectionHandlerState = {
-  selectedId?: string;
+type SelectionHandlerState = {
+  selectedIds?: string[];
 };
 
 export type SelectionHandlerProps = {
@@ -18,34 +19,51 @@ export type SelectionHandlerProps = {
 export default class SelectionHandler extends AbstractInteractionHandler<SelectionHandlerState> {
   private controlled: boolean;
 
-  constructor(controlled: boolean = false) {
+  private multi: boolean;
+
+  constructor(controlled: boolean = false, multi: boolean = false) {
     super();
     this.controlled = controlled;
+    this.multi = multi;
   }
 
-  getProps() {
-    return {
-      selected: this.getOwner().getId() === this.getState().selectedId,
-      onSelect: () => {
-        const id = this.getOwner().getId();
-        const state = this.getState();
-        const { selectedId } = state;
-        if (id === selectedId) {
-          if (!this.controlled) {
-            delete state.selectedId;
-          }
-          this.getOwner()
-            .getController()
-            .fireEvent(SELECTION_EVENT, undefined);
+  @computed
+  private get selected(): boolean {
+    const { selectedIds } = this.getState();
+    return !!selectedIds && selectedIds.includes(this.getOwner().getId());
+  }
+
+  private onSelect = (e: MouseEvent) => {
+    const id = this.getOwner().getId();
+    const state = this.getState();
+    const idx = state.selectedIds ? state.selectedIds.indexOf(id) : -1;
+    let selectedIds: string[];
+    if (this.multi && (e.ctrlKey || e.metaKey)) {
+      if (!state.selectedIds) {
+        selectedIds = [id];
+      } else {
+        selectedIds = [...state.selectedIds];
+        if (idx === -1) {
+          selectedIds.push(id);
         } else {
-          if (!this.controlled) {
-            state.selectedId = id;
-          }
-          this.getOwner()
-            .getController()
-            .fireEvent(SELECTION_EVENT, id);
+          selectedIds.splice(idx, 1);
         }
-      },
+      }
+    } else if (idx === -1 || this.multi) {
+      selectedIds = [id];
+    } else {
+      selectedIds = [];
+    }
+    if (!this.controlled) {
+      state.selectedIds = selectedIds;
+    }
+    this.fireEvent(SELECTION_EVENT, selectedIds);
+  };
+
+  getProps(): {} | undefined {
+    return {
+      selected: this.selected,
+      onSelect: this.onSelect,
     };
   }
 }

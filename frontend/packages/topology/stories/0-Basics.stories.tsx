@@ -20,8 +20,10 @@ export const singleNode = () => {
       {
         id: 'n1',
         type: 'node',
-        position: [50, 50],
-        dimensions: [20, 20],
+        x: 50,
+        y: 50,
+        width: 20,
+        height: 20,
       },
     ],
   };
@@ -43,14 +45,18 @@ export const singleEdge = () => {
       {
         id: 'n1',
         type: 'node',
-        position: [10, 10],
-        dimensions: [20, 20],
+        x: 10,
+        y: 10,
+        width: 20,
+        height: 20,
       },
       {
         id: 'n2',
         type: 'node',
-        position: [200, 50],
-        dimensions: [100, 30],
+        x: 200,
+        y: 50,
+        width: 100,
+        height: 30,
       },
     ],
     edges: [
@@ -67,3 +73,51 @@ export const singleEdge = () => {
   vis.registerWidgetFactory(defaultWidgetFactory);
   return <VisualizationWidget visualization={vis} />;
 };
+
+const groupStory = (groupType: string) => {
+  const vis = new Visualization();
+  const model: Model = {
+    graph: {
+      id: 'g1',
+      type: 'graph',
+      children: ['gr1'],
+    },
+    nodes: [
+      {
+        id: 'gr1',
+        type: groupType,
+        children: ['n1', 'n2', 'n3'],
+      },
+      {
+        id: 'n1',
+        type: 'node',
+        x: 50,
+        y: 50,
+        width: 30,
+        height: 30,
+      },
+      {
+        id: 'n2',
+        type: 'node',
+        x: 200,
+        y: 20,
+        width: 10,
+        height: 10,
+      },
+      {
+        id: 'n3',
+        type: 'node',
+        x: 150,
+        y: 100,
+        width: 20,
+        height: 20,
+      },
+    ],
+  };
+  vis.fromModel(model);
+  vis.registerWidgetFactory(defaultWidgetFactory);
+  return <VisualizationWidget visualization={vis} />;
+};
+
+export const group = () => groupStory('group');
+export const groupHull = () => groupStory('group-hull');

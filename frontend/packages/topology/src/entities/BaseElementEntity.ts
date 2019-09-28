@@ -9,9 +9,12 @@ import {
   NodeEntity,
   Controller,
   InteractionHandler,
+  ModelKind,
 } from '../types';
+import Stateful from '../utils/Stateful';
 
 export default abstract class BaseElementEntity<E extends Element = Element, D = any>
+  extends Stateful
   implements ElementEntity<E, D> {
   private id: string;
 
@@ -35,8 +38,30 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   @observable.shallow
   private interactionHandlers: InteractionHandler[];
 
+  private active = false;
+
+  isActive(): boolean {
+    return this.active;
+  }
+
+  activate(): void {
+    if (!this.active) {
+      this.active = true;
+      this.getInteractionHandlers().forEach((h) => h.activate());
+      this.getChildren().forEach((c) => c.activate());
+    }
+  }
+
+  deactivate(): void {
+    if (this.active) {
+      this.active = false;
+      this.getChildren().forEach((c) => c.deactivate());
+      this.getInteractionHandlers().forEach((h) => h.deactivate());
+    }
+  }
+
   get kind() {
-    return 'node';
+    return ModelKind.node;
   }
 
   installInteractionHandler(handler: InteractionHandler): void {
@@ -83,7 +108,16 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   }
 
   setParent(parent: ElementEntity): void {
-    this.parent = parent;
+    if (this.parent !== parent) {
+      if (this.parent) {
+        this.deactivate();
+        this.remove();
+      }
+      this.parent = parent;
+      if (parent && parent.isActive()) {
+        this.activate();
+      }
+    }
   }
 
   getId(): string {
@@ -165,7 +199,7 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
         controller.getEntityById(id).remove(),
       );
 
-      this.children = _.clone(model.children);
+      this.children = model.children.slice();
 
       // ensure parent references are set
       this.children.forEach((id) => controller.getNodeById(id).setParent(this));

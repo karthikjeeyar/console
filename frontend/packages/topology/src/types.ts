@@ -1,12 +1,9 @@
 import { ComponentType } from 'react';
 import Point from './geom/Point';
 import Rect from './geom/Rect';
-import Dimensions from './geom/Dimensions';
 
 // x, y
 export type PointTuple = [number, number];
-// width, height
-export type DimensionsTuple = [number, number];
 
 export interface Layout {
   type: string;
@@ -32,8 +29,10 @@ export interface Element {
 
 export interface Node extends Element {
   layoutConstraints?: LayoutConstraint[];
-  position?: PointTuple;
-  dimensions?: DimensionsTuple;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
 }
 
 export interface Edge extends Element {
@@ -60,6 +59,8 @@ export interface Anchor {
 export interface InteractionHandler<E extends ElementEntity = ElementEntity> {
   setOwner(owner: E): void;
   getProps(): {} | undefined;
+  activate(): void;
+  deactivate(): void;
 }
 
 export const isGraphEntity = (entity: ElementEntity): entity is GraphEntity => {
@@ -74,9 +75,16 @@ export const isEdgeEntity = (entity: ElementEntity): entity is EdgeEntity => {
   return entity && entity.kind === 'edge';
 };
 
-export interface ElementEntity<E extends Element = Element, D = any> {
-  readonly kind: string | 'graph' | 'edge' | 'node';
-  // TODO fixed: boolean ?
+export enum ModelKind {
+  graph = 'graph',
+  node = 'node',
+  edge = 'edge',
+}
+export interface ElementEntity<E extends Element = Element, D = any> extends WithState {
+  readonly kind: ModelKind;
+  isActive(): boolean;
+  activate(): void;
+  deactivate(): void;
   installInteractionHandler(handler: InteractionHandler): void;
   getInteractionHandlers(): InteractionHandler[];
   isDetached(): boolean;
@@ -103,8 +111,6 @@ export interface ElementEntity<E extends Element = Element, D = any> {
 export interface NodeEntity<E extends Node = Node, D = any> extends ElementEntity<E, D> {
   getPosition(): Point;
   setPosition(point: Point): void;
-  getDimensions(): Dimensions;
-  setDimensions(dimensions: Dimensions): void;
   getBoundingBox(): Rect;
   setBoundingBox(bbox: Rect): void;
   getAnchor(): Anchor;
@@ -131,9 +137,13 @@ export type EventListener<Args extends any[] = any[]> = (...args: Args) => void;
 
 export type State = { [key: string]: any };
 
-export interface Controller {
-  getState<S>(): S;
+export interface WithState {
+  getState<S extends {} = {}>(): S;
   setState(state: State): void;
+}
+
+export interface Controller extends WithState {
+  getStore<S extends {} = {}>(): S;
   fromModel(model: Model): void;
   getGraph(): GraphEntity;
   setGraph(Graph: GraphEntity): void;
@@ -158,4 +168,4 @@ export type WidgetFactory = (
 
 export type InteractionHandlerFactory = (entity: ElementEntity) => InteractionHandler[] | undefined;
 
-export type EntityFactory = (type: string) => ElementEntity | undefined;
+export type EntityFactory = (kind: ModelKind, type: string) => ElementEntity | undefined;

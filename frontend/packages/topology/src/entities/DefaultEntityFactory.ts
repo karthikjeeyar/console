@@ -1,15 +1,15 @@
-import { EntityFactory, ElementEntity } from '../types';
+import { EntityFactory, ElementEntity, ModelKind } from '../types';
 import BaseEdgeEntity from './BaseEdgeEntity';
 import BaseGraphEntity from './BaseGraphEntity';
 import BaseNodeEntity from './BaseNodeEntity';
 
-const defaultEntityFactory: EntityFactory = (type: string): ElementEntity | undefined => {
-  switch (type) {
-    case 'graph':
+const defaultEntityFactory: EntityFactory = (kind: ModelKind): ElementEntity | undefined => {
+  switch (kind) {
+    case ModelKind.graph:
       return new BaseGraphEntity();
-    case 'node':
+    case ModelKind.node:
       return new BaseNodeEntity();
-    case 'edge':
+    case ModelKind.edge:
       return new BaseEdgeEntity();
     default:
       return undefined;

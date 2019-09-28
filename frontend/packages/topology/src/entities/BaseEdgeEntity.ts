@@ -1,7 +1,7 @@
 // import { computed } from 'mobx';
 import { observable } from 'mobx';
 import Point from '../geom/Point';
-import { EdgeEntity, NodeEntity, Edge } from '../types';
+import { EdgeEntity, NodeEntity, Edge, ModelKind } from '../types';
 import BaseElementEntity from './BaseElementEntity';
 
 export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends BaseElementEntity<E, D>
@@ -16,7 +16,7 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
   private bendpoints: Point[];
 
   get kind() {
-    return 'edge';
+    return ModelKind.edge;
   }
 
   // @computed (switch to getter)

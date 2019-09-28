@@ -1,26 +1,43 @@
 import * as React from 'react';
-import { ElementEntity, isNodeEntity } from '../types';
+import { ElementEntity, isNodeEntity, isGraphEntity } from '../types';
 import widget from './widget';
 
 type EntityWidgetProps = {
   entity: ElementEntity;
 };
 
-const EntityWidget: React.FC<EntityWidgetProps> = ({ entity }) => {
-  const props = entity.getInteractionHandlers().reduce((a, v) => ({ ...v.getProps() }), {});
+// in a separate widget component so that changes to interaction handlers do not re-render children
+const EntityComponent: React.FC<EntityWidgetProps> = widget(({ entity }) => {
+  const props = {
+    ...entity.getInteractionHandlers().reduce((a, v) => ({ ...v.getProps() }), {}),
+    ...entity.getState(),
+  };
   const Component = entity.getController().getWidget(entity);
-  let result = (
-    <Component {...props} entity={entity}>
-      {entity.getChildren().map((c) => (
-        <EntityWidget key={c.getId()} entity={c} />
-      ))}
-    </Component>
-  );
+  return <Component {...props} entity={entity} />;
+});
+
+const EntityWidget: React.FC<EntityWidgetProps> = widget(({ entity }) => {
+  const component = <EntityComponent entity={entity} />;
+  if (isGraphEntity(entity)) {
+    return component;
+  }
+  const children = entity.getChildren().map((c) => <EntityWidget key={c.getId()} entity={c} />);
+  const commonProps = { [`data-${entity.kind}-id`]: entity.getId() };
   if (isNodeEntity(entity)) {
     const { x, y } = entity.getPosition();
-    result = <g transform={`translate(${x}, ${y})`}>{result}</g>;
+    return (
+      <g {...commonProps} transform={`translate(${x}, ${y})`}>
+        {component}
+        {children}
+      </g>
+    );
   }
-  return result;
-};
+  return (
+    <g {...commonProps}>
+      {component}
+      {children}
+    </g>
+  );
+});
 
-export default widget(EntityWidget);
+export default EntityWidget;

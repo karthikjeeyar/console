@@ -1,7 +1,7 @@
 import { InteractionHandler, ElementEntity } from '../types';
 
 export default abstract class AbstractInteractionHandler<
-  S = any,
+  S = {},
   E extends ElementEntity = ElementEntity
 > implements InteractionHandler {
   private owner: E;
@@ -22,5 +22,19 @@ export default abstract class AbstractInteractionHandler<
 
   getProps(): {} | undefined {
     return undefined;
+  }
+
+  fireEvent(type: string, ...args: any): void {
+    this.getOwner()
+      .getController()
+      .fireEvent(type, ...args);
+  }
+
+  activate(): void {
+    // do nothing
+  }
+
+  deactivate(): void {
+    // do nothing
   }
 }
