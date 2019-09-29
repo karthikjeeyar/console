@@ -1,8 +1,12 @@
+import { observable } from 'mobx';
+
 export default class Point {
   static readonly EMPTY = new Point();
 
+  @observable
   x: number;
 
+  @observable
   y: number;
 
   static fromPoint(point: Point): Point {

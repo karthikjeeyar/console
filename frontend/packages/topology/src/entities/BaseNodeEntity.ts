@@ -7,8 +7,8 @@ import BaseElementEntity from './BaseElementEntity';
 
 export default class BaseNodeEntity<E extends Node = Node, D = any> extends BaseElementEntity<E, D>
   implements NodeEntity<E, D> {
-  @observable
-  private bbox: Rect = new Rect();
+  @observable.ref
+  private bbox: Rect = observable(new Rect());
 
   @observable.ref
   private anchor: Anchor = new EllipseAnchor(this);
@@ -27,7 +27,7 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
   }
 
   setBoundingBox(bbox: Rect): void {
-    this.bbox = bbox;
+    this.bbox.setBounds(bbox.x, bbox.y, bbox.width, bbox.height);
   }
 
   getAnchor(): Anchor {

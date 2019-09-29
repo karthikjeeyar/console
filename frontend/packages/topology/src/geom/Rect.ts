@@ -1,14 +1,19 @@
 import Point from './Point';
+import { observable } from 'mobx';
 
 export default class Rect {
   static readonly EMPTY = new Rect();
 
+  @observable
   width: number = 0;
 
+  @observable
   height: number = 0;
 
+  @observable
   x: number = 0;
 
+  @observable
   y: number = 0;
 
   static fromRect(rect: Rect): Rect {
@@ -87,6 +92,14 @@ export default class Rect {
     this.width += h * 2;
     this.y -= v;
     this.height += v * 2;
+    return this;
+  }
+
+  setBounds(x: number, y: number, width: number, height: number) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
     return this;
   }
 

@@ -160,6 +160,7 @@ export interface Controller extends WithState {
   addEventListener<L extends EventListener = EventListener>(type: string, listener: L): void;
   removeEventListener(type: string, listener: EventListener): void;
   fireEvent(type: string, ...args: any): void;
+  getEntities(): ElementEntity[];
 }
 
 export type WidgetFactory = (

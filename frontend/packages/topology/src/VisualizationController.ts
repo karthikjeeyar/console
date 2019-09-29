@@ -88,6 +88,11 @@ export default class VisualizationController extends Stateful implements Control
     graph.setController(this);
   }
 
+  getEntities(): ElementEntity[] {
+    // TODO make efficient
+    return _.values(this.entities);
+  }
+
   addEntity(entity: ElementEntity): void {
     if (this.entities[entity.getId()]) {
       throw new Error(`Duplicate entity for ID '${entity.getId()}`);

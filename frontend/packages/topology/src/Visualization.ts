@@ -1,3 +1,4 @@
+import { action } from 'mobx';
 import {
   Controller,
   Model,
@@ -7,6 +8,7 @@ import {
   State,
   InteractionHandlerFactory,
   EventListener,
+  ElementEntity,
 } from './types';
 import VisualizationController from './VisualizationController';
 
@@ -21,12 +23,17 @@ export default class Visualization {
     }
   }
 
+  @action
   fromModel(model: Model): void {
     this.controller.fromModel(model);
   }
 
   getRoot(): GraphEntity {
     return this.controller.getGraph();
+  }
+
+  getEntities(): ElementEntity[] {
+    return this.controller.getEntities();
   }
 
   registerWidgetFactory(factory: WidgetFactory) {
@@ -49,6 +56,7 @@ export default class Visualization {
     this.controller.removeEventListener(type, listener);
   }
 
+  @action
   setState(state: State): void {
     this.controller.setState(state);
   }

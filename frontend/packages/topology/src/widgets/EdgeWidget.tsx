@@ -19,7 +19,7 @@ const EdgeWidget: React.FC<EdgeWidgetProps> = ({ entity }) => {
     .join('')}L${endPoint.x} ${endPoint.y}`;
   return (
     <>
-      <SvgArrowMarker id={TARGET_ARROW_MARKER_ID} nodeSize={0} markerSize={12} />
+      <SvgArrowMarker id={TARGET_ARROW_MARKER_ID} nodeSize={0} markerSize={5} />
       <path
         strokeWidth={1}
         stroke="red"
