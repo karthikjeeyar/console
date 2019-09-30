@@ -45,8 +45,8 @@ export const singleEdge = () => {
       {
         id: 'n1',
         type: 'node',
-        x: 10,
-        y: 10,
+        x: 20,
+        y: 20,
         width: 20,
         height: 20,
       },

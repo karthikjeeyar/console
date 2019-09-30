@@ -1,5 +1,5 @@
-import Point from './Point';
 import { observable } from 'mobx';
+import Point from './Point';
 
 export default class Rect {
   static readonly EMPTY = new Rect();

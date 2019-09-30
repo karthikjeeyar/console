@@ -1,6 +1,7 @@
 import { InteractionHandler, ElementEntity } from '../types';
 
 export default abstract class AbstractInteractionHandler<
+  P = {},
   S = {},
   E extends ElementEntity = ElementEntity
 > implements InteractionHandler {
@@ -20,7 +21,7 @@ export default abstract class AbstractInteractionHandler<
     this.owner = owner;
   }
 
-  getProps(): {} | undefined {
+  getProps(): P | undefined {
     return undefined;
   }
 

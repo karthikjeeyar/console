@@ -15,6 +15,8 @@ import {
   Node,
 } from '../src/types';
 import PanZoomHandler from '../src/handlers/PanZoomHandler';
+import DragHandler from '../src/handlers/DragHandler';
+import GroupDragHandler from '../src/handlers/GroupDragHandler';
 import data from './data/miserables';
 
 export default {
@@ -158,6 +160,12 @@ export const force = () => {
   vis.registerInteractionHandlerFactory((entity) => {
     if (entity.kind === ModelKind.graph) {
       return [new PanZoomHandler()];
+    }
+    if (entity.getType().startsWith('group')) {
+      return [new GroupDragHandler()];
+    }
+    if (entity.kind === ModelKind.node) {
+      return [new DragHandler()];
     }
     return undefined;
   });

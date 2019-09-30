@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { SelectionHandlerProps } from '../handlers/SelectionHandler';
+import { DragHandlerProps } from '../handlers/DragHandler';
 import { NodeEntity } from '../types';
 import Rect from '../geom/Rect';
 import Layer from '../layers/Layer';
@@ -7,9 +8,10 @@ import widget from './widget';
 
 type GroupWidgetProps = {
   entity: NodeEntity;
-} & SelectionHandlerProps;
+} & SelectionHandlerProps &
+  DragHandlerProps;
 
-const GroupWidget: React.FC<GroupWidgetProps> = ({ entity, selected, onSelect }) => {
+const GroupWidget: React.FC<GroupWidgetProps> = ({ entity, selected, onSelect, dragRef }) => {
   const children = entity.getChildren();
   if (children.length === 0) {
     return null;
@@ -23,6 +25,7 @@ const GroupWidget: React.FC<GroupWidgetProps> = ({ entity, selected, onSelect })
   return (
     <Layer id="groups">
       <rect
+        ref={dragRef}
         onClick={onSelect}
         x={box.x}
         y={box.y}

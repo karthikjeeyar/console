@@ -13,10 +13,13 @@ type SelectionHandlerState = {
 
 export type SelectionHandlerProps = {
   selected: boolean;
-  onSelect: () => void;
+  onSelect: (e: MouseEvent) => void;
 };
 
-export default class SelectionHandler extends AbstractInteractionHandler<SelectionHandlerState> {
+export default class SelectionHandler extends AbstractInteractionHandler<
+  SelectionHandlerProps,
+  SelectionHandlerState
+> {
   private controlled: boolean;
 
   private multi: boolean;
@@ -33,7 +36,7 @@ export default class SelectionHandler extends AbstractInteractionHandler<Selecti
     return !!selectedIds && selectedIds.includes(this.getOwner().getId());
   }
 
-  private onSelect = (e: MouseEvent) => {
+  private onSelect = (e: MouseEvent): void => {
     const id = this.getOwner().getId();
     const state = this.getState();
     const idx = state.selectedIds ? state.selectedIds.indexOf(id) : -1;
@@ -60,7 +63,7 @@ export default class SelectionHandler extends AbstractInteractionHandler<Selecti
     this.fireEvent(SELECTION_EVENT, selectedIds);
   };
 
-  getProps(): {} | undefined {
+  getProps(): SelectionHandlerProps {
     return {
       selected: this.selected,
       onSelect: this.onSelect,

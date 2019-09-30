@@ -3,19 +3,26 @@ import { polygonHull } from 'd3-polygon';
 import * as _ from 'lodash';
 import { hullPath } from '@console/dev-console/src/utils/svg-utils';
 import { SelectionHandlerProps } from '../handlers/SelectionHandler';
+import { DragHandlerProps } from '../handlers/DragHandler';
 import Layer from '../layers/Layer';
 import { NodeEntity, PointTuple } from '../types';
 import widget from './widget';
 
 type GroupHullWidgetProps = {
   entity: NodeEntity;
-} & SelectionHandlerProps;
+} & SelectionHandlerProps &
+  DragHandlerProps;
 
 type PointWithSize = PointTuple | [number, number, number];
 
 const hullPadding = (point: PointWithSize) => (point[2] || 0) + 10;
 
-const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({ entity, selected, onSelect }) => {
+const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
+  entity,
+  selected,
+  onSelect,
+  dragRef,
+}) => {
   const children = entity.getChildren();
   if (children.length === 0) {
     return null;
@@ -36,6 +43,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({ entity, selected, onS
   return (
     <Layer id="groups">
       <path
+        ref={dragRef}
         onClick={onSelect}
         d={containerPath}
         fill="#ededed"

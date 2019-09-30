@@ -24,6 +24,7 @@ export type PanZoomHandlerProps = {
 const ZOOM_EXTENT: [number, number] = [0.25, 4];
 
 export default class PanZoomHandler extends AbstractInteractionHandler<
+  PanZoomHandlerProps,
   PanZoomTransformState,
   GraphEntity
 > {
@@ -53,7 +54,7 @@ export default class PanZoomHandler extends AbstractInteractionHandler<
     this.extent = extent;
   }
 
-  getProps() {
+  getProps(): PanZoomHandlerProps {
     return {
       panZoomRef: this.panZoomRef,
       panZoomTransform: this.getState().panZoomTransform,

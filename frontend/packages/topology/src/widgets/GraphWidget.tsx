@@ -26,15 +26,20 @@ const EntityChildren: React.FC<EntityProps> = widget(({ entity }) => {
   );
 });
 
+// This inner Component will prevent re-rendering layers when the panZoomTransform changes
+const Inner: React.FC<EntityProps> = React.memo(({ entity }) => (
+  <LayersProvider layers={['groups', DEFAULT_LAYER]}>
+    <EntityChildren entity={entity} />
+  </LayersProvider>
+));
+
 const GraphWidget: React.FC<GraphWidgetProps> = ({ entity, panZoomRef, panZoomTransform }) => {
   return (
     <svg style={{ width: '100%', height: '100%', flexGrow: 1, flexShrink: 1 }}>
       <SvgDefsProvider>
-        <LayersProvider layers={['groups', DEFAULT_LAYER]}>
-          <g ref={panZoomRef} transform={panZoomTransform && panZoomTransform.toString()}>
-            <EntityChildren entity={entity} />
-          </g>
-        </LayersProvider>
+        <g ref={panZoomRef} transform={panZoomTransform && panZoomTransform.toString()}>
+          <Inner entity={entity} />
+        </g>
       </SvgDefsProvider>
     </svg>
   );

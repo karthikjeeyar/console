@@ -37,7 +37,7 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     this.target = target.getId();
   }
 
-  // TODO make readonyly
+  // TODO make readonly
   getBendpoints(): Point[] {
     return this.bendpoints || [];
   }

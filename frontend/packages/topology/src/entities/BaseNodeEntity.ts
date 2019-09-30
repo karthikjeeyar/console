@@ -36,17 +36,28 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
 
   setModel(model: E): void {
     super.setModel(model);
-    if ('x' in model && model.x != null) {
-      this.bbox.x = model.x;
-    }
-    if ('y' in model && model.y != null) {
-      this.bbox.y = model.y;
-    }
+    // update width and height before position
     if ('width' in model && model.width != null) {
       this.bbox.width = model.width;
     }
     if ('height' in model && model.height != null) {
       this.bbox.height = model.height;
+    }
+    let c;
+    if ('x' in model && model.x != null) {
+      if (!c) {
+        c = this.bbox.getCenter();
+      }
+      c[0] = model.x;
+    }
+    if ('y' in model && model.y != null) {
+      if (!c) {
+        c = this.bbox.getCenter();
+      }
+      c[1] = model.y;
+    }
+    if (c) {
+      this.bbox.setCenter(c[0], c[1]);
     }
   }
 }
