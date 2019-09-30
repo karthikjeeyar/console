@@ -3,6 +3,7 @@ import { polygonHull } from 'd3-polygon';
 import * as _ from 'lodash';
 import { hullPath } from '@console/dev-console/src/utils/svg-utils';
 import { SelectionHandlerProps } from '../handlers/SelectionHandler';
+import Layer from '../layers/Layer';
 import { NodeEntity, PointTuple } from '../types';
 import widget from './widget';
 
@@ -33,13 +34,15 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({ entity, selected, onS
   }
   const containerPath = hullPath(hullPoints, hullPadding);
   return (
-    <path
-      onClick={onSelect}
-      d={containerPath}
-      fill="#ededed"
-      strokeWidth={selected ? 2 : 0}
-      stroke={selected ? 'blue' : undefined}
-    />
+    <Layer id="groups">
+      <path
+        onClick={onSelect}
+        d={containerPath}
+        fill="#ededed"
+        strokeWidth={2}
+        stroke={selected ? 'blue' : '#cdcdcd'}
+      />
+    </Layer>
   );
 };
 

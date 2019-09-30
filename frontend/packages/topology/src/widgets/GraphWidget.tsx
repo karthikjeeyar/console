@@ -2,6 +2,7 @@ import * as React from 'react';
 import SvgDefsProvider from '@console/dev-console/src/components/svg/SvgDefsProvider';
 import { GraphEntity } from '../types';
 import { PanZoomHandlerProps } from '../handlers/PanZoomHandler';
+import LayersProvider, { DEFAULT_LAYER } from '../layers/LayersProvider';
 import widget from './widget';
 import EntityWidget from './EntityWidget';
 
@@ -29,9 +30,11 @@ const GraphWidget: React.FC<GraphWidgetProps> = ({ entity, panZoomRef, panZoomTr
   return (
     <svg style={{ width: '100%', height: '100%', flexGrow: 1, flexShrink: 1 }}>
       <SvgDefsProvider>
-        <g ref={panZoomRef} transform={panZoomTransform && panZoomTransform.toString()}>
-          <EntityChildren entity={entity} />
-        </g>
+        <LayersProvider layers={['groups', DEFAULT_LAYER]}>
+          <g ref={panZoomRef} transform={panZoomTransform && panZoomTransform.toString()}>
+            <EntityChildren entity={entity} />
+          </g>
+        </LayersProvider>
       </SvgDefsProvider>
     </svg>
   );

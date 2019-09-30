@@ -111,7 +111,7 @@ export default class VisualizationController extends Stateful implements Control
 
   getNodeById(id: string): NodeEntity {
     const node = this.entities[id];
-    if (node && !isNodeEntity(node)) {
+    if (!node || !isNodeEntity(node)) {
       throw new Error(`No node found with ID '${id}'.`);
     }
     return node;
@@ -119,7 +119,7 @@ export default class VisualizationController extends Stateful implements Control
 
   getEdgeById(id: string): EdgeEntity {
     const edge = this.entities[id];
-    if (edge && !isEdgeEntity(edge)) {
+    if (!edge || !isEdgeEntity(edge)) {
       throw new Error(`No edge found with ID '${id}'.`);
     }
     return edge;

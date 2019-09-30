@@ -2,6 +2,7 @@ import * as React from 'react';
 import { SelectionHandlerProps } from '../handlers/SelectionHandler';
 import { NodeEntity } from '../types';
 import Rect from '../geom/Rect';
+import Layer from '../layers/Layer';
 import widget from './widget';
 
 type GroupWidgetProps = {
@@ -20,16 +21,18 @@ const GroupWidget: React.FC<GroupWidgetProps> = ({ entity, selected, onSelect })
   // add padding
   box.expand(10, 10);
   return (
-    <rect
-      onClick={onSelect}
-      x={box.x}
-      y={box.y}
-      width={box.width}
-      height={box.height}
-      fill="#ededed"
-      strokeWidth={selected ? 2 : 0}
-      stroke={selected ? 'blue' : undefined}
-    />
+    <Layer id="groups">
+      <rect
+        onClick={onSelect}
+        x={box.x}
+        y={box.y}
+        width={box.width}
+        height={box.height}
+        fill="#ededed"
+        strokeWidth={2}
+        stroke={selected ? 'blue' : '#cdcdcd'}
+      />
+    </Layer>
   );
 };
 
