@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { action } from 'mobx';
-import { NodeEntity } from '../types';
+import { NodeEntity, isGraphEntity } from '../types';
 import AbstractInteractionHandler from './AbstractInteractionHandler';
 
 export type DragHandlerProps = {
@@ -20,14 +20,16 @@ export default class DragHandler extends AbstractInteractionHandler<
           .container(
             // TODO bridge the gap between scene tree and dom tree
             () =>
-              d3
-                .select(node.ownerSVGElement)
-                .select(
-                  `[data-id=${this.getOwner()
-                    .getParent()
-                    .getId()}]`,
-                )
-                .node() as any,
+              isGraphEntity(this.getOwner().getParent())
+                ? node.parentNode
+                : (d3
+                    .select(node.ownerSVGElement)
+                    .select(
+                      `[data-id=${this.getOwner()
+                        .getParent()
+                        .getId()}]`,
+                    )
+                    .node() as any),
           )
           .on(
             'drag',
