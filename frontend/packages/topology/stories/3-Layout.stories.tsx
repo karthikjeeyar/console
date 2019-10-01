@@ -182,7 +182,8 @@ export const force = () => {
   const d3links = entities.filter((e) => isEdgeEntity(e)).map((e: EdgeEntity) => new D3Link(e));
 
   // create force simulation
-  d3.forceSimulation<D3Node>()
+  const simulation = d3
+    .forceSimulation<D3Node>()
     .force('collide', d3.forceCollide<D3Node>().radius((d) => d.getRadius() + 5))
     .force('charge', d3.forceManyBody())
     .force('center', d3.forceCenter(cx, cy))
@@ -201,6 +202,10 @@ export const force = () => {
     .on(
       'tick',
       action(() => {
+        // speed up the simulation
+        for (let i = 0; i < 10; i++) {
+          simulation.tick();
+        }
         d3nodes.forEach((d) => d.update());
       }),
     )
