@@ -122,7 +122,9 @@ export interface EdgeEntity<E extends Edge = Edge, D = any> extends ElementEntit
   getTarget(): NodeEntity;
   setTarget(target: NodeEntity): void;
   getStartPoint(): Point;
+  setStartPoint(x?: number, y?: number): void;
   getEndPoint(): Point;
+  setEndPoint(x?: number, y?: number): void;
   getBendpoints(): Point[];
 }
 
