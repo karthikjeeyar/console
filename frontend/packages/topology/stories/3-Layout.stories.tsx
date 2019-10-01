@@ -3,7 +3,6 @@ import * as d3 from 'd3';
 import * as _ from 'lodash';
 import { action } from 'mobx';
 import Visualization from '../src/Visualization';
-import defaultWidgetFactory from '../src/widgets/defaultWidgetFactory';
 import VisualizationWidget from '../src/VisualizationWidget';
 import {
   Model,
@@ -14,10 +13,14 @@ import {
   ModelKind,
   Node,
 } from '../src/types';
-import PanZoomHandler from '../src/handlers/PanZoomHandler';
-import DragHandler from '../src/handlers/DragHandler';
-import GroupDragHandler from '../src/handlers/GroupDragHandler';
+import { withGroupDrag } from '../src/behavior/useGroupDrag';
+import { withPanZoom } from '../src/behavior/usePanZoom';
+import { withDrag } from '../src/behavior/useDrag';
+import GraphWidget from '../src/widgets/GraphWidget';
+import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 import data from './data/miserables';
+import NodeWidget from './widgets/NodeWidget';
+import GroupHullWidget from './widgets/GroupHullWidget';
 
 export default {
   title: 'Layout',
@@ -157,20 +160,22 @@ export const force = () => {
   };
 
   // init pan zoom
-  vis.registerInteractionHandlerFactory((entity) => {
+
+  vis.registerWidgetFactory(defaultWidgetFactory);
+
+  vis.registerWidgetFactory((entity) => {
     if (entity.kind === ModelKind.graph) {
-      return [new PanZoomHandler()];
+      return withPanZoom()(GraphWidget);
     }
-    if (entity.getType().startsWith('group')) {
-      return [new GroupDragHandler()];
+    if (entity.getType() === 'group-hull') {
+      return withGroupDrag(GroupHullWidget);
     }
     if (entity.kind === ModelKind.node) {
-      return [new DragHandler()];
+      return withDrag(NodeWidget);
     }
     return undefined;
   });
   vis.fromModel(model);
-  vis.registerWidgetFactory(defaultWidgetFactory);
 
   const entities = vis.getEntities();
   // create d3 nodes

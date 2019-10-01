@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import Visualization from '../src/Visualization';
-import defaultWidgetFactory from '../src/widgets/defaultWidgetFactory';
 import VisualizationWidget from '../src/VisualizationWidget';
 import { Model, ModelKind, Node } from '../src/types';
-import SelectionHandler, {
+import {
+  withSelection,
   SELECTION_EVENT,
   SelectionEventListener,
-} from '../src/handlers/SelectionHandler';
+} from '../src/behavior/useSelection';
+import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 
 export default {
   title: 'Selection',
@@ -46,12 +47,13 @@ const create2NodeModel = (): Model => ({
 
 export const uncontrolled: React.FC = () => {
   const vis = new Visualization();
-  vis.registerWidgetFactory(defaultWidgetFactory);
-  vis.registerInteractionHandlerFactory((entity) => {
-    if (entity.kind === 'node') {
-      return [new SelectionHandler()];
+  vis.registerWidgetFactory((entity) => {
+    const widget = defaultWidgetFactory(entity);
+    if (entity.kind === ModelKind.node) {
+      // TODO fix any type
+      return withSelection(false, false)(widget as any);
     }
-    return undefined;
+    return widget;
   });
   vis.fromModel(create2NodeModel());
   vis.addEventListener<SelectionEventListener>(SELECTION_EVENT, (id) => {
@@ -62,12 +64,13 @@ export const uncontrolled: React.FC = () => {
 
 export const controlled = () => {
   const vis = new Visualization();
-  vis.registerWidgetFactory(defaultWidgetFactory);
-  vis.registerInteractionHandlerFactory((entity) => {
+  vis.registerWidgetFactory((entity) => {
+    const widget = defaultWidgetFactory(entity);
     if (entity.kind === ModelKind.node) {
-      return [new SelectionHandler(true)];
+      // TODO fix any type
+      return withSelection(false, false)(widget as any);
     }
-    return undefined;
+    return widget;
   });
   vis.fromModel(create2NodeModel());
   const Component = () => {
@@ -85,12 +88,13 @@ export const controlled = () => {
 
 export const multiSelect: React.FC = () => {
   const vis = new Visualization();
-  vis.registerWidgetFactory(defaultWidgetFactory);
-  vis.registerInteractionHandlerFactory((entity) => {
-    if (entity.kind === 'node') {
-      return [new SelectionHandler(false, true)];
+  vis.registerWidgetFactory((entity) => {
+    const widget = defaultWidgetFactory(entity);
+    if (entity.kind === ModelKind.node) {
+      // TODO fix any type
+      return withSelection(true, false)(widget as any);
     }
-    return undefined;
+    return widget;
   });
   vis.fromModel(create2NodeModel());
   vis.addEventListener<SelectionEventListener>(SELECTION_EVENT, (id) => {
@@ -101,12 +105,13 @@ export const multiSelect: React.FC = () => {
 
 export const performance = () => {
   const vis = new Visualization();
-  vis.registerWidgetFactory(defaultWidgetFactory);
-  vis.registerInteractionHandlerFactory((entity) => {
+  vis.registerWidgetFactory((entity) => {
+    const widget = defaultWidgetFactory(entity);
     if (entity.kind === ModelKind.node) {
-      return [new SelectionHandler()];
+      // TODO fix any type
+      return withSelection(true, false)(widget as any);
     }
-    return undefined;
+    return widget;
   });
   const model: Model = {
     graph: {

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import Visualization from '../src/Visualization';
-import defaultWidgetFactory from '../src/widgets/defaultWidgetFactory';
 import VisualizationWidget from '../src/VisualizationWidget';
 import { Model } from '../src/types';
+import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 
 export default {
   title: 'Basic',

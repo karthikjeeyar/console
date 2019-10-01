@@ -1,13 +1,15 @@
 import * as React from 'react';
 import Visualization from '../src/Visualization';
-import defaultWidgetFactory from '../src/widgets/defaultWidgetFactory';
 import VisualizationWidget from '../src/VisualizationWidget';
 import { Model, ModelKind } from '../src/types';
-import PanZoomHandler, {
+import {
+  withPanZoom,
   PanZoomEventListener,
   PAN_ZOOM_EVENT,
   PanZoomTransform,
-} from '../src/handlers/PanZoomHandler';
+} from '../src/behavior/usePanZoom';
+import GraphWidget from '../src/widgets/GraphWidget';
+import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 
 export default {
   title: 'Pan Zoom',
@@ -47,9 +49,9 @@ const model: Model = {
 export const uncontrolled: React.FC = () => {
   const vis = new Visualization();
   vis.registerWidgetFactory(defaultWidgetFactory);
-  vis.registerInteractionHandlerFactory((entity) => {
+  vis.registerWidgetFactory((entity) => {
     if (entity.kind === ModelKind.graph) {
-      return [new PanZoomHandler()];
+      return withPanZoom(false)(GraphWidget);
     }
     return undefined;
   });
@@ -65,9 +67,9 @@ export const uncontrolled: React.FC = () => {
 export const controlled: React.FC = () => {
   const vis = new Visualization();
   vis.registerWidgetFactory(defaultWidgetFactory);
-  vis.registerInteractionHandlerFactory((entity) => {
+  vis.registerWidgetFactory((entity) => {
     if (entity.kind === ModelKind.graph) {
-      return [new PanZoomHandler(true)];
+      return withPanZoom(true)(GraphWidget);
     }
     return undefined;
   });

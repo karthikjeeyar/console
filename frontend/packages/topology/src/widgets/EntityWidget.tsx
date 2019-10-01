@@ -1,7 +1,7 @@
 import * as React from 'react';
 import LayerXYContext from '../layers/LayerXYContext';
 import { ElementEntity, isNodeEntity, isGraphEntity } from '../types';
-import widget from './widget';
+import widget from '../widget';
 
 type EntityWidgetProps = {
   entity: ElementEntity;

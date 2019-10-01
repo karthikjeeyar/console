@@ -1,16 +1,16 @@
 import * as React from 'react';
 import SvgDefsProvider from '@console/dev-console/src/components/svg/SvgDefsProvider';
 import { GraphEntity } from '../types';
-import { PanZoomHandlerProps } from '../handlers/PanZoomHandler';
+import { WithPanZoomProps } from '../behavior/usePanZoom';
 import LayersProvider, { DEFAULT_LAYER } from '../layers/LayersProvider';
-import widget from './widget';
+import widget from '../widget';
 import EntityWidget from './EntityWidget';
 
 type EntityProps = {
   entity: GraphEntity;
 };
 
-type GraphWidgetProps = EntityProps & PanZoomHandlerProps;
+type GraphWidgetProps = EntityProps & WithPanZoomProps;
 
 // This inner Component will prevent the re-rendering of all children when the panZoomTransform changes
 const EntityChildren: React.FC<EntityProps> = widget(({ entity }) => {
@@ -37,7 +37,13 @@ const GraphWidget: React.FC<GraphWidgetProps> = ({ entity, panZoomRef, panZoomTr
   return (
     <svg style={{ width: '100%', height: '100%', flexGrow: 1, flexShrink: 1 }}>
       <SvgDefsProvider>
-        <g ref={panZoomRef} transform={panZoomTransform && panZoomTransform.toString()}>
+        <g
+          ref={panZoomRef}
+          transform={panZoomTransform && panZoomTransform.toString()}
+          data-id={entity.getId()}
+          data-kind={entity.kind}
+          data-type={entity.getType()}
+        >
           <Inner entity={entity} />
         </g>
       </SvgDefsProvider>
