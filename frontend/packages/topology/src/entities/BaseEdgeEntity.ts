@@ -15,6 +15,12 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
   @observable.shallow
   private bendpoints: Point[];
 
+  @observable.ref
+  private startPoint?: Point;
+
+  @observable.ref
+  private endPoint?: Point;
+
   get kind(): ModelKind {
     return ModelKind.edge;
   }
@@ -44,6 +50,9 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
 
   // @computed (switch to getter)
   getStartPoint(): Point {
+    if (this.startPoint) {
+      return this.startPoint;
+    }
     const bendpoints = this.getBendpoints();
     let referencePoint: Point;
     if (bendpoints && bendpoints.length > 0) {
@@ -63,8 +72,21 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     return source.getAnchor().getLocation(referencePoint);
   }
 
+  setStartPoint(x?: number, y?: number): void {
+    if (x == null || y == null) {
+      this.startPoint = undefined;
+    } else if (this.startPoint) {
+      this.startPoint.setLocation(x, y);
+    } else {
+      this.startPoint = new Point(x, y);
+    }
+  }
+
   // @computed (switch to getter)
   getEndPoint(): Point {
+    if (this.endPoint) {
+      return this.endPoint;
+    }
     const bendpoints = this.getBendpoints();
     let referencePoint: Point;
     if (bendpoints && bendpoints.length > 0) {
@@ -82,6 +104,16 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
       throw new Error('Cannot compute end point. Missing target.');
     }
     return target.getAnchor().getLocation(referencePoint);
+  }
+
+  setEndPoint(x?: number, y?: number): void {
+    if (x == null || y == null) {
+      this.endPoint = undefined;
+    } else if (this.endPoint) {
+      this.endPoint.setLocation(x, y);
+    } else {
+      this.endPoint = new Point(x, y);
+    }
   }
 
   remove(): void {
