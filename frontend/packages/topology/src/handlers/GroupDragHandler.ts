@@ -15,17 +15,31 @@ export default class GroupDragHandler extends AbstractInteractionHandler<
   private dragRef = (node: SVGElement | null): void => {
     if (node) {
       d3.select(node).call(
-        d3.drag().on(
-          'drag',
-          action(() => {
-            const { dx, dy } = d3.event;
-            this.getOwner()
-              .getChildren()
-              .forEach((c) => {
-                c.getBoundingBox().translate(dx, dy);
-              });
-          }),
-        ),
+        d3
+          .drag()
+          .container(
+            // TODO bridge the gap between scene tree and dom tree
+            () =>
+              d3
+                .select(node.ownerSVGElement)
+                .select(
+                  `[data-id=${this.getOwner()
+                    .getParent()
+                    .getId()}]`,
+                )
+                .node() as any,
+          )
+          .on(
+            'drag',
+            action(() => {
+              const { dx, dy } = d3.event;
+              this.getOwner()
+                .getChildren()
+                .forEach((c) => {
+                  c.getBoundingBox().translate(dx, dy);
+                });
+            }),
+          ),
       );
     }
   };
