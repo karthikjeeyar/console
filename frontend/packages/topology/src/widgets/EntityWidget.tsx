@@ -29,7 +29,15 @@ const EntityWidget: React.FC<EntityWidgetProps> = widget(({ entity }) => {
     [`data-type`]: entity.getType(),
   };
   if (isNodeEntity(entity)) {
-    const { x, y } = entity.getPosition();
+    // accumulate all the parent node positions
+    let { x, y } = entity.getPosition();
+    let p = entity.getParent();
+    while (isNodeEntity(p)) {
+      const { x: px, y: py } = p.getPosition();
+      x += px;
+      y += py;
+      p = p.getParent();
+    }
     return (
       <g {...commonProps} transform={`translate(${x}, ${y})`}>
         <LayerXYContext.Provider value={{ x, y }}>
