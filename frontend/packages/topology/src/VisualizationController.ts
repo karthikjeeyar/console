@@ -136,15 +136,15 @@ export default class VisualizationController extends Stateful implements Control
   }
 
   registerWidgetFactory(factory: WidgetFactory) {
-    this.widgetFactories.push(factory);
+    this.widgetFactories.unshift(factory);
   }
 
   registerEntityFactory(factory: EntityFactory): void {
-    this.entityFactories.push(factory);
+    this.entityFactories.unshift(factory);
   }
 
   registerInteractionHandlerFactory(factory: InteractionHandlerFactory): void {
-    this.interactionHandlerFactories.push(factory);
+    this.interactionHandlerFactories.unshift(factory);
   }
 
   addEventListener<L extends EventListener = EventListener>(type: string, listener: L): void {
