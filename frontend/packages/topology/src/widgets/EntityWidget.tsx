@@ -17,12 +17,20 @@ const EntityComponent: React.FC<EntityWidgetProps> = widget(({ entity }) => {
   return <Component {...props} entity={entity} />;
 });
 
+const EntityChildren: React.FC<EntityWidgetProps> = widget(({ entity }) => {
+  return (
+    <>
+      {entity.getChildren().map((c) => (
+        <EntityWidget key={c.getId()} entity={c} />
+      ))}
+    </>
+  );
+});
+
 const EntityWidget: React.FC<EntityWidgetProps> = widget(({ entity }) => {
-  const component = <EntityComponent entity={entity} />;
   if (isGraphEntity(entity)) {
-    return component;
+    return <EntityComponent entity={entity} />;
   }
-  const children = entity.getChildren().map((c) => <EntityWidget key={c.getId()} entity={c} />);
   const commonProps = {
     [`data-id`]: entity.getId(),
     [`data-kind`]: entity.kind,
@@ -41,16 +49,16 @@ const EntityWidget: React.FC<EntityWidgetProps> = widget(({ entity }) => {
     return (
       <g {...commonProps} transform={`translate(${x}, ${y})`}>
         <LayerXYContext.Provider value={{ x, y }}>
-          {component}
-          {children}
+          {<EntityComponent entity={entity} />}
+          {<EntityChildren entity={entity} />}
         </LayerXYContext.Provider>
       </g>
     );
   }
   return (
     <g {...commonProps}>
-      {component}
-      {children}
+      {<EntityComponent entity={entity} />}
+      {<EntityChildren entity={entity} />}
     </g>
   );
 });
