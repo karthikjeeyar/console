@@ -1,6 +1,6 @@
 import { observable } from 'mobx';
 import Rect from '../geom/Rect';
-import { NodeEntity, Anchor, Node } from '../types';
+import { NodeEntity, Anchor, Node, ModelKind } from '../types';
 import EllipseAnchor from '../anchors/EllipseAnchor';
 import Point from '../geom/Point';
 import BaseElementEntity from './BaseElementEntity';
@@ -12,6 +12,10 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
 
   @observable.ref
   private anchor: Anchor = new EllipseAnchor(this);
+
+  get kind(): ModelKind {
+    return ModelKind.node;
+  }
 
   getPosition(): Point {
     // TODO make efficient

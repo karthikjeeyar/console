@@ -9,7 +9,7 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
   @observable
   private edges: string[];
 
-  get kind() {
+  get kind(): ModelKind {
     return ModelKind.graph;
   }
 

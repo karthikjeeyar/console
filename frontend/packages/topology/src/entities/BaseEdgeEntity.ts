@@ -15,7 +15,7 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
   @observable.shallow
   private bendpoints: Point[];
 
-  get kind() {
+  get kind(): ModelKind {
     return ModelKind.edge;
   }
 

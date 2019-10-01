@@ -60,8 +60,8 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
     }
   }
 
-  get kind() {
-    return ModelKind.node;
+  get kind(): ModelKind {
+    throw new Error('Not implemented');
   }
 
   installInteractionHandler(handler: InteractionHandler): void {
