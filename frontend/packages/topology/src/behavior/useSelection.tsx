@@ -11,11 +11,6 @@ type SelectionHandlerState = {
   selectedIds?: string[];
 };
 
-export type SelectionHandlerProps = {
-  selected: boolean;
-  onSelect: (e: React.MouseEvent) => void;
-};
-
 type OnSelect = (e: React.MouseEvent) => void;
 
 export const useSelection = (

@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { WithDragProps } from '../../src/behavior/useDrag';
-import { SelectionHandlerProps } from '../../src/behavior/useSelection';
+import { WithSelectionProps } from '../../src/behavior/useSelection';
 import { NodeEntity } from '../../src/types';
 import widget from '../../src/widget';
 
 type NodeWidgetProps = {
   entity: NodeEntity;
-} & SelectionHandlerProps &
+} & WithSelectionProps &
   WithDragProps;
 
 const NodeWidget: React.FC<NodeWidgetProps> = ({ entity, selected, onSelect, dragRef }) => {
