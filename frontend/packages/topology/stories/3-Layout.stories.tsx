@@ -161,10 +161,9 @@ export const force = () => {
     edges,
   };
 
-  // init pan zoom
-
   vis.registerWidgetFactory(defaultWidgetFactory);
 
+  // support pan zoom and drag
   vis.registerWidgetFactory((entity) => {
     if (entity.kind === ModelKind.graph) {
       return withPanZoom()(GraphWidget);
@@ -292,9 +291,8 @@ export const Dagre = () => {
     edges,
   };
 
-  // init pan zoom
   vis.registerWidgetFactory(defaultWidgetFactory);
-
+  // support pan zoom and drag
   vis.registerWidgetFactory((entity) => {
     if (entity.kind === ModelKind.graph) {
       return withPanZoom(false, [0.1, 5])(GraphWidget);
