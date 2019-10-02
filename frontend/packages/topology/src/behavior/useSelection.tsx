@@ -24,7 +24,7 @@ export const useSelection = (
   controlled: boolean = false,
 ): [boolean, OnSelect] => {
   const selected = useComputed(() => {
-    const { selectedIds } = entity.getController().getState();
+    const { selectedIds } = entity.getController().getState<SelectionHandlerState>();
     return !!selectedIds && selectedIds.includes(entity.getId());
   });
   const onSelect = React.useCallback(
