@@ -17,7 +17,7 @@ export const useGroupDrag = (entity: NodeEntity): DragRef => {
               () =>
                 d3
                   .select(node.ownerSVGElement)
-                  .select(`[data-id=${entity.getParent().getId()}]`)
+                  .select(`[data-id="${entity.getParent().getId()}"]`)
                   .node() as any,
             )
             .on(
