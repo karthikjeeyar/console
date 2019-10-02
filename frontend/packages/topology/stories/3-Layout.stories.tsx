@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as d3 from 'd3';
+import * as dagre from 'dagre';
 import * as _ from 'lodash';
 import { action } from 'mobx';
 import Visualization from '../src/Visualization';
@@ -12,6 +13,7 @@ import {
   isNodeEntity,
   ModelKind,
   Node,
+  Edge,
 } from '../src/types';
 import { withGroupDrag } from '../src/behavior/useGroupDrag';
 import { withPanZoom } from '../src/behavior/usePanZoom';
@@ -215,5 +217,98 @@ export const force = () => {
       }),
     )
     .restart();
+  return <VisualizationWidget visualization={vis} />;
+};
+
+export const Dagre = () => {
+  const vis = new Visualization();
+  const graph = new dagre.graphlib.Graph({ compound: true });
+  graph.setGraph({
+    marginx: 0,
+    marginy: 0,
+    nodesep: 50,
+    ranker: 'tight-tree',
+  });
+
+  // create nodes from data
+  const nodes: Node[] = data.nodes.map((d) => {
+    // randomize size somewhat
+    const width = 10 + d.id.length;
+    const height = 10 + d.id.length;
+    return {
+      id: d.id,
+      type: 'node',
+      width,
+      height,
+      x: 0,
+      y: 0,
+      data: d,
+    };
+  });
+
+  // create groups from data
+  const groupNodes: Node[] = _.map(_.groupBy(nodes, (n) => n.data.group), (v, k) => ({
+    type: 'group-hull',
+    id: k,
+    children: v.map((n: Node) => n.id),
+    label: `group-${k}`,
+  }));
+
+  _.forEach(nodes, (node) => {
+    graph.setNode(node.id, node);
+    graph.setParent(node.id, node.data.group);
+  });
+
+  // create links from data
+  const edges = data.links.map((d) => ({
+    data: d,
+    ...d,
+    id: `${d.source}_${d.target}`,
+    type: 'edge',
+    label: '',
+  }));
+
+  _.forEach(edges, (edge) => {
+    graph.setEdge(edge.data.source, edge.data.target, edge);
+  });
+
+  dagre.layout(graph);
+
+  _.forEach(edges, (edge: Edge) => {
+    if (edge.points && edge.points.length > 2) {
+      edge.bendpoints = edge.points.slice(1, -1).map((point: any) => [point.x, point.y]);
+    }
+  });
+
+  // create topology model
+  const model: Model = {
+    graph: {
+      id: 'g1',
+      type: 'graph',
+      children: groupNodes.map((n) => n.id),
+      edges: edges.map((e) => e.id),
+    },
+    nodes: [...nodes, ...groupNodes],
+    edges,
+  };
+
+  // init pan zoom
+  vis.registerWidgetFactory(defaultWidgetFactory);
+
+  vis.registerWidgetFactory((entity) => {
+    if (entity.kind === ModelKind.graph) {
+      return withPanZoom(false, [0.1, 5])(GraphWidget);
+    }
+    if (entity.getType() === 'group-hull') {
+      return withGroupDrag(GroupHullWidget);
+    }
+    if (entity.kind === ModelKind.node) {
+      return withDrag(NodeWidget);
+    }
+    return undefined;
+  });
+
+  vis.fromModel(model);
+
   return <VisualizationWidget visualization={vis} />;
 };

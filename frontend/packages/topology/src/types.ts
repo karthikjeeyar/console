@@ -39,6 +39,7 @@ export interface Edge extends Element {
   source?: string;
   target?: string;
   bendpoints?: PointTuple[];
+  points?: { x: number; y: number }[]; // Used by Dagre layout
 }
 
 export interface LayoutNode extends Node {
