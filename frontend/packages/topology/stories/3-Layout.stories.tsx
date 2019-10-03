@@ -23,6 +23,7 @@ import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 import data from './data/miserables';
 import NodeWidget from './widgets/NodeWidget';
 import GroupHullWidget from './widgets/GroupHullWidget';
+import GroupWidget from './widgets/GroupWidget';
 
 export default {
   title: 'Layout',
@@ -142,12 +143,15 @@ export const force = () => {
     children: v.map((n: Node) => n.id),
   }));
   // create links from data
-  const edges = data.links.map((d) => ({
-    data: d,
-    ...d,
-    id: `${d.source}_${d.target}`,
-    type: 'edge',
-  }));
+  const edges = data.links.map(
+    (d): Edge => ({
+      data: d,
+      source: d.source,
+      target: d.target,
+      id: `${d.source}_${d.target}`,
+      type: 'edge',
+    }),
+  );
 
   // create topology model
   const model: Model = {
@@ -219,6 +223,10 @@ export const force = () => {
   return <VisualizationWidget visualization={vis} />;
 };
 
+type DagreEdge = Edge & {
+  points?: { x: number; y: number }[];
+};
+
 export const Dagre = () => {
   const vis = new Visualization();
   const graph = new dagre.graphlib.Graph({ compound: true });
@@ -259,13 +267,15 @@ export const Dagre = () => {
   });
 
   // create links from data
-  const edges = data.links.map((d) => ({
-    data: d,
-    ...d,
-    id: `${d.source}_${d.target}`,
-    type: 'edge',
-    label: '',
-  }));
+  const edges = data.links.map(
+    (d): DagreEdge => ({
+      data: d,
+      source: d.source,
+      target: d.target,
+      id: `${d.source}_${d.target}`,
+      type: 'edge',
+    }),
+  );
 
   _.forEach(edges, (edge) => {
     graph.setEdge(edge.data.source, edge.data.target, edge);
@@ -273,7 +283,7 @@ export const Dagre = () => {
 
   dagre.layout(graph);
 
-  _.forEach(edges, (edge: Edge) => {
+  _.forEach(edges, (edge) => {
     if (edge.points && edge.points.length > 2) {
       edge.bendpoints = edge.points.slice(1, -1).map((point: any) => [point.x, point.y]);
     }
@@ -299,6 +309,9 @@ export const Dagre = () => {
     }
     if (entity.getType() === 'group-hull') {
       return withGroupDrag(GroupHullWidget);
+    }
+    if (entity.getType() === 'group') {
+      return withGroupDrag(GroupWidget);
     }
     if (entity.kind === ModelKind.node) {
       return withDrag(NodeWidget);
