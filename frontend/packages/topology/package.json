@@ -4,8 +4,11 @@
   "description": "Topology",
   "private": true,
   "dependencies": {
+    "@types/dagre": "0.7.42",
+    "dagre": "^0.8.2",
     "mobx": "5.13.1",
-    "mobx-react": "6.1.3"
+    "mobx-react": "6.1.3",
+    "webcola": "3.4.0"
   },
   "consolePlugin": {
     "entry": "src/plugin.tsx"

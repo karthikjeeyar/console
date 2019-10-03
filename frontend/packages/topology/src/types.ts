@@ -126,6 +126,7 @@ export interface EdgeEntity<E extends Edge = Edge, D = any> extends ElementEntit
   getEndPoint(): Point;
   setEndPoint(x?: number, y?: number): void;
   getBendpoints(): Point[];
+  setBendpoints(points: Point[]): void;
 }
 
 export interface GraphEntity<E extends Graph = Graph, D = any> extends ElementEntity<E, D> {
