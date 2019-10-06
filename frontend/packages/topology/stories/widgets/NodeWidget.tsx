@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useAnchor } from '../../src/behavior/useAnchor';
+import EllipseAnchor from '../../src/anchors/EllipseAnchor';
 import { WithDragNodeProps } from '../../src/behavior/useDragNode';
 import { WithSelectionProps } from '../../src/behavior/useSelection';
 import { NodeEntity } from '../../src/types';
@@ -18,6 +20,7 @@ const NodeWidget: React.FC<NodeWidgetProps> = ({
   dragNodeRef,
   dndDragRef,
 }) => {
+  useAnchor(React.useCallback(() => new EllipseAnchor(), []));
   const { width, height } = entity.getBoundingBox();
   return (
     <ellipse

@@ -5,7 +5,7 @@ export default class EllipseAnchor extends AbstractAnchor {
   getLocation(reference: Point): Point {
     const r = this.getOwner().getBoundingBox();
     if (r.isEmpty()) {
-      return r.getLocation();
+      return r.getCenter();
     }
     const ref = r
       .getCenter()
