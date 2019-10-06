@@ -23,6 +23,10 @@ export default class Visualization {
     }
   }
 
+  getController(): Controller {
+    return this.controller;
+  }
+
   @action
   fromModel(model: Model): void {
     this.controller.fromModel(model);

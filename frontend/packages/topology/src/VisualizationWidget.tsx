@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
+import ControllerContext from './utils/ControllerContext';
 import Visualization from './Visualization';
 import EntityWidget from './widgets/EntityWidget';
 import { State } from './types';
@@ -25,6 +26,10 @@ export default class VisualizationWidget extends React.Component<VisualizationWi
 
   render() {
     const { visualization } = this.props;
-    return <EntityWidget entity={visualization.getRoot()} />;
+    return (
+      <ControllerContext.Provider value={visualization.getController()}>
+        <EntityWidget entity={visualization.getRoot()} />
+      </ControllerContext.Provider>
+    );
   }
 }

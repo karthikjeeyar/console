@@ -35,6 +35,7 @@ export default class VisualizationController extends Stateful implements Control
 
   private eventListeners: { [type: string]: EventListener[] } = {};
 
+  @observable.shallow
   private readonly store = {};
 
   getStore<S = {}>(): S {
@@ -160,7 +161,7 @@ export default class VisualizationController extends Stateful implements Control
       return;
     }
     const listeners = this.eventListeners[type];
-    const l = [];
+    const l: EventListener[] = [];
     for (let i = 0, { length } = listeners; i < length; i++) {
       if (listeners[i] !== listener) {
         l.push(listeners[i]);

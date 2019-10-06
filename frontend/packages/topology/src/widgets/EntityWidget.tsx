@@ -1,4 +1,5 @@
 import * as React from 'react';
+import EntityContext from '../utils/EntityContext';
 import LayerXYContext from '../layers/LayerXYContext';
 import { ElementEntity, isNodeEntity, isGraphEntity } from '../types';
 import widget from '../widget';
@@ -14,7 +15,11 @@ const EntityComponent: React.FC<EntityWidgetProps> = widget(({ entity }) => {
     ...entity.getState(),
   };
   const Component = entity.getController().getWidget(entity);
-  return <Component {...props} entity={entity} />;
+  return (
+    <EntityContext.Provider value={entity}>
+      <Component {...props} entity={entity} />
+    </EntityContext.Provider>
+  );
 });
 
 const EntityChildren: React.FC<EntityWidgetProps> = widget(({ entity }) => {
