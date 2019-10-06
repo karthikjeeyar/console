@@ -4,7 +4,6 @@ import * as _ from 'lodash';
 import { action } from 'mobx';
 import { EdgeEntity, isEdgeEntity, isNodeEntity, NodeEntity } from '../../src/types';
 import Visualization from '../../src/Visualization';
-import Point from '../../src/geom/Point';
 
 class D3Node implements d3.SimulationNodeDatum {
   private node: NodeEntity;
@@ -26,7 +25,7 @@ class D3Node implements d3.SimulationNodeDatum {
   }
 
   get x(): number {
-    return this.xx || this.node.getBoundingBox().x;
+    return this.xx || this.node.getPosition().x;
   }
 
   set x(x: number) {
@@ -34,20 +33,20 @@ class D3Node implements d3.SimulationNodeDatum {
   }
 
   get y(): number {
-    return this.yy || this.node.getBoundingBox().y;
+    return this.yy || this.node.getPosition().y;
   }
 
   set y(y: number) {
     this.yy = y;
   }
 
-  setPosition(position: Point) {
-    this.node.setPosition(position);
+  setPosition(x: number, y: number) {
+    this.node.setPosition(x, y);
   }
 
   update() {
     if (this.xx != null && this.yy != null) {
-      this.node.getBoundingBox().setLocation(this.xx, this.yy);
+      this.node.setPosition(this.xx, this.yy);
     }
     this.xx = undefined;
     this.yy = undefined;
@@ -105,17 +104,13 @@ export const ForceLayout = (vis: Visualization) => {
     .filter((e) => isEdgeEntity(e))
     .map((e: EdgeEntity) => new D3Link(e));
 
-  // const groupNodes: NodeEntity[] = entities.filter(
-  //   (e) => isNodeEntity(e) && e.getType() === 'group-hull',
-  // ) as NodeEntity[];
-
   // force center
   const bodyRect = document.body.getBoundingClientRect();
   const cx = bodyRect.width / 2;
   const cy = bodyRect.height / 2;
 
   _.forEach(nodes, (node: D3Node) => {
-    node.setPosition(new Point(cx, cy));
+    node.setPosition(cx, cy);
   });
 
   // create force simulation

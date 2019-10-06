@@ -4,7 +4,6 @@ import * as d3 from 'd3';
 import { action } from 'mobx';
 import Visualization from '../../src/Visualization';
 import { EdgeEntity, isEdgeEntity, isNodeEntity, NodeEntity } from '../../src/types';
-import Point from '../../src/geom/Point';
 
 class ColaNode implements webcola.Node {
   private node: NodeEntity;
@@ -26,7 +25,7 @@ class ColaNode implements webcola.Node {
   }
 
   get x(): number {
-    return this.xx || this.node.getBoundingBox().x;
+    return this.xx || this.node.getPosition().x;
   }
 
   set x(x: number) {
@@ -34,20 +33,20 @@ class ColaNode implements webcola.Node {
   }
 
   get y(): number {
-    return this.yy || this.node.getBoundingBox().y;
+    return this.yy || this.node.getPosition().y;
   }
 
   set y(y: number) {
     this.yy = y;
   }
 
-  setPosition(position: Point) {
-    this.node.setPosition(position);
+  setPosition(x: number, y: number) {
+    this.node.setPosition(x, y);
   }
 
   update() {
     if (this.xx != null && this.yy != null) {
-      this.node.getBoundingBox().setLocation(this.xx, this.yy);
+      this.node.setPosition(this.xx, this.yy);
     }
     this.xx = undefined;
     this.yy = undefined;
@@ -144,7 +143,7 @@ export const ColaLayout = (vis: Visualization) => {
   const cy = bodyRect.height / 2;
 
   _.forEach(nodes, (node: ColaNode) => {
-    node.setPosition(new Point(cx, cy));
+    node.setPosition(cx, cy);
   });
 
   _.forEach(edges, (edge: ColaLink) => {
@@ -164,15 +163,12 @@ export const ColaLayout = (vis: Visualization) => {
         ? 200
         : 50,
     )
-    .on(
-      'tick',
-      action(() => {
-        // speed up the simulation
-        if (++tickCount % 10 === 0) {
-          nodes.forEach((d) => d.update());
-        }
-      }),
-    )
+    .on('tick', () => {
+      // speed up the simulation
+      if (++tickCount % 10 === 0) {
+        action(() => nodes.forEach((d) => d.update()))();
+      }
+    })
     .on(
       'end',
       action(() => {

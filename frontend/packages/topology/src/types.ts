@@ -110,7 +110,7 @@ export interface ElementEntity<E extends Element = Element, D = any> extends Wit
 
 export interface NodeEntity<E extends Node = Node, D = any> extends ElementEntity<E, D> {
   getPosition(): Point;
-  setPosition(point: Point): void;
+  setPosition(x: number, y: number): void;
   getBoundingBox(): Rect;
   setBoundingBox(bbox: Rect): void;
   getAnchor(): Anchor;

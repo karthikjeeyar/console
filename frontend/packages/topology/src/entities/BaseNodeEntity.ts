@@ -22,7 +22,7 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
     return this.bbox.getCenter();
   }
 
-  setPosition({ x, y }: Point): void {
+  setPosition(x: number, y: number): void {
     this.bbox.setCenter(x, y);
   }
 

@@ -28,7 +28,7 @@ class DagreNode {
   }
 
   set x(value: number) {
-    this.node.setPosition(new Point(value, this.node.getPosition().y));
+    this.node.setPosition(value, this.node.getPosition().y);
   }
 
   get y(): number {
@@ -36,7 +36,7 @@ class DagreNode {
   }
 
   set y(value: number) {
-    this.node.setPosition(new Point(this.node.getPosition().x, value));
+    this.node.setPosition(this.node.getPosition().x, value);
   }
 }
 
