@@ -47,11 +47,10 @@ export interface LayoutNode extends Node {
 
 export interface Graph extends LayoutNode {
   name?: string;
-  edges?: string[];
 }
 
-export interface Anchor {
-  getOwner(): NodeEntity;
+export interface Anchor<E extends NodeEntity = NodeEntity> {
+  setOwner(owner: E): void;
   getLocation(reference: Point): Point;
   getReferencePoint(): Point;
 }
@@ -101,11 +100,12 @@ export interface ElementEntity<E extends Element = Element, D = any> extends Wit
   isVisible(): boolean;
   getData(): D | undefined;
   setData(data: D | undefined): void;
-  getChildren(): NodeEntity[];
-  addChild(child: NodeEntity): void;
-  removeChild(child: NodeEntity): void;
+  getChildren(): ElementEntity[];
+  appendChild(child: ElementEntity): void;
+  removeChild(child: ElementEntity): void;
   remove(): void;
   setModel(model: E): void;
+  raise(): void;
 }
 
 export interface NodeEntity<E extends Node = Node, D = any> extends ElementEntity<E, D> {
@@ -114,6 +114,8 @@ export interface NodeEntity<E extends Node = Node, D = any> extends ElementEntit
   getBoundingBox(): Rect;
   setBoundingBox(bbox: Rect): void;
   getAnchor(): Anchor;
+  setAnchor(anchor: Anchor): void;
+  getNodes(): NodeEntity[];
 }
 
 export interface EdgeEntity<E extends Edge = Edge, D = any> extends ElementEntity<E, D> {
@@ -132,8 +134,6 @@ export interface EdgeEntity<E extends Edge = Edge, D = any> extends ElementEntit
 export interface GraphEntity<E extends Graph = Graph, D = any> extends ElementEntity<E, D> {
   getNodes(): NodeEntity[];
   getEdges(): EdgeEntity[];
-  removeNode(node: NodeEntity): void;
-  removeEdge(edge: EdgeEntity): void;
 }
 
 export type EventListener<Args extends any[] = any[]> = (...args: Args) => void;

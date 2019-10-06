@@ -13,6 +13,9 @@ type EntityProps = {
 
 const spec: DragSourceSpec<any, any, any> = {
   item: { type: '#dragNode#' },
+  begin: action((monitor: DragSourceMonitor, props: EntityProps) => {
+    props.entity.raise();
+  }),
   drag: action((event: DragEvent, monitor: DragSourceMonitor, props: EntityProps) => {
     const { dx, dy } = event;
     props.entity.getBoundingBox().translate(dx, dy);

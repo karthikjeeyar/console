@@ -61,8 +61,7 @@ const getModel = (): Model => {
     graph: {
       id: 'g1',
       type: 'graph',
-      children: groupNodes.map((n) => n.id),
-      edges: edges.map((e) => e.id),
+      children: groupNodes.map((n) => n.id).concat(edges.map((e) => e.id)),
     },
     nodes: [...nodes, ...groupNodes],
     edges,

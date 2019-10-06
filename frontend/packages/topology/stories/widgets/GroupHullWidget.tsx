@@ -35,7 +35,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   const pathRef = React.useRef<string | null>(null);
 
   if (!droppable || !pathRef.current) {
-    const children = entity.getChildren();
+    const children = entity.getNodes();
     if (children.length === 0) {
       return null;
     }

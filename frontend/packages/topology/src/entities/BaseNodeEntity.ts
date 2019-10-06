@@ -1,7 +1,7 @@
-import { observable } from 'mobx';
+import { observable, computed } from 'mobx';
 import Rect from '../geom/Rect';
-import { NodeEntity, Anchor, Node, ModelKind } from '../types';
-import EllipseAnchor from '../anchors/EllipseAnchor';
+import { NodeEntity, Anchor, Node, ModelKind, isNodeEntity } from '../types';
+import RectAnchor from '../anchors/RectAnchor';
 import Point from '../geom/Point';
 import BaseElementEntity from './BaseElementEntity';
 
@@ -11,7 +11,12 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
   private bbox: Rect = observable(new Rect());
 
   @observable.ref
-  private anchor: Anchor = new EllipseAnchor(this);
+  private anchor: Anchor = new RectAnchor(this);
+
+  @computed
+  private get nodes(): NodeEntity[] {
+    return this.getChildren().filter(isNodeEntity);
+  }
 
   get kind(): ModelKind {
     return ModelKind.node;
@@ -36,6 +41,15 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
 
   getAnchor(): Anchor {
     return this.anchor;
+  }
+
+  setAnchor(anchor: Anchor): void {
+    anchor.setOwner(this);
+    this.anchor = anchor;
+  }
+
+  getNodes(): NodeEntity[] {
+    return this.nodes;
   }
 
   setModel(model: E): void {

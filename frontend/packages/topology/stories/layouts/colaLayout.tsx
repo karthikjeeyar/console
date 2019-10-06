@@ -132,7 +132,7 @@ export const ColaLayout = (vis: Visualization) => {
     .map((e: NodeEntity) => new ColaNode(e));
   const groups: ColaGroup[] = entities
     .filter((e) => isNodeEntity(e) && e.getType() === 'group-hull')
-    .map((group: NodeEntity) => new ColaGroup(group.getChildren(), nodes));
+    .map((group: NodeEntity) => new ColaGroup(group.getNodes(), nodes));
   const edges: ColaLink[] = entities
     .filter((e) => isEdgeEntity(e))
     .map((e: EdgeEntity) => new ColaLink(e));

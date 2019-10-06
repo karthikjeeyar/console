@@ -119,12 +119,6 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     }
   }
 
-  remove(): void {
-    super.remove();
-    const graph = this.getGraph();
-    graph.removeEdge(this);
-  }
-
   setModel(model: E): void {
     super.setModel(model);
     if (model.source) {

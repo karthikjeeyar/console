@@ -8,6 +8,7 @@ type LayerProps = {
   children: React.ReactNode;
 };
 
+// TODO creating a portal doesn't let children re-render their order
 const Layer: React.FC<LayerProps> = ({ id, children }) => (
   <LayersContext.Consumer>
     {(getLayerNode) => {

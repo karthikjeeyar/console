@@ -13,11 +13,17 @@ type EntityProps = {
 
 const spec: DragSourceSpec<any, any, any> = {
   item: { type: '#useDragGroup#' },
+  begin: action((monitor: DragSourceMonitor, props: EntityProps) => {
+    props.entity.raise();
+  }),
   drag: action((event: DragEvent, monitor: DragSourceMonitor, props: EntityProps) => {
     const { dx, dy } = event;
-    props.entity.getChildren().forEach((c) => {
-      c.getBoundingBox().translate(dx, dy);
-    });
+    props.entity
+      .getChildren()
+      .filter(isNodeEntity)
+      .forEach((c) => {
+        c.getBoundingBox().translate(dx, dy);
+      });
   }),
 };
 

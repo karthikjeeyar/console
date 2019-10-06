@@ -23,8 +23,7 @@ export const reconnect = () => {
     graph: {
       id: 'g1',
       type: 'graph',
-      children: ['n1', 'n2', 'n3'],
-      edges: ['e1', 'e2'],
+      children: ['n1', 'n2', 'n3', 'e1', 'e2'],
     },
     nodes: [
       {

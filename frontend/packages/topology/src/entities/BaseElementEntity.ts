@@ -5,11 +5,10 @@ import {
   GraphEntity,
   ElementEntity,
   isGraphEntity,
-  isNodeEntity,
-  NodeEntity,
   Controller,
   InteractionHandler,
   ModelKind,
+  isNodeEntity,
 } from '../types';
 import Stateful from '../utils/Stateful';
 
@@ -153,25 +152,30 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   }
 
   // @computed (switch to getter)
-  getChildren(): NodeEntity[] {
+  getChildren(): ElementEntity[] {
     if (this.children) {
       const controller = this.getGraph().getController();
-      return this.children.map((id) => controller.getNodeById(id));
+      return this.children.map((id) => controller.getEntityById(id));
     }
     return [];
   }
 
-  addChild(child: NodeEntity) {
+  appendChild(child: ElementEntity) {
     if (!this.children) {
       this.children = [child.getId()];
       child.setParent(this);
-    } else if (this.children && !this.children.includes(child.getId())) {
+    } else {
+      const idx = this.children.indexOf(child.getId());
       this.children.push(child.getId());
-      child.setParent(this);
+      if (idx !== -1) {
+        this.children.splice(idx, 1);
+      } else {
+        child.setParent(this);
+      }
     }
   }
 
-  removeChild(child: NodeEntity) {
+  removeChild(child: ElementEntity) {
     if (this.children) {
       const idx = this.children.indexOf(child.getId());
       if (idx !== -1) {
@@ -182,9 +186,7 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   }
 
   remove(): void {
-    if (isNodeEntity(this)) {
-      this.getParent().removeChild(this);
-    }
+    this.getParent().removeChild(this);
   }
 
   setModel(model: E): void {
@@ -199,13 +201,43 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
         controller.getEntityById(id).remove(),
       );
 
-      this.children = model.children.slice();
+      const toadd = _.difference(model.children, this.children);
+      if (this.children) {
+        this.children.unshift(...toadd);
+      } else {
+        this.children = toadd;
+      }
 
       // ensure parent references are set
-      this.children.forEach((id) => controller.getNodeById(id).setParent(this));
+      toadd.forEach((id) => controller.getEntityById(id).setParent(this));
     }
     if ('data' in model) {
       this.data = model.data;
+    }
+  }
+
+  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // protected setModelChildren(children: string[] | undefined, model: E): void {
+  //   if (Array.isArray(children)) {
+  //     const controller = this.getController();
+
+  //     // remove all unknown nodes
+  //     _.difference(this.children, children).forEach((id) => controller.getEntityById(id).remove());
+
+  //     const toadd = _.difference(children, this.children);
+  //     this.children.unshift(...toadd);
+
+  //     // ensure parent references are set
+  //     toadd.forEach((id) => controller.getEntityById(id).setParent(this));
+  //   }
+  // }
+
+  raise() {
+    if (this.parent) {
+      this.parent.appendChild(this);
+      if (isNodeEntity(this.parent)) {
+        this.parent.raise();
+      }
     }
   }
 }

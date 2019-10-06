@@ -38,8 +38,7 @@ export const singleEdge = () => {
     graph: {
       id: 'g1',
       type: 'graph',
-      children: ['n1', 'n2'],
-      edges: ['e1'],
+      children: ['n1', 'n2', 'e1'],
     },
     nodes: [
       {

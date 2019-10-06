@@ -36,10 +36,8 @@ export default class GroupDragHandler extends AbstractInteractionHandler<
             action(() => {
               const { dx, dy } = d3.event;
               this.getOwner()
-                .getChildren()
-                .forEach((c) => {
-                  c.getBoundingBox().translate(dx, dy);
-                });
+                .getNodes()
+                .forEach((c) => c.getBoundingBox().translate(dx, dy));
             }),
           ),
       );

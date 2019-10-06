@@ -30,7 +30,7 @@ const GroupWidget: React.FC<GroupWidgetProps> = ({
   const boxRef = React.useRef<Rect | null>(null);
 
   if (!droppable || !boxRef.current) {
-    const children = entity.getChildren();
+    const children = entity.getNodes();
     if (children.length === 0) {
       return null;
     }

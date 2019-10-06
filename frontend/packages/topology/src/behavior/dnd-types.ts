@@ -75,7 +75,7 @@ export type DndStore = {
   dndManager: DndManager;
 };
 
-// TODO address type such that useRef work with cast to any
+// TODO address type such that useRef work without cast to any
 export type DragElementWrapper = (elementOrNode: Element | null) => void;
 // | React.RefObject<Element>;
 

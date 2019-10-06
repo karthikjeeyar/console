@@ -95,7 +95,7 @@ export const dnd = () => {
         },
         end: (dropResult, monitor, props) => {
           if (monitor.didDrop() && dropResult && props) {
-            dropResult.addChild(props.entity);
+            dropResult.appendChild(props.entity);
           }
         },
       })(NodeWidget);
