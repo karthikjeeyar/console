@@ -1,19 +1,27 @@
 import * as React from 'react';
-import { WithDragProps } from '../../src/behavior/useDrag';
+import { WithDragNodeProps } from '../../src/behavior/useDragNode';
 import { WithSelectionProps } from '../../src/behavior/useSelection';
 import { NodeEntity } from '../../src/types';
 import widget from '../../src/widget';
+import { WithDndDragProps } from '../../src/behavior/useDndDrag';
 
 type NodeWidgetProps = {
   entity: NodeEntity;
 } & WithSelectionProps &
-  WithDragProps;
+  WithDragNodeProps &
+  WithDndDragProps;
 
-const NodeWidget: React.FC<NodeWidgetProps> = ({ entity, selected, onSelect, dragRef }) => {
+const NodeWidget: React.FC<NodeWidgetProps> = ({
+  entity,
+  selected,
+  onSelect,
+  dragNodeRef,
+  dndDragRef,
+}) => {
   const { width, height } = entity.getBoundingBox();
   return (
     <ellipse
-      ref={dragRef}
+      ref={dragNodeRef || dndDragRef}
       onClick={onSelect}
       cx={0}
       cy={0}
