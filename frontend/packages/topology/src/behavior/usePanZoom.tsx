@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as d3 from 'd3';
 import { observer } from 'mobx-react';
+import useCallbackRef from '../utils/useCallbackRef';
 import { GraphEntity, EventListener } from '../types';
 
 export type PanZoomTransform = {
@@ -19,32 +20,40 @@ type PanZoomTransformState = {
   panZoomTransform: PanZoomTransform;
 };
 
-type PanZoomRef = (node: SVGElement | null) => void;
+export type PanZoomRef = (node: SVGElement | null) => void;
 
 export const usePanZoom = (
   entity: GraphEntity,
   zoomExtent: [number, number] = ZOOM_EXTENT,
   controlled: boolean = false,
 ): [PanZoomTransform | undefined, PanZoomRef] => {
-  const refCallback = React.useCallback(
-    (node: SVGElement | null) => {
-      if (node) {
-        // TODO fix any type
-        const $svg = d3.select(node.ownerSVGElement) as any;
-        const zoom = d3
-          .zoom()
-          .scaleExtent(zoomExtent)
-          .on('zoom', () => {
-            if (!controlled) {
-              entity.getController().getState<PanZoomTransformState>().panZoomTransform =
-                d3.event.transform;
-            }
-            entity.getController().fireEvent(PAN_ZOOM_EVENT, d3.event.transform);
-          });
-        zoom($svg);
-      }
-    },
-    [controlled, entity, zoomExtent],
+  const refCallback = useCallbackRef(
+    React.useCallback(
+      (node: SVGElement | null) => {
+        if (node) {
+          // TODO fix any type
+          const $svg = d3.select(node.ownerSVGElement) as any;
+          const zoom = d3
+            .zoom()
+            .scaleExtent(zoomExtent)
+            .on('zoom', () => {
+              if (!controlled) {
+                entity.getController().getState<PanZoomTransformState>().panZoomTransform =
+                  d3.event.transform;
+              }
+              entity.getController().fireEvent(PAN_ZOOM_EVENT, d3.event.transform);
+            });
+          zoom($svg);
+        }
+        return () => {
+          if (node) {
+            // remove all zomo listeners
+            d3.select(node.ownerSVGElement).on('.zoom', null);
+          }
+        };
+      },
+      [controlled, entity, zoomExtent],
+    ),
   );
 
   return [entity.getController().getState<PanZoomTransformState>().panZoomTransform, refCallback];

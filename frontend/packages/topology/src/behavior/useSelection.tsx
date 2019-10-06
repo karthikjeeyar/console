@@ -11,7 +11,7 @@ type SelectionHandlerState = {
   selectedIds?: string[];
 };
 
-type OnSelect = (e: React.MouseEvent) => void;
+export type OnSelect = (e: React.MouseEvent) => void;
 
 export const useSelection = (
   entity: ElementEntity,

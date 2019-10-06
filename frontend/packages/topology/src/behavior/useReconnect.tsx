@@ -4,7 +4,7 @@ import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { EdgeEntity } from '../types';
 
-type ConnectorRef = (node: SVGElement | null) => void;
+export type ConnectorRef = (node: SVGElement | null) => void;
 
 const connectorRef = (entity: EdgeEntity, node: SVGElement | null, isSource: boolean): void => {
   if (node) {
