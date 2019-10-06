@@ -4,8 +4,8 @@ import { Edge, Model, ModelKind, Node } from '../src/types';
 import Visualization from '../src/Visualization';
 import { withPanZoom } from '../src/behavior/usePanZoom';
 import GraphWidget from '../src/widgets/GraphWidget';
-import { withGroupDrag } from '../src/behavior/useGroupDrag';
-import { withDrag } from '../src/behavior/useDrag';
+import { withDragGroup } from '../src/behavior/useDragGroup';
+import { withDragNode } from '../src/behavior/useDragNode';
 import VisualizationWidget from '../src/VisualizationWidget';
 import { ColaLayout } from './layouts/colaLayout';
 import { DagreLayout } from './layouts/dagreLayout';
@@ -82,13 +82,13 @@ const getVisualization = (model: Model): Visualization => {
       return withPanZoom()(GraphWidget);
     }
     if (entity.getType() === 'group-hull') {
-      return withGroupDrag(GroupHullWidget);
+      return withDragGroup(GroupHullWidget);
     }
     if (entity.getType() === 'group') {
-      return withGroupDrag(GroupWidget);
+      return withDragGroup(GroupWidget);
     }
     if (entity.kind === ModelKind.node) {
-      return withDrag(NodeWidget);
+      return withDragNode(NodeWidget);
     }
     return undefined;
   });
