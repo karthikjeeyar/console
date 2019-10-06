@@ -21,11 +21,8 @@ export default class EllipseAnchor extends AbstractAnchor {
     const dy = ref.y > 0 ? 0.5 : -0.5;
     let k = (ref.y * r.width) / (ref.x * r.height);
     k *= k;
-    return r.getCenter().translate(
-      // eslint-disable-next-line no-bitwise
-      (r.width * dx) / Math.sqrt(1 + k),
-      // eslint-disable-next-line no-bitwise
-      (r.height * dy) / Math.sqrt(1 + 1 / k),
-    );
+    return r
+      .getCenter()
+      .translate((r.width * dx) / Math.sqrt(1 + k), (r.height * dy) / Math.sqrt(1 + 1 / k));
   }
 }
