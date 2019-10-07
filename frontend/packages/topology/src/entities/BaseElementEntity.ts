@@ -8,7 +8,6 @@ import {
   isGraphEntity,
   Controller,
   ModelKind,
-  isNodeEntity,
   Translatable,
 } from '../types';
 import Stateful from '../utils/Stateful';
@@ -188,9 +187,7 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   raise() {
     if (this.parent) {
       this.parent.appendChild(this);
-      if (isNodeEntity(this.parent)) {
-        this.parent.raise();
-      }
+      this.parent.raise();
     }
   }
 

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { action } from 'mobx';
-import { isNodeEntity, NodeEntity } from '../types';
+import { ElementEntity } from '../types';
 import EntityContext from '../utils/EntityContext';
 import { useDndDrag } from './useDndDrag';
 import { DragSourceSpec, DragEvent, DragSourceMonitor } from './dnd-types';
@@ -8,7 +8,7 @@ import { DragSourceSpec, DragEvent, DragSourceMonitor } from './dnd-types';
 export type DragRef = (node: SVGElement | null) => void;
 
 type EntityProps = {
-  entity: NodeEntity;
+  entity: ElementEntity;
 };
 
 const spec: DragSourceSpec<any, any, any> = {
@@ -24,9 +24,6 @@ const spec: DragSourceSpec<any, any, any> = {
 
 export const useDragNode = (): DragRef => {
   const entity = React.useContext(EntityContext);
-  if (!isNodeEntity(entity)) {
-    throw new Error('useDragNode must be used within the scope of a NodeEntity');
-  }
   const [, refCallback] = useDndDrag(spec, { entity });
   return refCallback;
 };
