@@ -12,6 +12,10 @@ export default class RectAnchor extends AbstractAnchor {
     let dx = reference.x - center.x;
     let dy = reference.y - center.y;
 
+    if (dx === 0 || dy === 0) {
+      return center;
+    }
+
     const scale = 0.5 / Math.max(Math.abs(dx) / r.width, Math.abs(dy) / r.height);
 
     dx *= scale;
