@@ -174,22 +174,6 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
     }
   }
 
-  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // protected setModelChildren(children: string[] | undefined, model: E): void {
-  //   if (Array.isArray(children)) {
-  //     const controller = this.getController();
-
-  //     // remove all unknown nodes
-  //     _.difference(this.children, children).forEach((id) => controller.getEntityById(id).remove());
-
-  //     const toadd = _.difference(children, this.children);
-  //     this.children.unshift(...toadd);
-
-  //     // ensure parent references are set
-  //     toadd.forEach((id) => controller.getEntityById(id).setParent(this));
-  //   }
-  // }
-
   raise() {
     if (this.parent) {
       this.parent.appendChild(this);

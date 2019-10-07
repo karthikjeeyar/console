@@ -1,6 +1,5 @@
 import * as React from 'react';
 import EntityContext from '../utils/EntityContext';
-import LayerXYContext from '../layers/LayerXYContext';
 import { ElementEntity, isNodeEntity, isGraphEntity } from '../types';
 import widget from '../widget';
 
@@ -38,21 +37,11 @@ const EntityWidget: React.FC<EntityWidgetProps> = widget(({ entity }) => {
     [`data-type`]: entity.getType(),
   };
   if (isNodeEntity(entity)) {
-    // accumulate all the parent node positions
-    let { x, y } = entity.getPosition();
-    let p = entity.getParent();
-    while (isNodeEntity(p)) {
-      const { x: px, y: py } = p.getPosition();
-      x += px;
-      y += py;
-      p = p.getParent();
-    }
+    const { x, y } = entity.getPosition();
     return (
       <g {...commonProps} transform={`translate(${x}, ${y})`}>
-        <LayerXYContext.Provider value={{ x, y }}>
-          {<EntityComponent entity={entity} />}
-          {<EntityChildren entity={entity} />}
-        </LayerXYContext.Provider>
+        {<EntityComponent entity={entity} />}
+        {<EntityChildren entity={entity} />}
       </g>
     );
   }

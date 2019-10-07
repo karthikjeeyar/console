@@ -33,7 +33,7 @@ export default class LayersProvider extends React.Component<LayersProviderProps,
           if (this.state[id]) {
             return this.state[id];
           }
-          throw new Error(`Unknown layer ${id}`);
+          throw new Error(`Unknown layer '${id}'`);
         }}
       >
         {layerIds.map((id) => (
