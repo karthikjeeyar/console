@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { action } from 'mobx';
 import Visualization from '../src/Visualization';
 import VisualizationWidget from '../src/VisualizationWidget';
 import { Model, isNodeEntity, NodeEntity } from '../src/types';
@@ -11,6 +12,10 @@ import GroupHullWidget from './widgets/GroupHullWidget';
 
 export default {
   title: 'Drag and Drop',
+};
+
+type EntityProps = {
+  entity: NodeEntity;
 };
 
 export const dnd = () => {
@@ -79,7 +84,7 @@ export const dnd = () => {
   // support pan zoom and drag
   vis.registerWidgetFactory((entity) => {
     if (isNodeEntity(entity) && entity.getType() === 'group-drop') {
-      return withDndDrop<any, any, any, { entity: NodeEntity }>({
+      return withDndDrop<any, any, any, EntityProps>({
         accept: 'test',
         collect: (monitor) => ({
           droppable: monitor.isDragging(),
@@ -88,16 +93,19 @@ export const dnd = () => {
       })(GroupHullWidget);
     }
     if (isNodeEntity(entity) && entity.getType() === 'node-drag') {
-      return withDndDrag<any, NodeEntity, any, { entity: NodeEntity }>({
+      return withDndDrag<any, NodeEntity, any, EntityProps>({
         item: { type: 'test' },
-        drag: (event: DragEvent, monitor: DragSourceMonitor, props: { entity: NodeEntity }) => {
+        begin: action((monitor: DragSourceMonitor, props: EntityProps) => {
+          props.entity.raise();
+        }),
+        drag: action((event: DragEvent, monitor: DragSourceMonitor, props: EntityProps) => {
           props.entity.getBounds().translate(event.dx, event.dy);
-        },
-        end: (dropResult, monitor, props) => {
+        }),
+        end: action((dropResult: NodeEntity, monitor: DragSourceMonitor, props: EntityProps) => {
           if (monitor.didDrop() && dropResult && props) {
             dropResult.appendChild(props.entity);
           }
-        },
+        }),
       })(NodeWidget);
     }
     return undefined;
