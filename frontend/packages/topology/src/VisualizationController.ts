@@ -13,7 +13,6 @@ import {
   isEdgeEntity,
   isNodeEntity,
   Model,
-  InteractionHandlerFactory,
   EventListener,
   ModelKind,
 } from './types';
@@ -30,8 +29,6 @@ export default class VisualizationController extends Stateful implements Control
   private widgetFactories: WidgetFactory[] = [];
 
   private entityFactories: EntityFactory[] = [defaultEntityFactory];
-
-  private interactionHandlerFactories: InteractionHandlerFactory[] = [];
 
   private eventListeners: { [type: string]: EventListener[] } = {};
 
@@ -67,11 +64,6 @@ export default class VisualizationController extends Stateful implements Control
         this.removeEntity(entity);
       }
     });
-
-    // TODO where to activate the graph?
-    if (this.graph) {
-      this.graph.activate();
-    }
   }
 
   getGraph(): GraphEntity {
@@ -144,10 +136,6 @@ export default class VisualizationController extends Stateful implements Control
     this.entityFactories.unshift(factory);
   }
 
-  registerInteractionHandlerFactory(factory: InteractionHandlerFactory): void {
-    this.interactionHandlerFactories.unshift(factory);
-  }
-
   addEventListener<L extends EventListener = EventListener>(type: string, listener: L): void {
     if (!this.eventListeners[type]) {
       this.eventListeners[type] = [listener];
@@ -201,15 +189,5 @@ export default class VisualizationController extends Stateful implements Control
     entity.setType(model.type);
     entity.setController(this);
     this.addEntity(entity);
-    this.installInteractionHandlers(entity);
-  }
-
-  private installInteractionHandlers(entity: ElementEntity): void {
-    this.interactionHandlerFactories.forEach((f) => {
-      const handlers = f(entity);
-      if (handlers) {
-        handlers.forEach((h) => entity.installInteractionHandler(h));
-      }
-    });
   }
 }

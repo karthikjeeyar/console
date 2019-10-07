@@ -55,13 +55,6 @@ export interface Anchor<E extends NodeEntity = NodeEntity> {
   getReferencePoint(): Point;
 }
 
-export interface InteractionHandler<E extends ElementEntity = ElementEntity> {
-  setOwner(owner: E): void;
-  getProps(): {} | undefined;
-  activate(): void;
-  deactivate(): void;
-}
-
 export const isGraphEntity = (entity: ElementEntity): entity is GraphEntity => {
   return entity && entity.kind === 'graph';
 };
@@ -81,11 +74,6 @@ export enum ModelKind {
 }
 export interface ElementEntity<E extends Element = Element, D = any> extends WithState {
   readonly kind: ModelKind;
-  isActive(): boolean;
-  activate(): void;
-  deactivate(): void;
-  installInteractionHandler(handler: InteractionHandler): void;
-  getInteractionHandlers(): InteractionHandler[];
   isDetached(): boolean;
   getController(): Controller;
   setController(controller?: Controller): void;
@@ -159,7 +147,6 @@ export interface Controller extends WithState {
   getWidget(entity: ElementEntity): ComponentType<{ entity: ElementEntity }>;
   registerWidgetFactory(factory: WidgetFactory): void;
   registerEntityFactory(factory: EntityFactory): void;
-  registerInteractionHandlerFactory(factory: InteractionHandlerFactory): void;
   addEventListener<L extends EventListener = EventListener>(type: string, listener: L): void;
   removeEventListener(type: string, listener: EventListener): void;
   fireEvent(type: string, ...args: any): void;
@@ -169,7 +156,5 @@ export interface Controller extends WithState {
 export type WidgetFactory = (
   entity: ElementEntity,
 ) => ComponentType<{ entity: ElementEntity }> | undefined;
-
-export type InteractionHandlerFactory = (entity: ElementEntity) => InteractionHandler[] | undefined;
 
 export type EntityFactory = (kind: ModelKind, type: string) => ElementEntity | undefined;

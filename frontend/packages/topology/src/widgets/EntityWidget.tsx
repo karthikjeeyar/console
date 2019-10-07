@@ -10,14 +10,10 @@ type EntityWidgetProps = {
 
 // in a separate widget component so that changes to interaction handlers do not re-render children
 const EntityComponent: React.FC<EntityWidgetProps> = widget(({ entity }) => {
-  const props = {
-    ...entity.getInteractionHandlers().reduce((a, v) => ({ ...v.getProps() }), {}),
-    ...entity.getState(),
-  };
   const Component = entity.getController().getWidget(entity);
   return (
     <EntityContext.Provider value={entity}>
-      <Component {...props} entity={entity} />
+      <Component {...entity.getState()} entity={entity} />
     </EntityContext.Provider>
   );
 });

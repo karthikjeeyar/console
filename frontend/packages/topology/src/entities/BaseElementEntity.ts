@@ -6,7 +6,6 @@ import {
   ElementEntity,
   isGraphEntity,
   Controller,
-  InteractionHandler,
   ModelKind,
   isNodeEntity,
 } from '../types';
@@ -34,45 +33,8 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   @observable.ref
   private controller: Controller;
 
-  @observable.shallow
-  private interactionHandlers: InteractionHandler[];
-
-  private active = false;
-
-  isActive(): boolean {
-    return this.active;
-  }
-
-  activate(): void {
-    if (!this.active) {
-      this.active = true;
-      this.getInteractionHandlers().forEach((h) => h.activate());
-      this.getChildren().forEach((c) => c.activate());
-    }
-  }
-
-  deactivate(): void {
-    if (this.active) {
-      this.active = false;
-      this.getChildren().forEach((c) => c.deactivate());
-      this.getInteractionHandlers().forEach((h) => h.deactivate());
-    }
-  }
-
   get kind(): ModelKind {
     throw new Error('Not implemented');
-  }
-
-  installInteractionHandler(handler: InteractionHandler): void {
-    if (!this.interactionHandlers) {
-      this.interactionHandlers = [];
-    }
-    this.interactionHandlers.push(handler);
-    handler.setOwner(this);
-  }
-
-  getInteractionHandlers(): InteractionHandler[] {
-    return this.interactionHandlers || [];
   }
 
   getController(): Controller {
@@ -109,13 +71,9 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   setParent(parent: ElementEntity): void {
     if (this.parent !== parent) {
       if (this.parent) {
-        this.deactivate();
         this.remove();
       }
       this.parent = parent;
-      if (parent && parent.isActive()) {
-        this.activate();
-      }
     }
   }
 
