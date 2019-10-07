@@ -19,9 +19,9 @@ export default class VisualizationWidget extends React.Component<VisualizationWi
   }
 
   componentDidUpdate() {
-    setTimeout(() => {
-      this.props.state && this.props.visualization.setState(this.props.state);
-    }, 0);
+    // setTimeout(() => {
+    this.props.state && this.props.visualization.setState(this.props.state);
+    // }, 0);
   }
 
   render() {
