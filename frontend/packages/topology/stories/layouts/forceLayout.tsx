@@ -25,7 +25,7 @@ class D3Node implements d3.SimulationNodeDatum {
   }
 
   get x(): number {
-    return this.xx || this.node.getPosition().x;
+    return this.xx || this.node.getBounds().getCenter().x;
   }
 
   set x(x: number) {
@@ -33,7 +33,7 @@ class D3Node implements d3.SimulationNodeDatum {
   }
 
   get y(): number {
-    return this.yy || this.node.getPosition().y;
+    return this.yy || this.node.getBounds().getCenter().y;
   }
 
   set y(y: number) {
@@ -41,12 +41,12 @@ class D3Node implements d3.SimulationNodeDatum {
   }
 
   setPosition(x: number, y: number) {
-    this.node.setPosition(x, y);
+    this.node.getBounds().setCenter(x, y);
   }
 
   update() {
     if (this.xx != null && this.yy != null) {
-      this.node.setPosition(this.xx, this.yy);
+      this.node.getBounds().setCenter(this.xx, this.yy);
     }
     this.xx = undefined;
     this.yy = undefined;

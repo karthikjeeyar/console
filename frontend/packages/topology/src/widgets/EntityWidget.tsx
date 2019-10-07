@@ -1,6 +1,6 @@
 import * as React from 'react';
 import EntityContext from '../utils/EntityContext';
-import { ElementEntity, isNodeEntity, isGraphEntity } from '../types';
+import { ElementEntity, isGraphEntity } from '../types';
 import widget from '../widget';
 
 type EntityWidgetProps = {
@@ -36,17 +36,9 @@ const EntityWidget: React.FC<EntityWidgetProps> = widget(({ entity }) => {
     [`data-kind`]: entity.kind,
     [`data-type`]: entity.getType(),
   };
-  if (isNodeEntity(entity)) {
-    const { x, y } = entity.getPosition();
-    return (
-      <g {...commonProps} transform={`translate(${x}, ${y})`}>
-        {<EntityComponent entity={entity} />}
-        {<EntityChildren entity={entity} />}
-      </g>
-    );
-  }
+  const { x, y } = entity.getBounds();
   return (
-    <g {...commonProps}>
+    <g {...commonProps} transform={`translate(${x}, ${y})`}>
       {<EntityComponent entity={entity} />}
       {<EntityChildren entity={entity} />}
     </g>

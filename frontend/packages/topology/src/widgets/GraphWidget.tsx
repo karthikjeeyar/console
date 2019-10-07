@@ -16,10 +16,10 @@ type GraphWidgetProps = EntityProps & WithPanZoomProps;
 const EntityChildren: React.FC<EntityProps> = widget(({ entity }) => {
   return (
     <>
-      {entity.getNodes().map((e) => (
+      {entity.getEdges().map((e) => (
         <EntityWidget key={e.getId()} entity={e} />
       ))}
-      {entity.getEdges().map((e) => (
+      {entity.getNodes().map((e) => (
         <EntityWidget key={e.getId()} entity={e} />
       ))}
     </>
@@ -33,13 +33,15 @@ const Inner: React.FC<EntityProps> = React.memo(({ entity }) => (
   </LayersProvider>
 ));
 
-const GraphWidget: React.FC<GraphWidgetProps> = ({ entity, panZoomRef, panZoomTransform }) => {
+const GraphWidget: React.FC<GraphWidgetProps> = ({ entity, panZoomRef }) => {
   return (
     <svg style={{ width: '100%', height: '100%', flexGrow: 1, flexShrink: 1 }}>
       <SvgDefsProvider>
         <g
           ref={panZoomRef}
-          transform={panZoomTransform && panZoomTransform.toString()}
+          transform={`translate(${entity.getBounds().x}, ${
+            entity.getBounds().y
+          }) scale(${entity.getScale()})`}
           data-id={entity.getId()}
           data-kind={entity.kind}
           data-type={entity.getType()}

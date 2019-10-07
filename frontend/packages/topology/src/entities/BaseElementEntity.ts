@@ -1,5 +1,6 @@
 import { observable } from 'mobx';
 import * as _ from 'lodash';
+import Rect from '../geom/Rect';
 import {
   Element,
   GraphEntity,
@@ -8,6 +9,7 @@ import {
   Controller,
   ModelKind,
   isNodeEntity,
+  Translatable,
 } from '../types';
 import Stateful from '../utils/Stateful';
 
@@ -33,8 +35,17 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   @observable.ref
   private controller: Controller;
 
-  get kind(): ModelKind {
-    throw new Error('Not implemented');
+  @observable.ref
+  private bounds: Rect = observable(new Rect());
+
+  abstract get kind(): ModelKind;
+
+  getBounds(): Rect {
+    return this.bounds;
+  }
+
+  setBounds(bounds: Rect): void {
+    this.bounds.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
   }
 
   getController(): Controller {
@@ -181,5 +192,29 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
         this.parent.raise();
       }
     }
+  }
+
+  translateToAbsolute(t: Translatable): void {
+    if (this.parent) {
+      this.parent.translateToParent(t);
+      this.parent.translateToAbsolute(t);
+    }
+  }
+
+  translateFromAbsolute(t: Translatable): void {
+    if (this.parent) {
+      this.parent.translateFromAbsolute(t);
+      this.parent.translateFromParent(t);
+    }
+  }
+
+  translateToParent(t: Translatable): void {
+    const b = this.getBounds();
+    t.translate(-b.x, -b.y);
+  }
+
+  translateFromParent(t: Translatable): void {
+    const b = this.getBounds();
+    t.translate(b.x, b.y);
   }
 }

@@ -24,19 +24,19 @@ class DagreNode {
   }
 
   get x(): number {
-    return this.node.getPosition().x;
+    return this.node.getBounds().getCenter().x;
   }
 
   set x(value: number) {
-    this.node.setPosition(value, this.node.getPosition().y);
+    this.node.getBounds().setCenter(value, this.node.getBounds().getCenter().y);
   }
 
   get y(): number {
-    return this.node.getPosition().y;
+    return this.node.getBounds().getCenter().y;
   }
 
   set y(value: number) {
-    this.node.setPosition(this.node.getPosition().x, value);
+    this.node.getBounds().setCenter(this.node.getBounds().getCenter().x, value);
   }
 }
 

@@ -2,6 +2,11 @@ import { ComponentType } from 'react';
 import Point from './geom/Point';
 import Rect from './geom/Rect';
 
+export interface Translatable {
+  translate(dx: number, dy: number): void;
+  scale(s: number): void;
+}
+
 // x, y
 export type PointTuple = [number, number];
 
@@ -47,6 +52,7 @@ export interface LayoutNode extends Node {
 
 export interface Graph extends LayoutNode {
   name?: string;
+  scale?: number;
 }
 
 export interface Anchor<E extends NodeEntity = NodeEntity> {
@@ -94,13 +100,15 @@ export interface ElementEntity<E extends Element = Element, D = any> extends Wit
   remove(): void;
   setModel(model: E): void;
   raise(): void;
+  getBounds(): Rect;
+  setBounds(bounds: Rect): void;
+  translateToAbsolute(t: Translatable): void;
+  translateFromAbsolute(t: Translatable): void;
+  translateToParent(t: Translatable): void;
+  translateFromParent(t: Translatable): void;
 }
 
 export interface NodeEntity<E extends Node = Node, D = any> extends ElementEntity<E, D> {
-  getPosition(): Point;
-  setPosition(x: number, y: number): void;
-  getBounds(): Rect;
-  setBoundingBox(bbox: Rect): void;
   getAnchor(): Anchor;
   setAnchor(anchor: Anchor): void;
   getNodes(): NodeEntity[];
@@ -122,6 +130,8 @@ export interface EdgeEntity<E extends Edge = Edge, D = any> extends ElementEntit
 export interface GraphEntity<E extends Graph = Graph, D = any> extends ElementEntity<E, D> {
   getNodes(): NodeEntity[];
   getEdges(): EdgeEntity[];
+  getScale(): number;
+  setScale(scale: number): void;
 }
 
 export type EventListener<Args extends any[] = any[]> = (...args: Args) => void;

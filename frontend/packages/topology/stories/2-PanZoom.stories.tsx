@@ -1,13 +1,9 @@
 import * as React from 'react';
+import { reaction } from 'mobx';
 import Visualization from '../src/Visualization';
 import VisualizationWidget from '../src/VisualizationWidget';
 import { Model, ModelKind } from '../src/types';
-import {
-  withPanZoom,
-  PanZoomEventListener,
-  PAN_ZOOM_EVENT,
-  PanZoomTransform,
-} from '../src/behavior/usePanZoom';
+import { withPanZoom } from '../src/behavior/usePanZoom';
 import GraphWidget from '../src/widgets/GraphWidget';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 
@@ -46,44 +42,27 @@ const model: Model = {
   ],
 };
 
-export const uncontrolled: React.FC = () => {
+export const panZoom: React.FC = () => {
   const vis = new Visualization();
   vis.registerWidgetFactory(defaultWidgetFactory);
   vis.registerWidgetFactory((entity) => {
     if (entity.kind === ModelKind.graph) {
-      return withPanZoom(false)(GraphWidget);
+      return withPanZoom()(GraphWidget);
     }
     return undefined;
   });
   vis.fromModel(model);
-  vis.addEventListener<PanZoomEventListener>(PAN_ZOOM_EVENT, (transform) => {
-    // logging to action panel is too laggy therefore log to console
-    // eslint-disable-next-line no-console
-    console.log(`Pan zoom event`, transform);
-  });
+  reaction(
+    () => ({
+      x: vis.getRoot().getBounds().x,
+      y: vis.getRoot().getBounds().y,
+      k: vis.getRoot().getScale(),
+    }),
+    (transform) => {
+      // logging to action panel is too laggy therefore log to console
+      // eslint-disable-next-line no-console
+      console.log(`Pan zoom event`, transform);
+    },
+  );
   return <VisualizationWidget visualization={vis} />;
-};
-
-export const controlled: React.FC = () => {
-  const vis = new Visualization();
-  vis.registerWidgetFactory(defaultWidgetFactory);
-  vis.registerWidgetFactory((entity) => {
-    if (entity.kind === ModelKind.graph) {
-      return withPanZoom(true)(GraphWidget);
-    }
-    return undefined;
-  });
-  vis.fromModel(model);
-  const Component = () => {
-    const [panZoomTransform, setZoomTransform] = React.useState<PanZoomTransform>();
-    React.useEffect(() => {
-      vis.addEventListener<PanZoomEventListener>(PAN_ZOOM_EVENT, (transform) => {
-        setZoomTransform(transform);
-        // logging to action panel is too laggy
-        console.log(`Pan zoom event`, transform);
-      });
-    }, []);
-    return <VisualizationWidget visualization={vis} state={{ panZoomTransform }} />;
-  };
-  return <Component />;
 };

@@ -10,7 +10,7 @@ const LayerContainer: React.FC = ({ children }) => {
   let y = 0;
   while (!isGraphEntity(p)) {
     if (isNodeEntity(p)) {
-      const { x: px, y: py } = p.getPosition();
+      const { x: px, y: py } = p.getBounds();
       x += px;
       y += py;
     }

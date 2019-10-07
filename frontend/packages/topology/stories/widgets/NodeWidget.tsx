@@ -26,8 +26,8 @@ const NodeWidget: React.FC<NodeWidgetProps> = ({
     <ellipse
       ref={dragNodeRef || dndDragRef}
       onClick={onSelect}
-      cx={0}
-      cy={0}
+      cx={width / 2}
+      cy={height / 2}
       rx={Math.max(0, width / 2 - 1)}
       ry={Math.max(0, height / 2 - 1)}
       fill={selected ? 'blue' : 'grey'}
