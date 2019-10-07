@@ -34,9 +34,9 @@ const GroupWidget: React.FC<GroupWidgetProps> = ({
     if (children.length === 0) {
       return null;
     }
-    const box: Rect = children[0].getBoundingBox().clone();
+    const box: Rect = children[0].getBounds().clone();
     for (let i = 1, l = children.length; i < l; i++) {
-      box.union(children[i].getBoundingBox());
+      box.union(children[i].getBounds());
     }
     // add padding
     box.expand(10, 10);

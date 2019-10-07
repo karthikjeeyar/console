@@ -53,7 +53,7 @@ class ColaNode implements webcola.Node {
   }
 
   getRadius(): number {
-    const { width, height } = this.node.getBoundingBox();
+    const { width, height } = this.node.getBounds();
     return Math.max(width, height) / 2;
   }
 }

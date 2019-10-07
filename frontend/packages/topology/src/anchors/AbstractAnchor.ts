@@ -25,6 +25,6 @@ export default abstract class AbstractAnchor<E extends NodeEntity = NodeEntity>
   }
 
   getReferencePoint(): Point {
-    return this.owner.getBoundingBox().getCenter();
+    return this.owner.getBounds().getCenter();
   }
 }

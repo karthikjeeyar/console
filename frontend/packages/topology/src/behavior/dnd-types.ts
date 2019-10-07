@@ -23,7 +23,6 @@ export type DropTarget = {
   hover(dndManager: DndManager): void;
   canDrop(dndManager: DndManager): boolean;
   hitTest(x: number, y: number): boolean;
-  getBoundingBox(): any;
 };
 
 export interface DndState {

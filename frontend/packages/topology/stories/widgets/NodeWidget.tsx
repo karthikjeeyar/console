@@ -21,7 +21,7 @@ const NodeWidget: React.FC<NodeWidgetProps> = ({
   dndDragRef,
 }) => {
   useAnchor(React.useCallback(() => new EllipseAnchor(), []));
-  const { width, height } = entity.getBoundingBox();
+  const { width, height } = entity.getBounds();
   return (
     <ellipse
       ref={dragNodeRef || dndDragRef}

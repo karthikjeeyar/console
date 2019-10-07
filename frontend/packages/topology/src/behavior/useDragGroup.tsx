@@ -22,7 +22,7 @@ const spec: DragSourceSpec<any, any, any> = {
       .getChildren()
       .filter(isNodeEntity)
       .forEach((c) => {
-        c.getBoundingBox().translate(dx, dy);
+        c.getBounds().translate(dx, dy);
       });
   }),
 };

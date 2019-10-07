@@ -82,13 +82,6 @@ export const useDndDrop = <
   React.useEffect(() => {
     const [targetId, unregister] = dndManager.registerTarget({
       type: spec.accept,
-      getBoundingBox: (): any => {
-        if (nodeRef.current) {
-          const rect = nodeRef.current.getBoundingClientRect();
-          return { x0: rect.left, x1: rect.right, y0: rect.top, y1: rect.bottom };
-        }
-        return null;
-      },
       hitTest: (x: number, y: number): boolean => {
         if (specRef.current.hitTest) {
           return specRef.current.hitTest(x, y);

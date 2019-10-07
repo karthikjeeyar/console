@@ -18,7 +18,7 @@ const spec: DragSourceSpec<any, any, any> = {
   }),
   drag: action((event: DragEvent, monitor: DragSourceMonitor, props: EntityProps) => {
     const { dx, dy } = event;
-    props.entity.getBoundingBox().translate(dx, dy);
+    props.entity.getBounds().translate(dx, dy);
   }),
 };
 

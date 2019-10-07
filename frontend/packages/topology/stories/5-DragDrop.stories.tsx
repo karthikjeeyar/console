@@ -91,7 +91,7 @@ export const dnd = () => {
       return withDndDrag<any, NodeEntity, any, { entity: NodeEntity }>({
         item: { type: 'test' },
         drag: (event: DragEvent, monitor: DragSourceMonitor, props: { entity: NodeEntity }) => {
-          props.entity.getBoundingBox().translate(event.dx, event.dy);
+          props.entity.getBounds().translate(event.dx, event.dy);
         },
         end: (dropResult, monitor, props) => {
           if (monitor.didDrop() && dropResult && props) {

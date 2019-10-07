@@ -53,7 +53,7 @@ class D3Node implements d3.SimulationNodeDatum {
   }
 
   getRadius(): number {
-    const { width, height } = this.node.getBoundingBox();
+    const { width, height } = this.node.getBounds();
     return Math.max(width, height) / 2;
   }
 }

@@ -41,8 +41,8 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
     }
     const points: PointWithSize[] = new Array(children.length);
     _.forEach(children, (c, i) => {
-      const { width, height } = c.getBoundingBox();
-      const { x, y } = c.getBoundingBox().getCenter();
+      const { width, height } = c.getBounds();
+      const { x, y } = c.getBounds().getCenter();
       const size = Math.max(width, height);
       points[i] = [x, y, size / 2] as PointWithSize;
     });

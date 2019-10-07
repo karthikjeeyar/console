@@ -31,7 +31,7 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
     this.bbox.setCenter(x, y);
   }
 
-  getBoundingBox(): Rect {
+  getBounds(): Rect {
     return this.bbox;
   }
 
