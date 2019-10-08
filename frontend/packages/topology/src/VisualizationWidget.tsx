@@ -10,26 +10,15 @@ interface VisualizationWidgetProps {
   state?: State;
 }
 
-// eslint-disable-next-line react/prefer-stateless-function
-@observer
-export default class VisualizationWidget extends React.Component<VisualizationWidgetProps> {
-  constructor(props: VisualizationWidgetProps) {
-    super(props);
-    props.state && props.visualization.setState(props.state);
-  }
+const VisualizationWidget: React.FC<VisualizationWidgetProps> = ({ visualization, state }) => {
+  React.useEffect(() => {
+    state && visualization.setState(state);
+  }, [visualization, state]);
+  return (
+    <ControllerContext.Provider value={visualization.getController()}>
+      <EntityWidget entity={visualization.getRoot()} />
+    </ControllerContext.Provider>
+  );
+};
 
-  componentDidUpdate() {
-    // setTimeout(() => {
-    this.props.state && this.props.visualization.setState(this.props.state);
-    // }, 0);
-  }
-
-  render() {
-    const { visualization } = this.props;
-    return (
-      <ControllerContext.Provider value={visualization.getController()}>
-        <EntityWidget entity={visualization.getRoot()} />
-      </ControllerContext.Provider>
-    );
-  }
-}
+export default observer(VisualizationWidget);
