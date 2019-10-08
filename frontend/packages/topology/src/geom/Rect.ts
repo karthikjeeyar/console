@@ -1,7 +1,8 @@
 import { observable } from 'mobx';
+import { Translatable } from './types';
 import Point from './Point';
 
-export default class Rect {
+export default class Rect implements Translatable {
   static readonly EMPTY = new Rect();
 
   @observable
@@ -60,6 +61,17 @@ export default class Rect {
   translate(dx: number, dy: number): Rect {
     this.x += dx;
     this.y += dy;
+    return this;
+  }
+
+  scale(scaleX: number, scaleY?: number): Rect {
+    const sy = scaleY != null ? scaleY : scaleX;
+    const xx = this.x;
+    const yy = this.y;
+    this.x *= scaleX;
+    this.y *= sy;
+    this.width = (xx + this.width) * scaleX - this.x;
+    this.height = (yy + this.height) * sy - this.y;
     return this;
   }
 

@@ -60,6 +60,8 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     let referencePoint: Point;
     if (bendpoints && bendpoints.length > 0) {
       [referencePoint] = bendpoints;
+    } else if (this.endPoint) {
+      referencePoint = this.endPoint;
     } else {
       const target = this.getTarget();
       if (target) {
@@ -94,6 +96,8 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     let referencePoint: Point;
     if (bendpoints && bendpoints.length > 0) {
       referencePoint = bendpoints[bendpoints.length - 1];
+    } else if (this.startPoint) {
+      referencePoint = this.startPoint;
     } else {
       const source = this.getSource();
       if (source) {

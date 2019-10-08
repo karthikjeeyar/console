@@ -6,12 +6,16 @@ import { WithSelectionProps } from '../../src/behavior/useSelection';
 import { NodeEntity } from '../../src/types';
 import widget from '../../src/widget';
 import { WithDndDragProps } from '../../src/behavior/useDndDrag';
+import { WithDndDropProps } from '../../src/behavior/useDndDrop';
 
 type NodeWidgetProps = {
   entity: NodeEntity;
+  droppable?: boolean;
+  hover?: boolean;
 } & WithSelectionProps &
   WithDragNodeProps &
-  WithDndDragProps;
+  WithDndDragProps &
+  WithDndDropProps;
 
 const NodeWidget: React.FC<NodeWidgetProps> = ({
   entity,
@@ -19,19 +23,22 @@ const NodeWidget: React.FC<NodeWidgetProps> = ({
   onSelect,
   dragNodeRef,
   dndDragRef,
+  droppable,
+  hover,
+  dndDropRef,
 }) => {
   useAnchor(React.useCallback(() => new EllipseAnchor(), []));
   const { width, height } = entity.getBounds();
   return (
     <ellipse
-      ref={dragNodeRef || dndDragRef}
+      ref={dragNodeRef || dndDragRef || dndDropRef}
       onClick={onSelect}
       cx={width / 2}
       cy={height / 2}
       rx={Math.max(0, width / 2 - 1)}
       ry={Math.max(0, height / 2 - 1)}
-      fill={selected ? 'blue' : 'grey'}
-      strokeWidth="1"
+      fill={hover ? 'lightgreen' : droppable ? 'lightblue' : selected ? 'blue' : 'grey'}
+      strokeWidth={1}
       stroke="#333333"
     />
   );

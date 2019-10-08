@@ -10,8 +10,8 @@ import { WithDndDragProps } from '../../src/behavior/useDndDrag';
 
 type GroupWidgetProps = {
   entity: NodeEntity;
-  droppable: boolean;
-  hover: boolean;
+  droppable?: boolean;
+  hover?: boolean;
 } & WithSelectionProps &
   WithDragGroupProps &
   WithDndDragProps &

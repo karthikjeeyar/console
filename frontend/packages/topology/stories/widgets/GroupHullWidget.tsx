@@ -12,8 +12,8 @@ import { WithDndDropProps } from '../../src/behavior/useDndDrop';
 
 type GroupHullWidgetProps = {
   entity: NodeEntity;
-  droppable: boolean;
-  hover: boolean;
+  droppable?: boolean;
+  hover?: boolean;
 } & WithSelectionProps &
   WithDragGroupProps &
   WithDndDragProps &

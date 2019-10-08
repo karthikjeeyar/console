@@ -8,9 +8,9 @@ import {
   isGraphEntity,
   Controller,
   ModelKind,
-  Translatable,
 } from '../types';
 import Stateful from '../utils/Stateful';
+import { Translatable } from '../geom/types';
 
 export default abstract class BaseElementEntity<E extends Element = Element, D = any>
   extends Stateful
@@ -185,33 +185,28 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   }
 
   raise() {
-    if (this.parent) {
-      this.parent.appendChild(this);
-      this.parent.raise();
+    const { parent } = this;
+    if (parent) {
+      parent.appendChild(this);
+      parent.raise();
     }
   }
 
   translateToAbsolute(t: Translatable): void {
-    if (this.parent) {
-      this.parent.translateToParent(t);
-      this.parent.translateToAbsolute(t);
+    const { x, y } = this.getBounds();
+    t.translate(x, y);
+    const { parent } = this;
+    if (parent) {
+      parent.translateToAbsolute(t);
     }
   }
 
   translateFromAbsolute(t: Translatable): void {
-    if (this.parent) {
-      this.parent.translateFromAbsolute(t);
-      this.parent.translateFromParent(t);
+    const { parent } = this;
+    if (parent) {
+      parent.translateFromAbsolute(t);
     }
-  }
-
-  translateToParent(t: Translatable): void {
-    const b = this.getBounds();
-    t.translate(-b.x, -b.y);
-  }
-
-  translateFromParent(t: Translatable): void {
-    const b = this.getBounds();
-    t.translate(b.x, b.y);
+    const { x, y } = this.getBounds();
+    t.translate(-x, -y);
   }
 }

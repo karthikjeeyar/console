@@ -28,7 +28,7 @@ const EntityChildren: React.FC<EntityProps> = widget(({ entity }) => {
 
 // This inner Component will prevent re-rendering layers when the panZoomTransform changes
 const Inner: React.FC<EntityProps> = React.memo(({ entity }) => (
-  <LayersProvider layers={['groups', DEFAULT_LAYER]}>
+  <LayersProvider layers={['groups', DEFAULT_LAYER, 'top']}>
     <EntityChildren entity={entity} />
   </LayersProvider>
 ));

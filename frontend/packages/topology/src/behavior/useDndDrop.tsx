@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 // @ts-ignore
 import { pointInSvgPath } from 'point-in-svg-path';
 import EntityContext from '../utils/EntityContext';
+import Point from '../geom/Point';
 import {
   ConnectDropTarget,
   DragObjectWithType,
@@ -87,22 +88,38 @@ export const useDndDrop = <
           return specRef.current.hitTest(x, y);
         }
         if (nodeRef.current) {
+          if (!(nodeRef.current instanceof SVGGraphicsElement)) {
+            return false;
+          }
+          // perform a fast bounds check
+          const { left, right, top, bottom } = nodeRef.current.getBBox();
+          if (x < left || x > right || y < top || y > bottom) {
+            return false;
+          }
+
+          // translate to this entity's coordinates
+          // assumes the node is not within an svg element containing another transform
+          const point = new Point(x, y);
+          entityRef.current.translateFromAbsolute(point);
+
           if (nodeRef.current instanceof SVGPathElement) {
             const d = nodeRef.current.getAttribute('d');
-            return pointInSvgPath(d, x, y);
+            return pointInSvgPath(d, point.x, point.y);
           }
           if (nodeRef.current instanceof SVGCircleElement) {
-            const cx = +(nodeRef.current.getAttribute('cx') || 0);
-            const cy = +(nodeRef.current.getAttribute('cy') || 0);
-            const r = +(nodeRef.current.getAttribute('r') || 0);
-            return Math.sqrt((x - cx) ** 2 + (y - cy) ** 2) < r;
+            const { cx, cy, r } = nodeRef.current;
+            return (
+              Math.sqrt((point.x - cx.animVal.value) ** 2 + (point.y - cy.animVal.value) ** 2) <
+              r.animVal.value
+            );
           }
           if (nodeRef.current instanceof SVGEllipseElement) {
-            const cx = +(nodeRef.current.getAttribute('cx') || 0);
-            const cy = +(nodeRef.current.getAttribute('cy') || 0);
-            const rx = +(nodeRef.current.getAttribute('rx') || 0);
-            const ry = +(nodeRef.current.getAttribute('ry') || 0);
-            return (x - cx) ** 2 / rx ** 2 + (y - cy) ** 2 / ry ** 2 <= 1;
+            const { cx, cy, rx, ry } = nodeRef.current;
+            return (
+              (point.x - cx.animVal.value) ** 2 / rx.animVal.value ** 2 +
+                (point.y - cy.animVal.value) ** 2 / ry.animVal.value ** 2 <=
+              1
+            );
           }
           if (nodeRef.current instanceof SVGPolygonElement) {
             const arr = (nodeRef.current.getAttribute('points') || '')
@@ -113,11 +130,12 @@ export const useDndDrop = <
             for (let i = 0; i < arr.length; i += 2) {
               points.push(arr.slice(i, i + 2) as [number, number]);
             }
-            return d3.polygonContains(points, [x, y]);
+            return d3.polygonContains(points, [point.x, point.y]);
           }
           // TODO support round rect
-          const rect = nodeRef.current.getBoundingClientRect();
-          return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+
+          // already passed the bbox test
+          return true;
         }
         return false;
       },

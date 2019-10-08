@@ -1,6 +1,7 @@
 import { observable } from 'mobx';
+import { Translatable } from './types';
 
-export default class Point {
+export default class Point implements Translatable {
   static readonly EMPTY = new Point();
 
   @observable
@@ -33,6 +34,12 @@ export default class Point {
   translate(dx: number, dy: number): Point {
     this.x += dx;
     this.y += dy;
+    return this;
+  }
+
+  scale(scaleX: number, scaleY?: number): Point {
+    this.x = this.x * scaleX;
+    this.y = this.y * (scaleY != null ? scaleY : scaleX);
     return this;
   }
 

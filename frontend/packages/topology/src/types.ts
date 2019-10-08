@@ -1,11 +1,7 @@
 import { ComponentType } from 'react';
 import Point from './geom/Point';
 import Rect from './geom/Rect';
-
-export interface Translatable {
-  translate(dx: number, dy: number): void;
-  scale(s: number): void;
-}
+import { Translatable } from './geom/types';
 
 // x, y
 export type PointTuple = [number, number];
@@ -104,8 +100,6 @@ export interface ElementEntity<E extends Element = Element, D = any> extends Wit
   setBounds(bounds: Rect): void;
   translateToAbsolute(t: Translatable): void;
   translateFromAbsolute(t: Translatable): void;
-  translateToParent(t: Translatable): void;
-  translateFromParent(t: Translatable): void;
 }
 
 export interface NodeEntity<E extends Node = Node, D = any> extends ElementEntity<E, D> {

@@ -4,7 +4,7 @@ import LayersContext from './LayersContext';
 import LayerContainer from './LayerContainer';
 
 type LayerProps = {
-  id: string;
+  id: string | null;
   children: React.ReactNode;
 };
 
@@ -12,7 +12,7 @@ type LayerProps = {
 const Layer: React.FC<LayerProps> = ({ id, children }) => (
   <LayersContext.Consumer>
     {(getLayerNode) => {
-      const layerNode = getLayerNode(id);
+      const layerNode = id ? getLayerNode(id) : null;
       return layerNode
         ? createPortal(<LayerContainer>{children}</LayerContainer>, layerNode)
         : children;
