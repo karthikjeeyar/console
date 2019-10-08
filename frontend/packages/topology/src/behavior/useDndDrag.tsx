@@ -52,7 +52,7 @@ export const useDndDrag = <
         return dndManagerRef.current.canDragSource(idRef.current);
       },
       isDragging: (): boolean => {
-        return dndManagerRef.current.isDragging();
+        return dndManagerRef.current.isDraggingSource(idRef.current);
       },
       getItemType: (): Identifier | undefined => {
         return dndManagerRef.current.getItemType();

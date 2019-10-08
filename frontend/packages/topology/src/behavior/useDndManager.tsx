@@ -99,7 +99,7 @@ export class DndManagerImpl implements DndManager {
   }
 
   isDraggingSource(sourceId: string | undefined): boolean {
-    return this.state.sourceId === sourceId;
+    return this.state.sourceId != null && this.state.sourceId === sourceId;
   }
 
   isOverTarget(targetId: string | undefined, options = { shallow: false }): boolean {
