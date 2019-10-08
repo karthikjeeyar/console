@@ -12,6 +12,7 @@ type GroupWidgetProps = {
   entity: NodeEntity;
   droppable?: boolean;
   hover?: boolean;
+  canDrop?: boolean;
 } & WithSelectionProps &
   WithDragGroupProps &
   WithDndDragProps &
@@ -26,6 +27,7 @@ const GroupWidget: React.FC<GroupWidgetProps> = ({
   dndDropRef,
   droppable,
   hover,
+  canDrop,
 }) => {
   const boxRef = React.useRef<Rect | null>(null);
 
@@ -54,7 +56,7 @@ const GroupWidget: React.FC<GroupWidgetProps> = ({
         y={boxRef.current.y}
         width={boxRef.current.width}
         height={boxRef.current.height}
-        fill={hover ? 'lightgreen' : droppable ? 'lightblue' : '#ededed'}
+        fill={canDrop && hover ? 'lightgreen' : canDrop && droppable ? 'lightblue' : '#ededed'}
         strokeWidth={2}
         stroke={selected ? 'blue' : '#cdcdcd'}
       />

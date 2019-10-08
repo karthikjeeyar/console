@@ -14,6 +14,7 @@ type GroupHullWidgetProps = {
   entity: NodeEntity;
   droppable?: boolean;
   hover?: boolean;
+  canDrop?: boolean;
 } & WithSelectionProps &
   WithDragGroupProps &
   WithDndDragProps &
@@ -31,6 +32,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   dndDropRef,
   hover,
   droppable,
+  canDrop,
 }) => {
   const pathRef = React.useRef<string | null>(null);
 
@@ -62,7 +64,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
         ref={dragGroupRef || dndDropRef}
         onClick={onSelect}
         d={pathRef.current}
-        fill={hover ? 'lightgreen' : droppable ? 'lightblue' : '#ededed'}
+        fill={canDrop && hover ? 'lightgreen' : canDrop && droppable ? 'lightblue' : '#ededed'}
         strokeWidth={2}
         stroke={selected ? 'blue' : '#cdcdcd'}
       />

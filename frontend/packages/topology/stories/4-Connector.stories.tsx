@@ -25,9 +25,13 @@ export const reconnect = () => {
     if (entity.kind === ModelKind.node) {
       return withDndDrop<any, any, any, EntityProps>({
         accept: 'test',
+        canDrop: (item, monitor, props) => {
+          return !props || (item.getSource() !== props.entity && item.getTarget() !== props.entity);
+        },
         collect: (monitor) => ({
           droppable: monitor.isDragging(),
           hover: monitor.isOver(),
+          canDrop: monitor.canDrop(),
         }),
       })(NodeWidget);
     }
@@ -36,6 +40,7 @@ export const reconnect = () => {
         item: { type: 'test' },
         begin: action((monitor: DragSourceMonitor, props: EntityProps) => {
           props.entity.raise();
+          return props.entity;
         }),
         drag: action((event: DragEvent, monitor: DragSourceMonitor, props: EntityProps) => {
           props.entity.setStartPoint(event.x, event.y);
@@ -51,6 +56,7 @@ export const reconnect = () => {
           item: { type: 'test' },
           begin: action((monitor: DragSourceMonitor, props: EntityProps) => {
             props.entity.raise();
+            return props.entity;
           }),
           drag: action((event: DragEvent, monitor: DragSourceMonitor, props: EntityProps) => {
             props.entity.setEndPoint(event.x, event.y);

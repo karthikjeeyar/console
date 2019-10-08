@@ -86,7 +86,7 @@ export class DndManagerImpl implements DndManager {
 
   canDropOnTarget(targetId: string | undefined): boolean {
     const target = this.getTarget(targetId);
-    if (!target || this.isDragging() || this.didDrop()) {
+    if (!target || !this.isDragging() || this.didDrop()) {
       return false;
     }
 
@@ -218,9 +218,8 @@ export class DndManagerImpl implements DndManager {
   }
 
   drop(): void {
-    // TODO slicing to suppress mobx warning
     this.getTargetIds()
-      .slice()
+      .filter((id) => this.canDropOnTarget(id))
       .reverse()
       .forEach((id, idx) => {
         const target = this.getTarget(id);

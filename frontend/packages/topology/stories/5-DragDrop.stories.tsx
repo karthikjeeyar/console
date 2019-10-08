@@ -86,9 +86,13 @@ export const dnd = () => {
     if (isNodeEntity(entity) && entity.getType() === 'group-drop') {
       return withDndDrop<any, any, any, EntityProps>({
         accept: 'test',
+        canDrop: (item, monitor, props) => {
+          return !!props && item.getParent() !== props.entity;
+        },
         collect: (monitor) => ({
           droppable: monitor.isDragging(),
           hover: monitor.isOver(),
+          canDrop: monitor.canDrop(),
         }),
       })(GroupHullWidget);
     }
@@ -97,6 +101,7 @@ export const dnd = () => {
         item: { type: 'test' },
         begin: action((monitor: DragSourceMonitor, props: EntityProps) => {
           props.entity.raise();
+          return props.entity;
         }),
         drag: action((event: DragEvent, monitor: DragSourceMonitor, props: EntityProps) => {
           props.entity.getBounds().translate(event.dx, event.dy);

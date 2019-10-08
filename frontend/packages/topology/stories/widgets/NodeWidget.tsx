@@ -12,6 +12,7 @@ type NodeWidgetProps = {
   entity: NodeEntity;
   droppable?: boolean;
   hover?: boolean;
+  canDrop?: boolean;
 } & WithSelectionProps &
   WithDragNodeProps &
   WithDndDragProps &
@@ -25,6 +26,7 @@ const NodeWidget: React.FC<NodeWidgetProps> = ({
   dndDragRef,
   droppable,
   hover,
+  canDrop,
   dndDropRef,
 }) => {
   useAnchor(React.useCallback(() => new EllipseAnchor(), []));
@@ -37,7 +39,15 @@ const NodeWidget: React.FC<NodeWidgetProps> = ({
       cy={height / 2}
       rx={Math.max(0, width / 2 - 1)}
       ry={Math.max(0, height / 2 - 1)}
-      fill={hover ? 'lightgreen' : droppable ? 'lightblue' : selected ? 'blue' : 'grey'}
+      fill={
+        canDrop && hover
+          ? 'lightgreen'
+          : canDrop && droppable
+          ? 'lightblue'
+          : selected
+          ? 'blue'
+          : 'grey'
+      }
       strokeWidth={1}
       stroke="#333333"
     />
