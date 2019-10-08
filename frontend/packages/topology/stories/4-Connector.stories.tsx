@@ -6,6 +6,8 @@ import { Model, ModelKind, EdgeEntity, NodeEntity } from '../src/types';
 import { withTargetDrag, withSourceDrag } from '../src/behavior/useReconnect';
 import { DragSourceMonitor, DragEvent } from '../src/behavior/dnd-types';
 import { withDndDrop } from '../src/behavior/useDndDrop';
+import { withPanZoom } from '../src/behavior/usePanZoom';
+import GraphWidget from '../src/widgets/GraphWidget';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 import EdgeWidget from './widgets/EdgeWidget';
 import NodeWidget from './widgets/NodeWidget';
@@ -22,6 +24,9 @@ export const reconnect = () => {
   const vis = new Visualization();
   vis.registerWidgetFactory(defaultWidgetFactory);
   vis.registerWidgetFactory((entity) => {
+    if (entity.kind === ModelKind.graph) {
+      return withPanZoom()(GraphWidget);
+    }
     if (entity.kind === ModelKind.node) {
       return withDndDrop<any, any, any, EntityProps>({
         accept: 'test',

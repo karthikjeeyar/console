@@ -17,13 +17,11 @@ export const withSourceDrag = <
 ) => <P extends WithSourceDragProps & CollectedProps & Props>(
   WrappedComponent: React.ComponentType<P>,
 ) => {
-  const Component: React.FC<Omit<P, keyof WithSourceDragProps & CollectedProps>> = observer(
-    (props) => {
-      const [dndDragProps, dndDragRef] = useDndDrag(spec, props);
-      return <WrappedComponent {...props as any} sourceDragRef={dndDragRef} {...dndDragProps} />;
-    },
-  );
-  return Component;
+  const Component: React.FC<Omit<P, keyof WithSourceDragProps & CollectedProps>> = (props) => {
+    const [dndDragProps, dndDragRef] = useDndDrag(spec, props);
+    return <WrappedComponent {...props as any} sourceDragRef={dndDragRef} {...dndDragProps} />;
+  };
+  return observer(Component);
 };
 
 export type WithTargetDragProps = {
@@ -40,11 +38,9 @@ export const withTargetDrag = <
 ) => <P extends WithSourceDragProps & CollectedProps & Props>(
   WrappedComponent: React.ComponentType<P>,
 ) => {
-  const Component: React.FC<Omit<P, keyof WithSourceDragProps & CollectedProps>> = observer(
-    (props) => {
-      const [dndDragProps, dndDragRef] = useDndDrag(spec, props);
-      return <WrappedComponent {...props as any} targetDragRef={dndDragRef} {...dndDragProps} />;
-    },
-  );
-  return Component;
+  const Component: React.FC<Omit<P, keyof WithSourceDragProps & CollectedProps>> = (props) => {
+    const [dndDragProps, dndDragRef] = useDndDrag(spec, props);
+    return <WrappedComponent {...props as any} targetDragRef={dndDragRef} {...dndDragProps} />;
+  };
+  return observer(Component);
 };

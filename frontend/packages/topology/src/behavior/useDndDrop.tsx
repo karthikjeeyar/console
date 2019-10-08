@@ -176,12 +176,10 @@ export const withDndDrop = <
 ) => <P extends WithDndDropProps & CollectedProps & Props>(
   WrappedComponent: React.ComponentType<P>,
 ) => {
-  const Component: React.FC<Omit<P, keyof WithDndDropProps & CollectedProps>> = observer(
-    (props) => {
-      // TODO why is props giving an error but not in useDndDrag
-      const [dndDropProps, dndDropRef] = useDndDrop(spec, props as any);
-      return <WrappedComponent {...props as any} dndDropRef={dndDropRef} {...dndDropProps} />;
-    },
-  );
-  return Component;
+  const Component: React.FC<Omit<P, keyof WithDndDropProps & CollectedProps>> = (props) => {
+    // TODO why is props giving an error but not in useDndDrag
+    const [dndDropProps, dndDropRef] = useDndDrop(spec, props as any);
+    return <WrappedComponent {...props as any} dndDropRef={dndDropRef} {...dndDropProps} />;
+  };
+  return observer(Component);
 };

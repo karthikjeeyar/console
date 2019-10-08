@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { action } from 'mobx';
+import { observer } from 'mobx-react';
 import { NodeEntity } from '../types';
 import EntityContext from '../utils/EntityContext';
 import { useDndDrag } from './useDndDrag';
@@ -41,5 +42,5 @@ export const withDragGroup = <P extends WithDragGroupProps>(
     const dragGroupRef = useDragGroup();
     return <WrappedComponent {...props as any} dragGroupRef={dragGroupRef} />;
   };
-  return Component;
+  return observer(Component);
 };

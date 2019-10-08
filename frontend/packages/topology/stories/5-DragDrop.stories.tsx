@@ -2,13 +2,15 @@ import * as React from 'react';
 import { action } from 'mobx';
 import Visualization from '../src/Visualization';
 import VisualizationWidget from '../src/VisualizationWidget';
-import { Model, isNodeEntity, NodeEntity } from '../src/types';
+import { Model, isNodeEntity, NodeEntity, ModelKind } from '../src/types';
 import { withDndDrag } from '../src/behavior/useDndDrag';
 import { withDndDrop } from '../src/behavior/useDndDrop';
 import { DragSourceMonitor, DragEvent } from '../src/behavior/dnd-types';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 import NodeWidget from './widgets/NodeWidget';
 import GroupHullWidget from './widgets/GroupHullWidget';
+import GraphWidget from '../src/widgets/GraphWidget';
+import { withPanZoom } from '../src/behavior/usePanZoom';
 
 export default {
   title: 'Drag and Drop',
@@ -83,6 +85,9 @@ export const dnd = () => {
   vis.registerWidgetFactory(defaultWidgetFactory);
   // support pan zoom and drag
   vis.registerWidgetFactory((entity) => {
+    if (entity.kind === ModelKind.graph) {
+      return withPanZoom()(GraphWidget);
+    }
     if (isNodeEntity(entity) && entity.getType() === 'group-drop') {
       return withDndDrop<any, any, any, EntityProps>({
         accept: 'test',

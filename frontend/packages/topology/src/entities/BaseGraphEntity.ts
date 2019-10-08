@@ -52,4 +52,12 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
       this.scale = +model.scale;
     }
   }
+
+  translateToAbsolute(): void {
+    // do nothing
+  }
+
+  translateFromAbsolute(): void {
+    // do nothing
+  }
 }

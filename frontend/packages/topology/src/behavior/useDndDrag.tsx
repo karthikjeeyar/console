@@ -85,7 +85,12 @@ export const useDndDrag = <
                 () =>
                   d3
                     .select(node.ownerSVGElement)
-                    .select(`[data-id="${entity.getParent().getId()}"]`)
+                    .select(
+                      `[data-id="${entity
+                        .getController()
+                        .getGraph()
+                        .getId()}"]`,
+                    )
                     .node() as any,
               )
               .on(

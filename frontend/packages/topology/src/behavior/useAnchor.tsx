@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { action } from 'mobx';
+import { observer } from 'mobx-react';
 import { isNodeEntity, Anchor, NodeEntity } from '../types';
 import EntityContext from '../utils/EntityContext';
 
@@ -20,5 +21,5 @@ export const withAnchor = <P extends {} = {}>(anchor: Anchor) => (
     useAnchor(React.useCallback(() => anchor, []));
     return <WrappedComponent {...props} />;
   };
-  return Component;
+  return observer(Component);
 };

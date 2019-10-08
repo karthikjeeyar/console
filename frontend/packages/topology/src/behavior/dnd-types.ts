@@ -12,7 +12,7 @@ export type DragEvent = {
 export type DragSource = {
   type: SourceType;
   canDrag(dndManager: DndManager): boolean;
-  beginDrag(dndManager: DndManager): void;
+  beginDrag(dndManager: DndManager): any;
   drag(dndManager: DndManager): void;
   endDrag(dndManager: DndManager): void;
 };
@@ -98,7 +98,7 @@ export interface DragSourceSpec<
   Props extends {} = {}
 > {
   item: DragObject;
-  begin?: (monitor: DragSourceMonitor, props?: Props) => DragObject;
+  begin?: (monitor: DragSourceMonitor, props?: Props) => any;
   drag?: (event: DragEvent, monitor: DragSourceMonitor, props?: Props) => void;
   end?: (dropResult: DropResult | undefined, monitor: DragSourceMonitor, props?: Props) => void;
   canDrag?: boolean | ((monitor: DragSourceMonitor, props?: Props) => boolean);
