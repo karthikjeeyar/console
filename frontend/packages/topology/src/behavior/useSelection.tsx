@@ -2,7 +2,8 @@ import * as React from 'react';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { useComputed } from 'mobx-react-lite';
-import { EventListener, ElementEntity } from '../types';
+import { EventListener } from '../types';
+import EntityContext from '../utils/EntityContext';
 
 export const SELECTION_EVENT = 'selection';
 
@@ -15,19 +16,23 @@ type SelectionHandlerState = {
 export type OnSelect = (e: React.MouseEvent) => void;
 
 export const useSelection = (
-  entity: ElementEntity,
   multi: boolean = false,
   controlled: boolean = false,
 ): [boolean, OnSelect] => {
+  const entity = React.useContext(EntityContext);
+  const entityRef = React.useRef(entity);
+  entityRef.current = entity;
+
   const selected = useComputed(() => {
     const { selectedIds } = entity.getController().getState<SelectionHandlerState>();
     return !!selectedIds && selectedIds.includes(entity.getId());
-  });
+  }, [entity]);
+
   const onSelect = React.useCallback(
     action(
       (e: React.MouseEvent): void => {
-        const id = entity.getId();
-        const state = entity.getController().getState<SelectionHandlerState>();
+        const id = entityRef.current.getId();
+        const state = entityRef.current.getController().getState<SelectionHandlerState>();
         const idx = state.selectedIds ? state.selectedIds.indexOf(id) : -1;
         let selectedIds: string[];
         let raise = false;
@@ -53,13 +58,13 @@ export const useSelection = (
         if (!controlled) {
           state.selectedIds = selectedIds;
         }
-        entity.getController().fireEvent(SELECTION_EVENT, selectedIds);
+        entityRef.current.getController().fireEvent(SELECTION_EVENT, selectedIds);
         if (raise) {
-          entity.raise();
+          entityRef.current.raise();
         }
       },
     ),
-    [controlled, entity, multi],
+    [],
   );
   return [selected, onSelect];
 };
@@ -69,17 +74,13 @@ export type WithSelectionProps = {
   onSelect: OnSelect;
 };
 
-type EntityProps = {
-  entity: ElementEntity;
-};
-
 export const withSelection = (multi: boolean = false, controlled: boolean = false) => <
   P extends WithSelectionProps
 >(
   WrappedComponent: React.ComponentType<P>,
 ) => {
-  const Component: React.FC<Omit<P, keyof WithSelectionProps> & EntityProps> = (props) => {
-    const [selected, onSelect] = useSelection(props.entity, multi, controlled);
+  const Component: React.FC<Omit<P, keyof WithSelectionProps>> = (props) => {
+    const [selected, onSelect] = useSelection(multi, controlled);
     return <WrappedComponent {...props as any} selected={selected} onSelect={onSelect} />;
   };
   return observer(Component);

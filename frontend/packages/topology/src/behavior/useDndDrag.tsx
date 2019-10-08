@@ -34,6 +34,8 @@ export const useDndDrag = <
   dndManagerRef.current = dndManager;
 
   const entity = React.useContext(EntityContext);
+  const entityRef = React.useRef(entity);
+  entityRef.current = entity;
 
   const idRef = React.useRef<string>();
 
@@ -74,55 +76,52 @@ export const useDndDrag = <
   monitorRef.current = monitor;
 
   const refCallback = useCallbackRef(
-    React.useCallback(
-      (node: SVGElement | null) => {
-        if (node) {
-          d3.select(node).call(
-            d3
-              .drag()
-              .container(
-                // TODO bridge the gap between scene tree and dom tree
-                () =>
-                  d3
-                    .select(node.ownerSVGElement)
-                    .select(
-                      `[data-id="${entity
-                        .getController()
-                        .getGraph()
-                        .getId()}"]`,
-                    )
-                    .node() as any,
-              )
-              .on(
-                'drag',
-                action(() => {
-                  dndManagerRef.current.drag(d3.event.x, d3.event.y);
-                }),
-              )
-              .on(
-                'start',
-                action(() => {
-                  if (idRef.current) {
-                    dndManagerRef.current.beginDrag(idRef.current, d3.event.x, d3.event.y);
-                  }
-                }),
-              )
-              .on(
-                'end',
-                action(() => {
-                  dndManagerRef.current.drop();
-                  dndManagerRef.current.endDrag();
-                }),
-              )
-              .filter(() => dndManagerRef.current.canDragSource(idRef.current)),
-          );
-        }
-        return () => {
-          node && d3.select(node).on('mousedown.drag', null);
-        };
-      },
-      [entity],
-    ),
+    React.useCallback((node: SVGElement | null) => {
+      if (node) {
+        d3.select(node).call(
+          d3
+            .drag()
+            .container(
+              // TODO bridge the gap between scene tree and dom tree
+              () =>
+                d3
+                  .select(node.ownerSVGElement)
+                  .select(
+                    `[data-id="${entityRef.current
+                      .getController()
+                      .getGraph()
+                      .getId()}"]`,
+                  )
+                  .node() as any,
+            )
+            .on(
+              'drag',
+              action(() => {
+                dndManagerRef.current.drag(d3.event.x, d3.event.y);
+              }),
+            )
+            .on(
+              'start',
+              action(() => {
+                if (idRef.current) {
+                  dndManagerRef.current.beginDrag(idRef.current, d3.event.x, d3.event.y);
+                }
+              }),
+            )
+            .on(
+              'end',
+              action(() => {
+                dndManagerRef.current.drop();
+                dndManagerRef.current.endDrag();
+              }),
+            )
+            .filter(() => dndManagerRef.current.canDragSource(idRef.current)),
+        );
+      }
+      return () => {
+        node && d3.select(node).on('mousedown.drag', null);
+      };
+    }, []),
   );
 
   React.useEffect(() => {

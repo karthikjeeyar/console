@@ -2,8 +2,9 @@ import * as React from 'react';
 import * as d3 from 'd3';
 import { observer } from 'mobx-react';
 import { action } from 'mobx';
+import EntityContext from '../utils/EntityContext';
 import useCallbackRef from '../utils/useCallbackRef';
-import { GraphEntity } from '../types';
+import { isGraphEntity } from '../types';
 
 export type PanZoomTransform = {
   x: number;
@@ -15,10 +16,14 @@ const ZOOM_EXTENT: [number, number] = [0.25, 4];
 
 export type PanZoomRef = (node: SVGElement | null) => void;
 
-export const usePanZoom = (
-  entity: GraphEntity,
-  zoomExtent: [number, number] = ZOOM_EXTENT,
-): PanZoomRef => {
+export const usePanZoom = (zoomExtent: [number, number] = ZOOM_EXTENT): PanZoomRef => {
+  const entity = React.useContext(EntityContext);
+  if (!isGraphEntity(entity)) {
+    throw new Error('usePanZoom must be used within the scope of a GraphEntity');
+  }
+  const entityRef = React.useRef(entity);
+  entityRef.current = entity;
+
   const refCallback = useCallbackRef(
     React.useCallback(
       (node: SVGElement | null) => {
@@ -31,20 +36,22 @@ export const usePanZoom = (
             .on(
               'zoom',
               action(() => {
-                entity.getBounds().setLocation(d3.event.transform.x, d3.event.transform.y);
-                entity.setScale(d3.event.transform.k);
+                entityRef.current
+                  .getBounds()
+                  .setLocation(d3.event.transform.x, d3.event.transform.y);
+                entityRef.current.setScale(d3.event.transform.k);
               }),
             );
           zoom($svg);
         }
         return () => {
           if (node) {
-            // remove all zomo listeners
+            // remove all zoom listeners
             d3.select(node.ownerSVGElement).on('.zoom', null);
           }
         };
       },
-      [entity, zoomExtent],
+      [zoomExtent],
     ),
   );
 
@@ -56,17 +63,13 @@ export type WithPanZoomProps = {
   panZoomTransform: PanZoomTransform;
 };
 
-type EntityProps = {
-  entity: GraphEntity;
-};
-
 export const withPanZoom = (zoomExtent: [number, number] = ZOOM_EXTENT) => <
   P extends WithPanZoomProps
 >(
   WrappedComponent: React.ComponentType<P>,
 ) => {
-  const Component: React.FC<Omit<P, keyof WithPanZoomProps> & EntityProps> = (props) => {
-    const panZoomRef = usePanZoom(props.entity, zoomExtent);
+  const Component: React.FC<Omit<P, keyof WithPanZoomProps>> = (props) => {
+    const panZoomRef = usePanZoom(zoomExtent);
     return <WrappedComponent {...props as any} panZoomRef={panZoomRef} />;
   };
   return observer(Component);
