@@ -6,6 +6,7 @@ import { WithSourceDragProps, WithTargetDragProps } from '../../src/behavior/use
 import Point from '../../src/geom/Point';
 import { EdgeEntity } from '../../src/types';
 import widget from '../../src/widget';
+import { useBendpoint } from '../../src/behavior/useBendpoint';
 
 type EdgeWidgetProps = {
   entity: EdgeEntity;
@@ -15,6 +16,28 @@ type EdgeWidgetProps = {
 
 const TARGET_ARROW_MARKER_ID = 'defaultTargetArrow';
 
+type BendpointProps = {
+  point: Point;
+};
+
+const Bendpoint: React.FC<BendpointProps> = widget(({ point }) => {
+  const [hover, setHover] = React.useState(false);
+  const [, ref] = useBendpoint(point);
+  return (
+    // eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
+    <circle
+      ref={ref}
+      cx={point.x}
+      cy={point.y}
+      r={5}
+      fill="lightblue"
+      fillOpacity={hover ? 0.8 : 0}
+      onMouseOver={() => setHover(true)}
+      onMouseOut={() => setHover(false)}
+    />
+  );
+});
+
 const EdgeWidget: React.FC<EdgeWidgetProps> = ({
   entity,
   sourceDragRef,
@@ -23,8 +46,8 @@ const EdgeWidget: React.FC<EdgeWidgetProps> = ({
 }) => {
   const startPoint = entity.getStartPoint();
   const endPoint = entity.getEndPoint();
-  const d = `M${startPoint.x} ${startPoint.y} ${entity
-    .getBendpoints()
+  const bendpoints = entity.getBendpoints();
+  const d = `M${startPoint.x} ${startPoint.y} ${bendpoints
     .map((b: Point) => `L${b.x} ${b.y} `)
     .join('')}L${endPoint.x} ${endPoint.y}`;
   return (
@@ -39,6 +62,7 @@ const EdgeWidget: React.FC<EdgeWidgetProps> = ({
           markerEnd={createSvgIdUrl(TARGET_ARROW_MARKER_ID)}
         />
       </Layer>
+      {bendpoints && bendpoints.map((p, i) => <Bendpoint point={p} key={i.toString()} />)}
       {sourceDragRef && (
         <circle ref={sourceDragRef} r={15} cx={startPoint.x} cy={startPoint.y} fillOpacity={0} />
       )}
