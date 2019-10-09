@@ -6,7 +6,7 @@ import {
   getPathAnchorPoint,
   getPolygonAnchorPoint,
   getRectAnchorPoint,
-} from './anchorUtils';
+} from './svgAnchorUtils';
 
 export default class SVGAnchor extends AbstractAnchor {
   private svgElement: SVGElement;
