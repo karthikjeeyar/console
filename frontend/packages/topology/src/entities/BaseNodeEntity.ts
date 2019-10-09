@@ -1,13 +1,13 @@
 import { observable, computed } from 'mobx';
 import { NodeEntity, Anchor, Node, ModelKind, isNodeEntity } from '../types';
-import RectAnchor from '../anchors/RectAnchor';
+import CenterAnchor from '../anchors/CenterAnchor';
 // import Point from '../geom/Point';
 import BaseElementEntity from './BaseElementEntity';
 
 export default class BaseNodeEntity<E extends Node = Node, D = any> extends BaseElementEntity<E, D>
   implements NodeEntity<E, D> {
   @observable.ref
-  private anchor: Anchor = new RectAnchor(this);
+  private anchor: Anchor = new CenterAnchor(this);
 
   @computed
   private get nodes(): NodeEntity[] {

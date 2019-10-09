@@ -1,6 +1,6 @@
 import Point from '../geom/Point';
 import AbstractAnchor from './AbstractAnchor';
-import { getEllipseAnchorPoint } from './AnchorUtils';
+import { getEllipseAnchorPoint } from './svgAnchorUtils';
 
 export default class EllipseAnchor extends AbstractAnchor {
   getLocation(reference: Point): Point {

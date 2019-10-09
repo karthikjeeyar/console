@@ -13,13 +13,18 @@ export const useSvgAnchor = (): ((node: SVGElement | null) => void) => {
     throw new Error('useAnchor must be used within the scope of a NodeEntity');
   }
 
+  const nodeRef = React.useRef<SVGElement | null>(null);
   const entityRef = React.useRef(entity);
   entityRef.current = entity;
 
   useAnchor(
     React.useCallback(() => {
       if (!(entity.getAnchor() instanceof SVGAnchor)) {
-        return new SVGAnchor();
+        const anchor = new SVGAnchor();
+        if (nodeRef.current) {
+          anchor.setSVGElement(nodeRef.current);
+        }
+        return anchor;
       }
       return undefined;
     }, [entity]),
@@ -27,6 +32,7 @@ export const useSvgAnchor = (): ((node: SVGElement | null) => void) => {
 
   const setAnchorSvgRef = React.useCallback<SvgAnchorRef>(
     action((node: SVGElement | null) => {
+      nodeRef.current = node;
       if (node) {
         const anchor = entity.getAnchor();
         if (anchor instanceof SVGAnchor) {

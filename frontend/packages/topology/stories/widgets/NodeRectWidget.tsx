@@ -38,8 +38,8 @@ const NodeRectWidget: React.FC<NodeRectWidgetProps> = ({
       onClick={onSelect}
       x={0}
       y={0}
-      width={Math.max(0, width)}
-      height={Math.max(0, height)}
+      width={Math.max(0, width) - 2}
+      height={Math.max(0, height) - 2}
       fill={
         canDrop && hover
           ? 'lightgreen'

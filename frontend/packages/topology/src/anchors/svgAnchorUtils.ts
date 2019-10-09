@@ -12,10 +12,15 @@ const getEllipseAnchorPoint = (
     .translate(reference.x, reference.y);
 
   if (ellipseReference.x === 0) {
-    return new Point(reference.x, ellipseReference.y > 0 ? center.y + height : center.y);
+    ellipseReference.setLocation(
+      reference.x,
+      ellipseReference.y > 0 ? center.y + height : center.y,
+    );
+    return ellipseReference;
   }
   if (ellipseReference.y === 0) {
-    return new Point(ellipseReference.x > 0 ? center.x + width : center.x, reference.y);
+    ellipseReference.setLocation(ellipseReference.x > 0 ? center.x + width : center.x, reference.y);
+    return ellipseReference;
   }
 
   const dx = ellipseReference.x > 0 ? 0.5 : -0.5;

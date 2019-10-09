@@ -1,6 +1,6 @@
 import Point from '../geom/Point';
 import AbstractAnchor from './AbstractAnchor';
-import { getRectAnchorPoint } from './AnchorUtils';
+import { getRectAnchorPoint } from './svgAnchorUtils';
 
 export default class RectAnchor extends AbstractAnchor {
   getLocation(reference: Point): Point {
