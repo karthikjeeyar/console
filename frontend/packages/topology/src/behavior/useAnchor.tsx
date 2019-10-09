@@ -4,13 +4,18 @@ import { observer } from 'mobx-react';
 import { isNodeEntity, Anchor, NodeEntity } from '../types';
 import EntityContext from '../utils/EntityContext';
 
-export const useAnchor = (anchorCallback: (entity: NodeEntity) => Anchor): void => {
+export const useAnchor = (anchorCallback: (entity: NodeEntity) => Anchor | undefined): void => {
   const entity = React.useContext(EntityContext);
   if (!isNodeEntity(entity)) {
     throw new Error('useAnchor must be used within the scope of a NodeEntity');
   }
   React.useEffect(() => {
-    action(() => entity.setAnchor(anchorCallback(entity)))();
+    action(() => {
+      const anchor = anchorCallback(entity);
+      if (anchor) {
+        entity.setAnchor(anchor);
+      }
+    })();
   }, [anchorCallback, entity]);
 };
 

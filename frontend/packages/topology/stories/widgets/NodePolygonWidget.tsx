@@ -7,7 +7,6 @@ import { WithDragNodeProps } from '../../src/behavior/useDragNode';
 import { WithSelectionProps } from '../../src/behavior/useSelection';
 import { WithDndDragProps } from '../../src/behavior/useDndDrag';
 import { WithDndDropProps } from '../../src/behavior/useDndDrop';
-import SVGAnchor from '../../src/anchors/SVGAnchor';
 import { combineRefs } from '../../src/utils/combineRefs';
 import Point from '../../src/geom/Point';
 
@@ -32,9 +31,7 @@ const NodePolygonWidget: React.FC<NodePolygonWidgetProps> = ({
   canDrop,
   dndDropRef,
 }) => {
-  const anchorRef: ((svg: SVGElement | null) => void) | null = useSvgAnchor(
-    React.useCallback(() => new SVGAnchor(), []),
-  );
+  const anchorRef = useSvgAnchor();
   const { width, height } = entity.getBounds();
 
   const points: Point[] = [

@@ -48,6 +48,8 @@ export interface LayoutNode extends Node {
 
 export interface Graph extends LayoutNode {
   name?: string;
+  x?: number;
+  y?: number;
   scale?: number;
 }
 

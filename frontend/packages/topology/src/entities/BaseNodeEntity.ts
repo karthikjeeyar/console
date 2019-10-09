@@ -41,21 +41,11 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
     if ('height' in model && model.height != null) {
       bounds.height = model.height;
     }
-    let c;
     if ('x' in model && model.x != null) {
-      if (!c) {
-        c = bounds.getCenter();
-      }
-      c[0] = model.x;
+      bounds.x = model.x;
     }
     if ('y' in model && model.y != null) {
-      if (!c) {
-        c = bounds.getCenter();
-      }
-      c[1] = model.y;
-    }
-    if (c) {
-      bounds.setCenter(c[0], c[1]);
+      bounds.y = model.y;
     }
   }
 }

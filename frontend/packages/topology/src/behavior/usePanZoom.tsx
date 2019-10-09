@@ -24,7 +24,7 @@ export const usePanZoom = (zoomExtent: [number, number] = ZOOM_EXTENT): PanZoomR
   const entityRef = React.useRef(entity);
   entityRef.current = entity;
 
-  const refCallback = useCallbackRef(
+  const refCallback = useCallbackRef<PanZoomRef>(
     React.useCallback(
       (node: SVGElement | null) => {
         if (node) {

@@ -1,42 +1,55 @@
 import * as React from 'react';
 import { action } from 'mobx';
-import { isNodeEntity, NodeEntity } from '../types';
+import { isNodeEntity } from '../types';
 import EntityContext from '../utils/EntityContext';
 import SVGAnchor from '../anchors/SVGAnchor';
+import { useAnchor } from './useAnchor';
 
-export const useSvgAnchor = (
-  anchorCallback: (entity: NodeEntity) => SVGAnchor,
-): ((svg: SVGElement | null) => void) => {
+export type SvgAnchorRef = (node: SVGElement | null) => void;
+
+export const useSvgAnchor = (): ((node: SVGElement | null) => void) => {
   const entity = React.useContext(EntityContext);
-  let svgElement: SVGElement | null = null;
-
   if (!isNodeEntity(entity)) {
     throw new Error('useAnchor must be used within the scope of a NodeEntity');
   }
 
-  React.useEffect(() => {
-    action(() => {
-      const anchor: SVGAnchor = anchorCallback(entity);
-      if (svgElement) {
-        anchor.setSVG(svgElement);
-      }
-      entity.setAnchor(anchor);
-    })();
-  }, [anchorCallback, entity, svgElement]);
+  const entityRef = React.useRef(entity);
+  entityRef.current = entity;
 
-  const setAnchorSvgRef = (svg: SVGElement | null): void => {
-    svgElement = svg;
-  };
+  useAnchor(
+    React.useCallback(() => {
+      if (!(entity.getAnchor() instanceof SVGAnchor)) {
+        return new SVGAnchor();
+      }
+      return undefined;
+    }, [entity]),
+  );
+
+  const setAnchorSvgRef = React.useCallback<SvgAnchorRef>(
+    action((node: SVGElement | null) => {
+      if (node) {
+        const anchor = entity.getAnchor();
+        if (anchor instanceof SVGAnchor) {
+          anchor.setSVGElement(node);
+        }
+      }
+    }),
+    [],
+  );
 
   return setAnchorSvgRef;
 };
 
-export const withSvgAnchor = <P extends {} = {}>(anchor: SVGAnchor) => (
+export type WithSvgAnchorProps = {
+  svgAnchorRef: SvgAnchorRef;
+};
+
+export const withSvgAnchor = <P extends WithSvgAnchorProps>() => (
   WrappedComponent: React.ComponentType<P>,
 ) => {
-  const Component: React.FC<P> = (props) => {
-    const svgRef = useSvgAnchor(React.useCallback(() => anchor, []));
-    return <WrappedComponent {...props} ref={svgRef} />;
+  const Component: React.FC<Omit<P, keyof WithSvgAnchorProps>> = (props) => {
+    const svgAnchorRef = useSvgAnchor();
+    return <WrappedComponent {...props as any} svgAnchorRef={svgAnchorRef} />;
   };
   return Component;
 };

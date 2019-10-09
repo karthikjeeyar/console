@@ -9,10 +9,10 @@ import {
 } from './AnchorUtils';
 
 export default class SVGAnchor extends AbstractAnchor {
-  private svg: SVGElement;
+  private svgElement: SVGElement;
 
-  setSVG(svg: SVGElement) {
-    this.svg = svg;
+  setSVGElement(svgElement: SVGElement) {
+    this.svgElement = svgElement;
   }
 
   getEllipseLocation(ellipse: SVGEllipseElement, reference: Point): Point {
@@ -57,20 +57,20 @@ export default class SVGAnchor extends AbstractAnchor {
   }
 
   getLocation(reference: Point): Point {
-    if (this.svg instanceof SVGEllipseElement) {
-      return this.getEllipseLocation(this.svg as SVGEllipseElement, reference);
+    if (this.svgElement instanceof SVGEllipseElement) {
+      return this.getEllipseLocation(this.svgElement, reference);
     }
 
-    if (this.svg instanceof SVGRectElement) {
-      return this.getRectLocation(this.svg as SVGRectElement, reference);
+    if (this.svgElement instanceof SVGRectElement) {
+      return this.getRectLocation(this.svgElement, reference);
     }
 
-    if (this.svg instanceof SVGPathElement) {
-      return this.getPathLocation(this.svg as SVGPathElement, reference);
+    if (this.svgElement instanceof SVGPathElement) {
+      return this.getPathLocation(this.svgElement, reference);
     }
 
-    if (this.svg instanceof SVGPolygonElement) {
-      return this.getPolygonLocation(this.svg as SVGPolygonElement, reference);
+    if (this.svgElement instanceof SVGPolygonElement) {
+      return this.getPolygonLocation(this.svgElement, reference);
     }
 
     return this.getOwner()

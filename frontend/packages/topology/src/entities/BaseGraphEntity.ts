@@ -51,6 +51,13 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
     if ('scale' in model && typeof model.scale === 'number') {
       this.scale = +model.scale;
     }
+    const bounds = this.getBounds();
+    if ('x' in model && model.x != null) {
+      bounds.x = model.x;
+    }
+    if ('y' in model && model.y != null) {
+      bounds.y = model.y;
+    }
   }
 
   translateToAbsolute(): void {

@@ -28,6 +28,8 @@ export const shapes = () => {
       id: 'g1',
       type: 'graph',
       children: ['n1', 'n6', 'gr1', 'gr2', 'e1', 'e2', 'e3', 'e4', 'e5'],
+      x: 25,
+      y: 25,
     },
     nodes: [
       {
