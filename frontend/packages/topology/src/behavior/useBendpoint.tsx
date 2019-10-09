@@ -58,10 +58,12 @@ export const useBendpoint = <DropResult, CollectedProps, Props = {}>(
   const ref = React.useCallback(
     (node) => {
       d3.select(node).on(
-        'dblclick',
+        'click',
         action(() => {
-          d3.event.stopPropagation();
-          entityRef.current.removeBendpoint(pointRef.current);
+          if (d3.event.shiftKey) {
+            d3.event.stopPropagation();
+            entityRef.current.removeBendpoint(pointRef.current);
+          }
         }),
       );
       dragRef(node);
