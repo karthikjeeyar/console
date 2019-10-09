@@ -8,6 +8,7 @@ import {
   State,
   EventListener,
   ElementEntity,
+  LayoutFactory,
 } from './types';
 import VisualizationController from './VisualizationController';
 
@@ -37,6 +38,10 @@ export default class Visualization {
 
   getEntities(): ElementEntity[] {
     return this.controller.getEntities();
+  }
+
+  registerLayoutFactory(factory: LayoutFactory) {
+    this.controller.registerLayoutFactory(factory);
   }
 
   registerWidgetFactory(factory: WidgetFactory) {

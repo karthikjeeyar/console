@@ -7,7 +7,7 @@ import { Translatable } from './geom/types';
 export type PointTuple = [number, number];
 
 export interface Layout {
-  type: string;
+  layout: (nodes: NodeEntity[], edges: EdgeEntity[]) => void;
 }
 
 export interface LayoutConstraint {
@@ -43,7 +43,7 @@ export interface Edge extends Element {
 }
 
 export interface LayoutNode extends Node {
-  layout?: Layout;
+  layout?: string;
 }
 
 export interface Graph extends LayoutNode {
@@ -129,6 +129,9 @@ export interface GraphEntity<E extends Graph = Graph, D = any> extends ElementEn
   getEdges(): EdgeEntity[];
   getScale(): number;
   setScale(scale: number): void;
+  getLayout(): string;
+  setLayout(type: string): void;
+  layout(): void;
 }
 
 export type EventListener<Args extends any[] = any[]> = (...args: Args) => void;
@@ -145,6 +148,7 @@ export interface Controller extends WithState {
   fromModel(model: Model): void;
   getGraph(): GraphEntity;
   setGraph(Graph: GraphEntity): void;
+  getLayout(type: string): Layout;
   getEntityById(id: string): ElementEntity;
   // TODO | undefined ?
   getNodeById(id: string): NodeEntity;
@@ -152,6 +156,7 @@ export interface Controller extends WithState {
   addEntity(entity: ElementEntity): void;
   removeEntity(entity: ElementEntity): void;
   getWidget(entity: ElementEntity): ComponentType<{ entity: ElementEntity }>;
+  registerLayoutFactory(factory: LayoutFactory): void;
   registerWidgetFactory(factory: WidgetFactory): void;
   registerEntityFactory(factory: EntityFactory): void;
   addEventListener<L extends EventListener = EventListener>(type: string, listener: L): void;
@@ -159,6 +164,8 @@ export interface Controller extends WithState {
   fireEvent(type: string, ...args: any): void;
   getEntities(): ElementEntity[];
 }
+
+export type LayoutFactory = (type: string) => Layout | undefined;
 
 export type WidgetFactory = (
   entity: ElementEntity,

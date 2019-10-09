@@ -7,9 +7,7 @@ import GraphWidget from '../src/widgets/GraphWidget';
 import { withDragGroup } from '../src/behavior/useDragGroup';
 import { withDragNode } from '../src/behavior/useDragNode';
 import VisualizationWidget from '../src/VisualizationWidget';
-import { ColaLayout } from './layouts/colaLayout';
-import { DagreLayout } from './layouts/dagreLayout';
-import { ForceLayout } from './layouts/forceLayout';
+import defaultLayoutFactory from '../src/layouts/defaultLayoutFactory';
 import data from './data/miserables';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 import GroupHullWidget from './widgets/GroupHullWidget';
@@ -20,7 +18,7 @@ export default {
   title: 'Layout',
 };
 
-const getModel = (): Model => {
+const getModel = (layout: string): Model => {
   // create nodes from data
   const nodes: Node[] = data.nodes.map((d) => {
     // randomize size somewhat
@@ -61,6 +59,7 @@ const getModel = (): Model => {
     graph: {
       id: 'g1',
       type: 'graph',
+      layout,
       children: groupNodes.map((n) => n.id).concat(edges.map((e) => e.id)),
     },
     nodes: [...nodes, ...groupNodes],
@@ -73,6 +72,7 @@ const getModel = (): Model => {
 const getVisualization = (model: Model): Visualization => {
   const vis = new Visualization();
 
+  vis.registerLayoutFactory(defaultLayoutFactory);
   vis.registerWidgetFactory(defaultWidgetFactory);
 
   // support pan zoom and drag
@@ -97,19 +97,16 @@ const getVisualization = (model: Model): Visualization => {
 };
 
 export const Force = () => {
-  const vis: Visualization = getVisualization(getModel());
-  ForceLayout(vis);
+  const vis: Visualization = getVisualization(getModel('force'));
   return <VisualizationWidget visualization={vis} />;
 };
 
 export const Dagre = () => {
-  const vis: Visualization = getVisualization(getModel());
-  DagreLayout(vis);
+  const vis: Visualization = getVisualization(getModel('dagre'));
   return <VisualizationWidget visualization={vis} />;
 };
 
 export const Cola = () => {
-  const vis: Visualization = getVisualization(getModel());
-  ColaLayout(vis);
+  const vis: Visualization = getVisualization(getModel('cola'));
   return <VisualizationWidget visualization={vis} />;
 };

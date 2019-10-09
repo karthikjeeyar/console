@@ -1,9 +1,8 @@
-// TODO create reusable layout classes
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 import { action } from 'mobx';
-import { EdgeEntity, isEdgeEntity, isNodeEntity, NodeEntity } from '../../src/types';
-import Visualization from '../../src/Visualization';
+import { EdgeEntity, Layout, NodeEntity } from '../types';
+import { leafNodeEntities } from '../utils/leafNodeEntities';
 
 class D3Node implements d3.SimulationNodeDatum {
   private node: NodeEntity;
@@ -94,52 +93,49 @@ class D3Link implements d3.SimulationLinkDatum<D3Node> {
   }
 }
 
-export const ForceLayout = (vis: Visualization) => {
-  const entities = vis.getEntities();
+export default class ForceLayout implements Layout {
+  layout = (nodeEntities: NodeEntity[], edgeEntities: EdgeEntity[]) => {
+    // Get all the leaf nodes and crate the D3 nodes from them
+    const nodes: D3Node[] = leafNodeEntities(nodeEntities).map((e: NodeEntity) => new D3Node(e));
+    const edges: D3Link[] = edgeEntities.map((e: EdgeEntity) => new D3Link(e));
 
-  const nodes: D3Node[] = entities
-    .filter((e) => isNodeEntity(e) && e.getType() === 'node')
-    .map((e: NodeEntity) => new D3Node(e));
-  const edges: D3Link[] = entities
-    .filter((e) => isEdgeEntity(e))
-    .map((e: EdgeEntity) => new D3Link(e));
+    // force center
+    // TODO: Use bounding component size rather than document.body
+    const bodyRect = document.body.getBoundingClientRect();
+    const cx = bodyRect.width / 2;
+    const cy = bodyRect.height / 2;
 
-  // force center
-  const bodyRect = document.body.getBoundingClientRect();
-  const cx = bodyRect.width / 2;
-  const cy = bodyRect.height / 2;
+    _.forEach(nodes, (node: D3Node) => {
+      node.setPosition(cx, cy);
+    });
 
-  _.forEach(nodes, (node: D3Node) => {
-    node.setPosition(cx, cy);
-  });
-
-  // create force simulation
-  const simulation = d3
-    .forceSimulation<D3Node>()
-    .force('collide', d3.forceCollide<D3Node>().radius((d) => d.getRadius() + 5))
-    .force('charge', d3.forceManyBody())
-    .force('center', d3.forceCenter(cx, cy))
-    .nodes(nodes)
-    .force(
-      'link',
-      d3
-        .forceLink<D3Node, D3Link>(edges)
-        .id((e) => e.id)
-        .distance((d) =>
-          (d.source as D3Node).entity.getParent() !== (d.target as D3Node).entity.getParent()
-            ? 200
-            : 50,
-        ),
-    )
-    .on(
-      'tick',
-      action(() => {
-        // speed up the simulation
-        for (let i = 0; i < 10; i++) {
-          simulation.tick();
-        }
-        nodes.forEach((d) => d.update());
-      }),
-    )
-    .restart();
-};
+    // create force simulation
+    const simulation = d3
+      .forceSimulation<D3Node>()
+      .force('collide', d3.forceCollide<D3Node>().radius((d) => d.getRadius() + 5))
+      .force('charge', d3.forceManyBody())
+      .nodes(nodes)
+      .force(
+        'link',
+        d3
+          .forceLink<D3Node, D3Link>(edges)
+          .id((e) => e.id)
+          .distance((d) =>
+            (d.source as D3Node).entity.getParent() !== (d.target as D3Node).entity.getParent()
+              ? 200
+              : 50,
+          ),
+      )
+      .on(
+        'tick',
+        action(() => {
+          // speed up the simulation
+          for (let i = 0; i < 10; i++) {
+            simulation.tick();
+          }
+          nodes.forEach((d) => d.update());
+        }),
+      )
+      .restart();
+  };
+}

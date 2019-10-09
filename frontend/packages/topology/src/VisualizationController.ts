@@ -15,6 +15,8 @@ import {
   Model,
   EventListener,
   ModelKind,
+  LayoutFactory,
+  Layout,
 } from './types';
 import defaultEntityFactory from './entities/defaultEntityFactory';
 import Stateful from './utils/Stateful';
@@ -25,6 +27,8 @@ export default class VisualizationController extends Stateful implements Control
 
   @observable.ref
   private graph: GraphEntity | undefined;
+
+  private layoutFactories: LayoutFactory[] = [];
 
   private widgetFactories: WidgetFactory[] = [];
 
@@ -126,6 +130,20 @@ export default class VisualizationController extends Stateful implements Control
       }
     }
     throw new Error(`Could not find widget for ${entity.kind}): ${entity.getId()}`);
+  }
+
+  registerLayoutFactory(factory: LayoutFactory) {
+    this.layoutFactories.unshift(factory);
+  }
+
+  getLayout(type: string): Layout {
+    for (const factory of this.layoutFactories) {
+      const layout = factory(type);
+      if (layout) {
+        return layout;
+      }
+    }
+    throw new Error(`Could not create layout for: ${type}`);
   }
 
   registerWidgetFactory(factory: WidgetFactory) {

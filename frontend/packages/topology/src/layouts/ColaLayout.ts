@@ -2,8 +2,8 @@ import * as _ from 'lodash';
 import * as webcola from 'webcola';
 import * as d3 from 'd3';
 import { action } from 'mobx';
-import Visualization from '../../src/Visualization';
-import { EdgeEntity, isEdgeEntity, isNodeEntity, NodeEntity } from '../../src/types';
+import { EdgeEntity, Layout, NodeEntity } from '../types';
+import { leafNodeEntities } from '../utils/leafNodeEntities';
 
 class ColaNode implements webcola.Node {
   private node: NodeEntity;
@@ -124,56 +124,46 @@ class ColaGroup implements webcola.Group {
   }
 }
 
-export const ColaLayout = (vis: Visualization) => {
-  const entities = vis.getEntities();
+export default class ColaLayout implements Layout {
+  layout = (nodeEntities: NodeEntity[], edgeEntities: EdgeEntity[]) => {
+    const nodes: ColaNode[] = leafNodeEntities(nodeEntities).map(
+      (e: NodeEntity) => new ColaNode(e),
+    );
+    const groups: ColaGroup[] = nodeEntities
+      .filter((e) => e.getType() === 'group-hull')
+      .map((group: NodeEntity) => new ColaGroup(group.getNodes(), nodes));
+    const edges: ColaLink[] = edgeEntities.map((e: EdgeEntity) => {
+      const edge: ColaLink = new ColaLink(e);
+      edge.source = _.find(nodes, { id: edge.entity.getSource().getId() }) || 0;
+      edge.target = _.find(nodes, { id: edge.entity.getTarget().getId() }) || 0;
+      return edge;
+    });
 
-  const nodes: ColaNode[] = entities
-    .filter((e) => isNodeEntity(e) && e.getType() === 'node')
-    .map((e: NodeEntity) => new ColaNode(e));
-  const groups: ColaGroup[] = entities
-    .filter((e) => isNodeEntity(e) && e.getType() === 'group-hull')
-    .map((group: NodeEntity) => new ColaGroup(group.getNodes(), nodes));
-  const edges: ColaLink[] = entities
-    .filter((e) => isEdgeEntity(e))
-    .map((e: EdgeEntity) => new ColaLink(e));
-
-  // force center
-  const bodyRect = document.body.getBoundingClientRect();
-  const cx = bodyRect.width / 2;
-  const cy = bodyRect.height / 2;
-
-  _.forEach(nodes, (node: ColaNode) => {
-    node.setPosition(cx, cy);
-  });
-
-  _.forEach(edges, (edge: ColaLink) => {
-    edge.source = _.find(nodes, { id: edge.entity.getSource().getId() }) || 0;
-    edge.target = _.find(nodes, { id: edge.entity.getTarget().getId() }) || 0;
-  });
-
-  let tickCount = 0;
-  const d3cola = webcola.d3adaptor(d3).linkDistance(30);
-  d3cola
-    .size([1000, 400])
-    .nodes(nodes)
-    .links(edges)
-    .groups(groups)
-    .linkDistance((link: ColaLink) =>
-      (link.source as ColaNode).entity.getParent() !== (link.target as ColaNode).entity.getParent()
-        ? 200
-        : 50,
-    )
-    .on('tick', () => {
-      // speed up the simulation
-      if (++tickCount % 10 === 0) {
-        action(() => nodes.forEach((d) => d.update()))();
-      }
-    })
-    .on(
-      'end',
-      action(() => {
-        nodes.forEach((d) => d.update());
-      }),
-    )
-    .start(20, 0, 10);
-};
+    let tickCount = 0;
+    const d3cola = webcola.d3adaptor(d3).linkDistance(30);
+    d3cola
+      .size([1000, 400])
+      .nodes(nodes)
+      .links(edges)
+      .groups(groups)
+      .linkDistance((link: ColaLink) =>
+        (link.source as ColaNode).entity.getParent() !==
+        (link.target as ColaNode).entity.getParent()
+          ? 200
+          : 50,
+      )
+      .on('tick', () => {
+        // speed up the simulation
+        if (++tickCount % 10 === 0) {
+          action(() => nodes.forEach((d) => d.update()))();
+        }
+      })
+      .on(
+        'end',
+        action(() => {
+          nodes.forEach((d) => d.update());
+        }),
+      )
+      .start(20, 0, 10);
+  };
+}
