@@ -12,7 +12,8 @@ const useCombineRefs = <RefType extends any>(...refs: React.Ref<RefType>[]): Rea
           }
         }
       }),
-    [refs],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    refs,
   );
 
 export default useCombineRefs;
