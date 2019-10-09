@@ -35,7 +35,7 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   private controller: Controller;
 
   @observable.ref
-  private bounds: Rect = observable(new Rect());
+  private bounds: Rect = new Rect();
 
   abstract get kind(): ModelKind;
 

@@ -81,6 +81,7 @@ export type DragElementWrapper = (elementOrNode: Element | null) => void;
 export type ConnectDragSource = DragElementWrapper;
 export type ConnectDropTarget = DragElementWrapper;
 
+// TODO support Symbols
 export type Identifier = string;
 
 export type TargetType = Identifier | Identifier[];

@@ -51,6 +51,14 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     this.bendpoints = points;
   }
 
+  removeBendpoint(point: Point | number): void {
+    if (typeof point === 'number') {
+      this.bendpoints.splice(point, 1);
+    } else {
+      this.bendpoints.splice(this.bendpoints.indexOf(point));
+    }
+  }
+
   // @computed (switch to getter)
   getStartPoint(): Point {
     if (this.startPoint) {

@@ -1,46 +1,60 @@
 import * as React from 'react';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
-import { NodeEntity } from '../types';
 import EntityContext from '../utils/EntityContext';
-import { useDndDrag } from './useDndDrag';
-import { DragSourceSpec, DragSourceMonitor, DragEvent } from './dnd-types';
+import { useDndDrag, WithDndDragProps } from './useDndDrag';
+import {
+  DragSourceSpec,
+  DragEvent,
+  ConnectDragSource,
+  DragObjectWithType,
+  DragSourceMonitor,
+} from './dnd-types';
 
-export type DragRef = (node: SVGElement | null) => void;
-
-type EntityProps = {
-  entity: NodeEntity;
-};
-
-const spec: DragSourceSpec<any, any, any> = {
-  item: { type: '#useDragGroup#' },
-  begin: action((monitor: DragSourceMonitor, props: EntityProps) => {
-    props.entity.raise();
-  }),
-  drag: action((event: DragEvent, monitor: DragSourceMonitor, props: EntityProps) => {
-    const { dx, dy } = event;
-    props.entity.getChildren().forEach((c) => {
-      c.getBounds().translate(dx, dy);
-    });
-  }),
-};
-
-export const useDragGroup = (): DragRef => {
+export const useDragGroup = <DropResult, CollectedProps, Props = {}>(
+  spec?: Omit<DragSourceSpec<DragObjectWithType, DropResult, CollectedProps>, 'type'>,
+  props?: Props,
+): [CollectedProps, ConnectDragSource] => {
   const entity = React.useContext(EntityContext);
-  const [, refCallback] = useDndDrag(spec, { entity });
-  return refCallback;
+  const entityRef = React.useRef(entity);
+  entityRef.current = entity;
+  return useDndDrag(
+    React.useMemo(() => {
+      const sourceSpec: DragSourceSpec<any, any, any, Props> = {
+        item: { type: '#useDragGroup#' },
+        begin: action((monitor: DragSourceMonitor, p: Props) => {
+          entityRef.current.raise();
+          return spec && spec.begin ? spec.begin(monitor, p) : undefined;
+        }),
+        drag: action((event: DragEvent, monitor: DragSourceMonitor, p: Props) => {
+          const { dx, dy } = event;
+          entityRef.current.getChildren().forEach((c) => {
+            c.getBounds().translate(dx, dy);
+          });
+          spec && spec.drag && spec.drag(event, monitor, p);
+        }),
+        canDrag: spec ? spec.canDrag : undefined,
+        end: spec ? spec.end : undefined,
+        collect: spec ? spec.collect : undefined,
+      };
+      return sourceSpec;
+    }, [spec]),
+    props,
+  );
 };
 
 export type WithDragGroupProps = {
-  dragGroupRef: DragRef;
+  dragGroupRef: WithDndDragProps['dndDragRef'];
 };
 
-export const withDragGroup = <P extends WithDragGroupProps>(
+export const withDragGroup = <DropResult, CollectedProps, Props = {}>(
+  spec?: Omit<DragSourceSpec<DragObjectWithType, DropResult, CollectedProps, Props>, 'type'>,
+) => <P extends WithDragGroupProps & CollectedProps & Props>(
   WrappedComponent: React.ComponentType<P>,
 ) => {
   const Component: React.FC<Omit<P, keyof WithDragGroupProps>> = (props) => {
-    const dragGroupRef = useDragGroup();
-    return <WrappedComponent {...props as any} dragGroupRef={dragGroupRef} />;
+    const [dragGroupProps, dragGroupRef] = useDragGroup(spec, props);
+    return <WrappedComponent {...props as any} dragGroupRef={dragGroupRef} {...dragGroupProps} />;
   };
   return observer(Component);
 };

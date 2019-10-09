@@ -10,6 +10,14 @@ export default class Point implements Translatable {
   @observable
   y: number;
 
+  private static SINGLETON = new Point();
+
+  static singleUse(x: number = 0, y: number = 0) {
+    Point.SINGLETON.x = x;
+    Point.SINGLETON.y = y;
+    return Point.SINGLETON;
+  }
+
   static fromPoint(point: Point): Point {
     return new Point(point.x, point.y);
   }

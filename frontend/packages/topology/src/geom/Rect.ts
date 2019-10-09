@@ -17,6 +17,16 @@ export default class Rect implements Translatable {
   @observable
   y: number = 0;
 
+  private static SINGLETON = new Rect();
+
+  static singleUse(x: number = 0, y: number = 0, width: number = 0, height: number = 0) {
+    Rect.SINGLETON.x = x;
+    Rect.SINGLETON.y = y;
+    Rect.SINGLETON.width = width;
+    Rect.SINGLETON.height = height;
+    return Rect.SINGLETON;
+  }
+
   static fromRect(rect: Rect): Rect {
     return new Rect(rect.x, rect.y, rect.width, rect.height);
   }

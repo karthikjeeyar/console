@@ -99,7 +99,7 @@ export const useDndDrop = <
 
           // translate to this entity's coordinates
           // assumes the node is not within an svg element containing another transform
-          const point = new Point(x, y);
+          const point = Point.singleUse(x, y);
           entityRef.current.translateFromAbsolute(point);
 
           if (nodeRef.current instanceof SVGPathElement) {

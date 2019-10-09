@@ -81,13 +81,13 @@ const getVisualization = (model: Model): Visualization => {
       return withPanZoom()(GraphWidget);
     }
     if (entity.getType() === 'group-hull') {
-      return withDragGroup(GroupHullWidget);
+      return withDragGroup()(GroupHullWidget);
     }
     if (entity.getType() === 'group') {
-      return withDragGroup(GroupWidget);
+      return withDragGroup()(GroupWidget);
     }
     if (entity.kind === ModelKind.node) {
-      return withDragNode(NodeWidget);
+      return withDragNode()(NodeWidget);
     }
     return undefined;
   });

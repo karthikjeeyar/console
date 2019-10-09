@@ -43,6 +43,8 @@ export const usePanZoom = (zoomExtent: [number, number] = ZOOM_EXTENT): PanZoomR
               }),
             );
           zoom($svg);
+          // disable double click zoom
+          // $svg.on('dblclick.zoom', null);
         }
         return () => {
           if (node) {

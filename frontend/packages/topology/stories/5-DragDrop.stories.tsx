@@ -5,12 +5,12 @@ import VisualizationWidget from '../src/VisualizationWidget';
 import { Model, isNodeEntity, NodeEntity, ModelKind } from '../src/types';
 import { withDndDrag } from '../src/behavior/useDndDrag';
 import { withDndDrop } from '../src/behavior/useDndDrop';
+import GraphWidget from '../src/widgets/GraphWidget';
+import { withPanZoom } from '../src/behavior/usePanZoom';
 import { DragSourceMonitor, DragEvent } from '../src/behavior/dnd-types';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 import NodeWidget from './widgets/NodeWidget';
 import GroupHullWidget from './widgets/GroupHullWidget';
-import GraphWidget from '../src/widgets/GraphWidget';
-import { withPanZoom } from '../src/behavior/usePanZoom';
 
 export default {
   title: 'Drag and Drop',
