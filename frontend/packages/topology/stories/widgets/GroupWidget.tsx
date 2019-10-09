@@ -1,4 +1,5 @@
 import * as React from 'react';
+import useCombineRefs from '../../src/utils/useCombineRefs';
 import { WithDragGroupProps } from '../../src/behavior/useDragGroup';
 import { WithSelectionProps } from '../../src/behavior/useSelection';
 import { NodeEntity } from '../../src/types';
@@ -30,6 +31,7 @@ const GroupWidget: React.FC<GroupWidgetProps> = ({
   canDrop,
 }) => {
   const boxRef = React.useRef<Rect | null>(null);
+  const refs = useCombineRefs<SVGRectElement>(dragGroupRef, dndDragRef, dndDropRef);
 
   if (!droppable || !boxRef.current) {
     const children = entity.getNodes();
@@ -50,7 +52,7 @@ const GroupWidget: React.FC<GroupWidgetProps> = ({
   return (
     <Layer id="groups">
       <rect
-        ref={dragGroupRef || dndDragRef || dndDropRef}
+        ref={refs}
         onClick={onSelect}
         x={boxRef.current.x}
         y={boxRef.current.y}

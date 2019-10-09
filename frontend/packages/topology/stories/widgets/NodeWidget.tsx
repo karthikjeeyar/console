@@ -6,7 +6,7 @@ import { WithDragNodeProps } from '../../src/behavior/useDragNode';
 import { WithSelectionProps } from '../../src/behavior/useSelection';
 import { WithDndDragProps } from '../../src/behavior/useDndDrag';
 import { WithDndDropProps } from '../../src/behavior/useDndDrop';
-import { combineRefs } from '../../src/utils/combineRefs';
+import useCombineRefs from '../../src/utils/useCombineRefs';
 
 type NodeWidgetProps = {
   entity: NodeEntity;
@@ -30,11 +30,12 @@ const NodeWidget: React.FC<NodeWidgetProps> = ({
   dndDropRef,
 }) => {
   const anchorRef = useSvgAnchor();
+  const refs = useCombineRefs<SVGEllipseElement>(dragNodeRef, dndDragRef, dndDropRef, anchorRef);
   const { width, height } = entity.getBounds();
 
   return (
     <ellipse
-      ref={combineRefs([dragNodeRef, dndDragRef, dndDropRef, anchorRef])}
+      ref={refs}
       onClick={onSelect}
       cx={width / 2}
       cy={height / 2}

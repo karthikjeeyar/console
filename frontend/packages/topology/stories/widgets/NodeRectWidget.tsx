@@ -6,7 +6,7 @@ import { WithDragNodeProps } from '../../src/behavior/useDragNode';
 import { WithSelectionProps } from '../../src/behavior/useSelection';
 import { WithDndDragProps } from '../../src/behavior/useDndDrag';
 import { WithDndDropProps } from '../../src/behavior/useDndDrop';
-import { combineRefs } from '../../src/utils/combineRefs';
+import useCombineRefs from '../../src/utils/useCombineRefs';
 
 type NodeRectWidgetProps = {
   entity: NodeEntity;
@@ -30,11 +30,12 @@ const NodeRectWidget: React.FC<NodeRectWidgetProps> = ({
   dndDropRef,
 }) => {
   const anchorRef = useSvgAnchor();
+  const refs = useCombineRefs<SVGRectElement>(dragNodeRef, dndDragRef, dndDropRef, anchorRef);
   const { width, height } = entity.getBounds();
 
   return (
     <rect
-      ref={combineRefs([dragNodeRef, dndDragRef, dndDropRef, anchorRef])}
+      ref={refs}
       onClick={onSelect}
       x={0}
       y={0}

@@ -9,6 +9,7 @@ import { NodeEntity, PointTuple } from '../../src/types';
 import widget from '../../src/widget';
 import { WithDndDragProps } from '../../src/behavior/useDndDrag';
 import { WithDndDropProps } from '../../src/behavior/useDndDrop';
+import useCombineRefs from '../../src/utils/useCombineRefs';
 
 type GroupHullWidgetProps = {
   entity: NodeEntity;
@@ -29,12 +30,14 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   selected,
   onSelect,
   dragGroupRef,
+  dndDragRef,
   dndDropRef,
   hover,
   droppable,
   canDrop,
 }) => {
   const pathRef = React.useRef<string | null>(null);
+  const refs = useCombineRefs<SVGPathElement>(dragGroupRef, dndDragRef, dndDropRef);
 
   if (!droppable || !pathRef.current) {
     const children = entity.getNodes();
@@ -61,7 +64,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   return (
     <Layer id="groups">
       <path
-        ref={dragGroupRef || dndDropRef}
+        ref={refs}
         onClick={onSelect}
         d={pathRef.current}
         fill={canDrop && hover ? 'lightgreen' : canDrop && droppable ? 'lightblue' : '#ededed'}

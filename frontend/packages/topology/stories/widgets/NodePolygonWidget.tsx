@@ -7,7 +7,7 @@ import { WithDragNodeProps } from '../../src/behavior/useDragNode';
 import { WithSelectionProps } from '../../src/behavior/useSelection';
 import { WithDndDragProps } from '../../src/behavior/useDndDrag';
 import { WithDndDropProps } from '../../src/behavior/useDndDrop';
-import { combineRefs } from '../../src/utils/combineRefs';
+import useCombineRefs from '../../src/utils/useCombineRefs';
 import Point from '../../src/geom/Point';
 
 type NodePolygonWidgetProps = {
@@ -32,6 +32,7 @@ const NodePolygonWidget: React.FC<NodePolygonWidgetProps> = ({
   dndDropRef,
 }) => {
   const anchorRef = useSvgAnchor();
+  const refs = useCombineRefs<SVGPolygonElement>(dragNodeRef, dndDragRef, dndDropRef, anchorRef);
   const { width, height } = entity.getBounds();
 
   const points: Point[] = [
@@ -52,7 +53,7 @@ const NodePolygonWidget: React.FC<NodePolygonWidgetProps> = ({
 
   return (
     <polygon
-      ref={combineRefs([dragNodeRef, dndDragRef, dndDropRef, anchorRef])}
+      ref={refs}
       onClick={onSelect}
       points={p}
       fill={
