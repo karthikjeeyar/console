@@ -14,12 +14,15 @@ const getEllipseAnchorPoint = (
   if (ellipseReference.x === 0) {
     ellipseReference.setLocation(
       reference.x,
-      ellipseReference.y > 0 ? center.y + height : center.y,
+      ellipseReference.y > 0 ? center.y + height / 2 : center.y,
     );
     return ellipseReference;
   }
   if (ellipseReference.y === 0) {
-    ellipseReference.setLocation(ellipseReference.x > 0 ? center.x + width : center.x, reference.y);
+    ellipseReference.setLocation(
+      ellipseReference.x > 0 ? center.x + width / 2 : center.x,
+      reference.y,
+    );
     return ellipseReference;
   }
 
@@ -40,7 +43,7 @@ const getRectAnchorPoint = (
   let dx = reference.x - center.x;
   let dy = reference.y - center.y;
 
-  if (dx === 0 || dy === 0) {
+  if (dx === 0 && dy === 0) {
     return center;
   }
 
