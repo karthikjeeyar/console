@@ -1,7 +1,7 @@
-import { Layout, LayoutFactory } from '../types';
-import ForceLayout from './ForceLayout';
-import ColaLayout from './ColaLayout';
-import DagreLayout from './DagreLayout';
+import { Layout, LayoutFactory } from '../../src/types';
+import ForceLayout from '../../src/layouts/ForceLayout';
+import ColaLayout from '../../src/layouts/ColaLayout';
+import DagreLayout from '../../src/layouts/DagreLayout';
 
 const defaultLayoutFactory: LayoutFactory = (type: string): Layout | undefined => {
   switch (type) {

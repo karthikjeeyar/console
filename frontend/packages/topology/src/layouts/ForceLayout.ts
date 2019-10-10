@@ -95,7 +95,7 @@ class D3Link implements d3.SimulationLinkDatum<D3Node> {
 
 export default class ForceLayout implements Layout {
   layout = (nodeEntities: NodeEntity[], edgeEntities: EdgeEntity[]) => {
-    // Get all the leaf nodes and crate the D3 nodes from them
+    // Get all the leaf nodes and create the D3 nodes from them
     const nodes: D3Node[] = leafNodeEntities(nodeEntities).map((e: NodeEntity) => new D3Node(e));
     const edges: D3Link[] = edgeEntities.map((e: EdgeEntity) => new D3Link(e));
 

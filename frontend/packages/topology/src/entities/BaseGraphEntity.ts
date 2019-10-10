@@ -18,10 +18,10 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
   private scale: number = 1;
 
   @observable
-  private layoutType: string = '';
+  private layoutType: string | undefined = '';
 
   @computed
-  private get graphLayout(): Layout {
+  private get graphLayout(): Layout | undefined {
     return this.getGraph()
       .getController()
       .getLayout(this.layoutType);
@@ -49,7 +49,7 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
     return this.edges;
   }
 
-  getLayout(): string {
+  getLayout(): string | undefined {
     return this.layoutType;
   }
 
@@ -58,7 +58,7 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
   }
 
   layout(): void {
-    if (this.layoutType) {
+    if (this.graphLayout) {
       this.graphLayout.layout(this.nodes, this.edges);
     }
   }
@@ -74,7 +74,7 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
   setModel(model: E): void {
     super.setModel(model);
 
-    if ('layout' in model && model.layout) {
+    if ('layout' in model) {
       this.layoutType = model.layout;
     }
     if ('scale' in model && typeof model.scale === 'number') {

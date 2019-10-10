@@ -129,8 +129,8 @@ export interface GraphEntity<E extends Graph = Graph, D = any> extends ElementEn
   getEdges(): EdgeEntity[];
   getScale(): number;
   setScale(scale: number): void;
-  getLayout(): string;
-  setLayout(type: string): void;
+  getLayout(): string | undefined;
+  setLayout(type: string | undefined): void;
   layout(): void;
 }
 
@@ -148,7 +148,7 @@ export interface Controller extends WithState {
   fromModel(model: Model): void;
   getGraph(): GraphEntity;
   setGraph(Graph: GraphEntity): void;
-  getLayout(type: string): Layout;
+  getLayout(type: string | undefined): Layout | undefined;
   getEntityById(id: string): ElementEntity;
   // TODO | undefined ?
   getNodeById(id: string): NodeEntity;

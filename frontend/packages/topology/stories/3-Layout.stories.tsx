@@ -7,7 +7,7 @@ import GraphWidget from '../src/widgets/GraphWidget';
 import { withDragGroup } from '../src/behavior/useDragGroup';
 import { withDragNode } from '../src/behavior/useDragNode';
 import VisualizationWidget from '../src/VisualizationWidget';
-import defaultLayoutFactory from '../src/layouts/defaultLayoutFactory';
+import defaultLayoutFactory from './layouts/defaultLayoutFactory';
 import data from './data/miserables';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 import GroupHullWidget from './widgets/GroupHullWidget';

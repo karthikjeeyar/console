@@ -136,14 +136,14 @@ export default class VisualizationController extends Stateful implements Control
     this.layoutFactories.unshift(factory);
   }
 
-  getLayout(type: string): Layout {
+  getLayout(type: string): Layout | undefined {
     for (const factory of this.layoutFactories) {
       const layout = factory(type);
       if (layout) {
         return layout;
       }
     }
-    throw new Error(`Could not create layout for: ${type}`);
+    return undefined;
   }
 
   registerWidgetFactory(factory: WidgetFactory) {
