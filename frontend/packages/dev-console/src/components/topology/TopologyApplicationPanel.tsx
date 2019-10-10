@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { ResourceIcon } from '@console/internal/components/utils';
+import { ResourceIcon, ActionsMenu } from '@console/internal/components/utils';
 import { TopologyApplicationObject } from './topology-types';
+import { groupActions } from './actions/groupActions';
 
 export type TopologyApplicationPanelProps = {
   application: TopologyApplicationObject;
@@ -13,6 +14,9 @@ const TopologyApplicationPanel: React.FC<TopologyApplicationPanelProps> = ({ app
         <div className="co-m-pane__name co-resource-item">
           <ResourceIcon className="co-m-resource-icon--lg" kind="application" />
           {application.name}
+        </div>
+        <div className="co-actions">
+          <ActionsMenu actions={groupActions(application)} />
         </div>
       </h1>
     </div>
