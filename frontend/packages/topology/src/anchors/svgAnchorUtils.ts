@@ -43,11 +43,13 @@ const getRectAnchorPoint = (
   let dx = reference.x - center.x;
   let dy = reference.y - center.y;
 
-  if (dx === 0 && dy === 0) {
+  if ((dx === 0 && dy === 0) || (width === 0 && height === 0)) {
     return center;
   }
 
-  const scale = 0.5 / Math.max(Math.abs(dx) / width, Math.abs(dy) / height);
+  const scale =
+    0.5 /
+    Math.max(width === 0 ? 0 : Math.abs(dx) / width, height === 0 ? 0 : Math.abs(dy) / height);
 
   dx *= scale;
   dy *= scale;
