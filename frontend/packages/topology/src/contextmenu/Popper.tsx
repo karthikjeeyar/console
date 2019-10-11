@@ -3,6 +3,7 @@ import PopperJS, { PopperOptions } from 'popper.js';
 import useCombineRefs from '../utils/useCombineRefs';
 import Portal from './Portal';
 
+// alignment with PopperJS reference API
 type PopperJSReference = {
   getBoundingClientRect: Element['getBoundingClientRect'];
   clientWidth: number;
@@ -42,12 +43,8 @@ class VirtualReference implements PopperJSReference {
   }
 }
 
-function getReference(reference: Reference): PopperJSReference {
-  if ('getBoundingClientRect' in reference) {
-    return reference;
-  }
-  return new VirtualReference(reference);
-}
+const getReference = (reference: Reference): PopperJSReference =>
+  'getBoundingClientRect' in reference ? reference : new VirtualReference(reference);
 
 type PopperProps = {
   closeOnEsc?: boolean;
@@ -74,7 +71,7 @@ type PopperProps = {
   returnFocus?: boolean;
 };
 
-const defaultOptions: PopperOptions = {};
+const DEFAULT_POPPER_OPTIONS: PopperOptions = {};
 
 const Popper: React.FC<PopperProps> = ({
   children,
@@ -82,7 +79,7 @@ const Popper: React.FC<PopperProps> = ({
   open,
   placement = 'bottom-start',
   reference,
-  popperOptions = defaultOptions,
+  popperOptions = DEFAULT_POPPER_OPTIONS,
   closeOnEsc,
   closeOnOutsideClick,
   onRequestClose,
@@ -134,25 +131,27 @@ const Popper: React.FC<PopperProps> = ({
 
     destroy();
 
-    const referenceObj = getReference(typeof reference === 'function' ? reference() : reference);
-
-    const popper = new PopperJS(referenceObj, nodeRef.current, {
-      placement,
-      ...popperOptions,
-      modifiers: {
-        preventOverflow: {
-          boundariesElement: 'window',
+    popperRefs(
+      new PopperJS(
+        getReference(typeof reference === 'function' ? reference() : reference),
+        nodeRef.current,
+        {
+          placement,
+          ...popperOptions,
+          modifiers: {
+            preventOverflow: {
+              boundariesElement: 'window',
+            },
+            ...popperOptions.modifiers,
+          },
         },
-        ...popperOptions.modifiers,
-      },
-    });
-    popperRefs(popper);
+      ),
+    );
 
     // init document listenerrs
     if (closeOnEsc) {
       document.addEventListener('keydown', onKeyDown, true);
     }
-
     if (closeOnOutsideClick) {
       document.addEventListener('mousedown', onClickOutside, true);
       document.addEventListener('touchstart', onClickOutside, true);
@@ -170,7 +169,7 @@ const Popper: React.FC<PopperProps> = ({
     onClickOutside,
   ]);
 
-  const handleRef = React.useCallback(
+  const nodeRefCallback = React.useCallback(
     (node) => {
       nodeRef.current = node;
       initialize();
@@ -196,7 +195,7 @@ const Popper: React.FC<PopperProps> = ({
 
   return isOpen ? (
     <Portal container={container}>
-      <div ref={handleRef}>{children}</div>
+      <div ref={nodeRefCallback}>{children}</div>
     </Portal>
   ) : null;
 };

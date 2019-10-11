@@ -7,9 +7,8 @@ type PortalProps = {
   container?: GetContainer;
 };
 
-function getContainer(container: GetContainer): Element | null | undefined {
-  return typeof container === 'function' ? container() : container;
-}
+const getContainer = (container: GetContainer): Element | null | undefined =>
+  typeof container === 'function' ? container() : container;
 
 const Portal: React.FC<PortalProps> = ({ children, container }) => {
   const [containerNode, setContainerNode] = React.useState<Element | null>(null);

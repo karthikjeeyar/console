@@ -68,5 +68,6 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
 
 export default ContextMenu;
 
+// re-export dropdown components as context menu components
 export const ContextMenuSeparator = DropdownSeparator;
 export const ContextMenuItem = DropdownItem;
