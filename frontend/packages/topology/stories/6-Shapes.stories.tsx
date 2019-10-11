@@ -4,14 +4,12 @@ import Visualization from '../src/Visualization';
 import VisualizationWidget from '../src/VisualizationWidget';
 import { Model, isNodeEntity, NodeEntity, ModelKind } from '../src/types';
 import { withDndDrag } from '../src/behavior/useDndDrag';
-import { withDndDrop } from '../src/behavior/useDndDrop';
 import GraphWidget from '../src/widgets/GraphWidget';
 import { withPanZoom } from '../src/behavior/usePanZoom';
 import { DragSourceMonitor, DragEvent } from '../src/behavior/dnd-types';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 import shapesWidgetFactory from './widgets/shapesWidgetFactory';
 import NodeWidget from './widgets/NodeWidget';
-import GroupHullWidget from './widgets/GroupHullWidget';
 
 export default {
   title: 'Shapes',
@@ -34,12 +32,12 @@ export const shapes = () => {
     nodes: [
       {
         id: 'gr1',
-        type: 'group-drop',
+        type: 'group-hull',
         children: ['n2', 'n3'],
       },
       {
         id: 'gr2',
-        type: 'group-drop',
+        type: 'group-hull',
         children: ['n4', 'n5'],
       },
       {
@@ -131,19 +129,6 @@ export const shapes = () => {
   vis.registerWidgetFactory((entity) => {
     if (entity.kind === ModelKind.graph) {
       return withPanZoom()(GraphWidget);
-    }
-    if (isNodeEntity(entity) && entity.getType() === 'group-drop') {
-      return withDndDrop<any, any, any, EntityProps>({
-        accept: 'test',
-        canDrop: (item, monitor, props) => {
-          return !!props && item.getParent() !== props.entity;
-        },
-        collect: (monitor) => ({
-          droppable: monitor.isDragging(),
-          hover: monitor.isOver(),
-          canDrop: monitor.canDrop(),
-        }),
-      })(GroupHullWidget);
     }
     if (isNodeEntity(entity) && entity.getType() === 'node-drag') {
       return withDndDrag<any, NodeEntity, any, EntityProps>({
