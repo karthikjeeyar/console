@@ -1,20 +1,17 @@
 import * as React from 'react';
-import { createSvgIdUrl } from '@console/dev-console/src/utils/svg-utils';
-import SvgArrowMarker from '@console/dev-console/src/components/topology/shapes/SvgArrowMarker';
 import Layer from '../../src/layers/Layer';
 import { WithSourceDragProps, WithTargetDragProps } from '../../src/behavior/useReconnect';
 import Point from '../../src/geom/Point';
 import { EdgeEntity } from '../../src/types';
 import widget from '../../src/widget';
 import { useBendpoint } from '../../src/behavior/useBendpoint';
+import ConnectorArrow from '../../src/arrows/ConnectorArrow';
 
 type EdgeWidgetProps = {
   entity: EdgeEntity;
   dragging?: boolean;
 } & WithSourceDragProps &
   WithTargetDragProps;
-
-const TARGET_ARROW_MARKER_ID = 'defaultTargetArrow';
 
 type BendpointProps = {
   point: Point;
@@ -50,25 +47,17 @@ const EdgeWidget: React.FC<EdgeWidgetProps> = ({
   const d = `M${startPoint.x} ${startPoint.y} ${bendpoints
     .map((b: Point) => `L${b.x} ${b.y} `)
     .join('')}L${endPoint.x} ${endPoint.y}`;
+
   return (
     <>
-      <SvgArrowMarker id={TARGET_ARROW_MARKER_ID} nodeSize={0} markerSize={7} />
       <Layer id={dragging ? 'top' : null}>
-        <path
-          strokeWidth={1}
-          stroke="red"
-          d={d}
-          fill="none"
-          markerEnd={createSvgIdUrl(TARGET_ARROW_MARKER_ID)}
-        />
+        <path strokeWidth={1} stroke="red" d={d} fill="none" />
+        {sourceDragRef && (
+          <circle ref={sourceDragRef} r={8} cx={startPoint.x} cy={startPoint.y} fillOpacity={0} />
+        )}
+        <ConnectorArrow dragRef={targetDragRef} edge={entity} />
       </Layer>
       {bendpoints && bendpoints.map((p, i) => <Bendpoint point={p} key={i.toString()} />)}
-      {sourceDragRef && (
-        <circle ref={sourceDragRef} r={15} cx={startPoint.x} cy={startPoint.y} fillOpacity={0} />
-      )}
-      {targetDragRef && (
-        <circle ref={targetDragRef} r={15} cx={endPoint.x} cy={endPoint.y} fillOpacity={0} />
-      )}
     </>
   );
 };
