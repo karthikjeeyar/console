@@ -11,7 +11,7 @@ export type WithContextMenuProps = {
 };
 
 export const withContextMenu = <E extends ElementEntity>(
-  actions: (entity: E) => React.ReactElement,
+  actions: (entity: E) => React.ReactElement[],
   atPoint: boolean = true,
 ) => <P extends WithContextMenuProps>(WrappedComponent: React.ComponentType<P>) => {
   const Component: React.FC<Omit<P, keyof WithContextMenuProps>> = (props) => {

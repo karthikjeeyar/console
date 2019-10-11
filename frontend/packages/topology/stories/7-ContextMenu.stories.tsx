@@ -26,8 +26,8 @@ function contextMenuItem(label: string, i: number): React.ReactElement {
   );
 }
 
-function createContextMenuItems(...labels: string[]): React.ReactElement {
-  return <>{labels.map(contextMenuItem)}</>;
+function createContextMenuItems(...labels: string[]): React.ReactElement[] {
+  return labels.map(contextMenuItem);
 }
 
 const defaultMenu = createContextMenuItems('First', 'Second', 'Third', '-', 'Fourth');
