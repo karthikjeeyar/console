@@ -146,7 +146,7 @@ export const useDndDrop = <
         typeof specRef.current.canDrop === 'boolean'
           ? specRef.current.canDrop
           : typeof specRef.current.canDrop === 'function'
-          ? specRef.current.canDrop(monitorRef.current.getItem(), monitor, props)
+          ? specRef.current.canDrop(monitorRef.current.getItem(), monitor, propsRef.current)
           : true,
       drop: () =>
         specRef.current.drop
@@ -157,7 +157,7 @@ export const useDndDrop = <
     });
     monitor.receiveHandlerId(targetId);
     return unregister;
-  }, [spec.accept, dndManager, monitor, props]);
+  }, [spec.accept, dndManager, monitor]);
 
   return [spec.collect ? spec.collect(monitor) : (({} as any) as CollectedProps), nodeRef as any];
 };

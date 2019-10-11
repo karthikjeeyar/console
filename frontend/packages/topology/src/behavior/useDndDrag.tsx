@@ -154,7 +154,7 @@ export const useDndDrag = <
     });
     monitor.receiveHandlerId(sourceId);
     return unregister;
-  }, [spec.item.type, dndManager, monitor, props]);
+  }, [spec.item.type, dndManager, monitor]);
 
   return [spec.collect ? spec.collect(monitor) : (({} as any) as CollectedProps), refCallback];
 };
