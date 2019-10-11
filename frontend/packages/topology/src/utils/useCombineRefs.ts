@@ -1,6 +1,8 @@
 import * as React from 'react';
 
-const useCombineRefs = <RefType extends any>(...refs: React.Ref<RefType>[]): React.Ref<RefType> =>
+const useCombineRefs = <RefType extends any>(
+  ...refs: (React.Ref<RefType> | undefined)[]
+): ((instance: RefType | null) => void) =>
   React.useCallback(
     (element: RefType): void =>
       refs.forEach((ref) => {
