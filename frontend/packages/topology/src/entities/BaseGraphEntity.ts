@@ -20,6 +20,10 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
   @observable
   private layoutType: string | undefined;
 
+  isDetached(): boolean {
+    return !!this.getController();
+  }
+
   @computed
   private get graphLayout(): Layout | undefined {
     return this.layoutType ? this.getController().getLayout(this.layoutType) : undefined;

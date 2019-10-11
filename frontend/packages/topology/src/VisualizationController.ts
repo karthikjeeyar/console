@@ -194,6 +194,10 @@ export default class VisualizationController extends Stateful implements Control
   }
 
   private createEntity<E extends ElementEntity>(kind: ModelKind, element: Element): E {
+    const existingEntity = this.entities[element.id];
+    if (existingEntity) {
+      return existingEntity as E;
+    }
     for (const factory of this.entityFactories) {
       const entity = factory(kind, element.type);
       if (entity) {
