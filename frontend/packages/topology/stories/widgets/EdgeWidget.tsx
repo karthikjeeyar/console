@@ -51,7 +51,12 @@ const EdgeWidget: React.FC<EdgeWidgetProps> = ({
   return (
     <>
       <Layer id={dragging ? 'top' : null}>
-        <path strokeWidth={1} stroke="red" d={d} fill="none" />
+        <path
+          strokeWidth={1}
+          stroke={(entity.getData() && entity.getData().color) || 'red'}
+          d={d}
+          fill="none"
+        />
         {sourceDragRef && (
           <circle ref={sourceDragRef} r={8} cx={startPoint.x} cy={startPoint.y} fillOpacity={0} />
         )}

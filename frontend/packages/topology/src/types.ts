@@ -102,6 +102,8 @@ export interface ElementEntity<E extends Element = Element, D = any> extends Wit
   setBounds(bounds: Rect): void;
   translateToAbsolute(t: Translatable): void;
   translateFromAbsolute(t: Translatable): void;
+  translateToParent(t: Translatable): void;
+  translateFromParent(t: Translatable): void;
 }
 
 export interface NodeEntity<E extends Node = Node, D = any> extends ElementEntity<E, D> {

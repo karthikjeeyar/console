@@ -21,7 +21,7 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
   private layoutType: string | undefined;
 
   isDetached(): boolean {
-    return !!this.getController();
+    return !this.getController();
   }
 
   @computed

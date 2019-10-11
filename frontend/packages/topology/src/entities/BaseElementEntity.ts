@@ -193,8 +193,7 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   }
 
   translateToAbsolute(t: Translatable): void {
-    const { x, y } = this.getBounds();
-    t.translate(x, y);
+    this.translateToParent(t);
     const { parent } = this;
     if (parent) {
       parent.translateToAbsolute(t);
@@ -206,6 +205,15 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
     if (parent) {
       parent.translateFromAbsolute(t);
     }
+    this.translateFromParent(t);
+  }
+
+  translateToParent(t: Translatable): void {
+    const { x, y } = this.getBounds();
+    t.translate(x, y);
+  }
+
+  translateFromParent(t: Translatable): void {
     const { x, y } = this.getBounds();
     t.translate(-x, -y);
   }

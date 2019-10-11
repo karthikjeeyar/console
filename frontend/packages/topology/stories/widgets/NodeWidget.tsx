@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { WithCreateConnectorProps } from '../../src/behavior/withCreateConnector';
 import { NodeEntity } from '../../src/types';
 import widget from '../../src/widget';
 import { useSvgAnchor } from '../../src/behavior/useSvgAnchor';
@@ -18,7 +19,8 @@ type NodeWidgetProps = {
   WithDragNodeProps &
   WithDndDragProps &
   WithDndDropProps &
-  WithContextMenuProps;
+  WithContextMenuProps &
+  WithCreateConnectorProps;
 
 const NodeWidget: React.FC<NodeWidgetProps> = ({
   entity,
@@ -31,6 +33,8 @@ const NodeWidget: React.FC<NodeWidgetProps> = ({
   canDrop,
   dndDropRef,
   onContextMenu,
+  onHideCreateConnector,
+  onShowCreateConnector,
 }) => {
   const anchorRef = useSvgAnchor();
   const refs = useCombineRefs<SVGEllipseElement>(dragNodeRef, dndDragRef, dndDropRef, anchorRef);
@@ -38,6 +42,8 @@ const NodeWidget: React.FC<NodeWidgetProps> = ({
 
   return (
     <ellipse
+      onMouseEnter={onShowCreateConnector}
+      onMouseLeave={onHideCreateConnector}
       ref={refs}
       onContextMenu={onContextMenu}
       onClick={onSelect}
