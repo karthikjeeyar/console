@@ -103,7 +103,11 @@ export default class VisualizationController extends Stateful implements Control
   }
 
   getEntityById(id: string): ElementEntity {
-    return this.entities[id];
+    const entity = this.entities[id];
+    if (!entity) {
+      throw new Error(`No entity found with ID '${id}'.`);
+    }
+    return entity;
   }
 
   getNodeById(id: string): NodeEntity {
@@ -143,7 +147,7 @@ export default class VisualizationController extends Stateful implements Control
         return layout;
       }
     }
-    return undefined;
+    throw new Error(`Could not find layout for type: ${type}`);
   }
 
   registerWidgetFactory(factory: WidgetFactory) {

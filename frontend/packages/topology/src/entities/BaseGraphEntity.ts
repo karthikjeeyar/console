@@ -18,13 +18,11 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
   private scale: number = 1;
 
   @observable
-  private layoutType: string | undefined = '';
+  private layoutType: string | undefined;
 
   @computed
   private get graphLayout(): Layout | undefined {
-    return this.getGraph()
-      .getController()
-      .getLayout(this.layoutType);
+    return this.layoutType ? this.getController().getLayout(this.layoutType) : undefined;
   }
 
   @computed
@@ -58,8 +56,9 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
   }
 
   layout(): void {
-    if (this.graphLayout) {
-      this.graphLayout.layout(this.nodes, this.edges);
+    const layout = this.graphLayout;
+    if (layout) {
+      layout.layout(this.nodes, this.edges);
     }
   }
 

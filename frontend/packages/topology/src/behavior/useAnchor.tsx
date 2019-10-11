@@ -9,7 +9,7 @@ export const useAnchor = (anchorCallback: (entity: NodeEntity) => Anchor | undef
   if (!isNodeEntity(entity)) {
     throw new Error('useAnchor must be used within the scope of a NodeEntity');
   }
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     action(() => {
       const anchor = anchorCallback(entity);
       if (anchor) {

@@ -33,13 +33,21 @@ const Inner: React.FC<EntityProps> = React.memo(({ entity }) => (
   </LayersProvider>
 ));
 
+function stopEvent(e: React.MouseEvent): void {
+  e.preventDefault();
+  e.stopPropagation();
+}
+
 const GraphWidget: React.FC<GraphWidgetProps> = ({ entity, panZoomRef }) => {
   React.useEffect(() => {
     entity.layout();
   }, [entity]);
 
   return (
-    <svg style={{ width: '100%', height: '100%', flexGrow: 1, flexShrink: 1 }}>
+    <svg
+      style={{ width: '100%', height: '100%', flexGrow: 1, flexShrink: 1 }}
+      onContextMenu={stopEvent}
+    >
       <SvgDefsProvider>
         <g
           ref={panZoomRef}

@@ -11,7 +11,7 @@ interface VisualizationWidgetProps {
 }
 
 const VisualizationWidget: React.FC<VisualizationWidgetProps> = ({ visualization, state }) => {
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     state && visualization.setState(state);
   }, [visualization, state]);
   return (

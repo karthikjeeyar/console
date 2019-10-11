@@ -7,6 +7,7 @@ import { WithSelectionProps } from '../../src/behavior/useSelection';
 import { WithDndDragProps } from '../../src/behavior/useDndDrag';
 import { WithDndDropProps } from '../../src/behavior/useDndDrop';
 import useCombineRefs from '../../src/utils/useCombineRefs';
+import { WithContextMenuProps } from '../../src/behavior/withContextMenu';
 
 type NodeWidgetProps = {
   entity: NodeEntity;
@@ -16,7 +17,8 @@ type NodeWidgetProps = {
 } & WithSelectionProps &
   WithDragNodeProps &
   WithDndDragProps &
-  WithDndDropProps;
+  WithDndDropProps &
+  WithContextMenuProps;
 
 const NodeWidget: React.FC<NodeWidgetProps> = ({
   entity,
@@ -28,6 +30,7 @@ const NodeWidget: React.FC<NodeWidgetProps> = ({
   hover,
   canDrop,
   dndDropRef,
+  onContextMenu,
 }) => {
   const anchorRef = useSvgAnchor();
   const refs = useCombineRefs<SVGEllipseElement>(dragNodeRef, dndDragRef, dndDropRef, anchorRef);
@@ -36,6 +39,7 @@ const NodeWidget: React.FC<NodeWidgetProps> = ({
   return (
     <ellipse
       ref={refs}
+      onContextMenu={onContextMenu}
       onClick={onSelect}
       cx={width / 2}
       cy={height / 2}
