@@ -103,7 +103,6 @@ const CreateConnectorWidget: React.FC<CreateConnectorWidgetProps> = observer((pr
 
   return (
     <>
-      =
       <Layer id="top">
         <g
           ref={dragRef}
