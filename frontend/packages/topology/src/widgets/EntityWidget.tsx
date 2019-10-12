@@ -1,6 +1,6 @@
 import * as React from 'react';
 import EntityContext from '../utils/EntityContext';
-import { ElementEntity, isGraphEntity } from '../types';
+import { ElementEntity, isGraphEntity, isEdgeEntity } from '../types';
 import widget from '../widget';
 
 type EntityWidgetProps = {
@@ -9,6 +9,16 @@ type EntityWidgetProps = {
 
 // in a separate widget component so that changes to interaction handlers do not re-render children
 const EntityComponent: React.FC<EntityWidgetProps> = widget(({ entity }) => {
+  if (!entity.isVisible()) {
+    return null;
+  }
+  if (isEdgeEntity(entity)) {
+    const source = entity.getSource();
+    const target = entity.getTarget();
+    if ((source && !source.isVisible()) || (target && !target.isVisible())) {
+      return null;
+    }
+  }
   const Component = entity.getController().getWidget(entity);
   return (
     <EntityContext.Provider value={entity}>
