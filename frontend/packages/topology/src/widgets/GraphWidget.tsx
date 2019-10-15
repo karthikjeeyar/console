@@ -1,4 +1,8 @@
 import * as React from 'react';
+import * as _ from 'lodash';
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// @ts-ignore-next-line
+import ReactMeasure from 'react-measure';
 import SvgDefsProvider from '@console/dev-console/src/components/svg/SvgDefsProvider';
 import { GraphEntity } from '../types';
 import { WithPanZoomProps } from '../behavior/usePanZoom';
@@ -39,30 +43,74 @@ function stopEvent(e: React.MouseEvent): void {
   e.stopPropagation();
 }
 
-const GraphWidget: React.FC<GraphWidgetProps> = ({ entity, panZoomRef }) => {
-  React.useEffect(() => {
+type Dimensions = {
+  width: number;
+  height: number;
+};
+
+const layoutGraph = (entity: GraphEntity, dimensions: Dimensions | null) => {
+  if (dimensions) {
+    entity.getBounds().setSize(dimensions.width, dimensions.height);
     entity.layout();
-  }, [entity]);
+  }
+};
+
+const GraphWidget: React.FC<GraphWidgetProps> = ({ entity, panZoomRef }) => {
+  const [dimensions, setDimensions] = React.useState<Dimensions | null>(null);
+  const layout = entity.getLayout();
+
+  React.useEffect(() => {
+    layoutGraph(entity, dimensions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entity, layout]);
+
+  const setGraphDimensions = React.useCallback(
+    (contentRect) => {
+      const newDimensions: Dimensions = {
+        width: contentRect.client.width,
+        height: contentRect.client.height,
+      };
+      if (!dimensions) {
+        layoutGraph(entity, newDimensions);
+      }
+      setDimensions(newDimensions);
+    },
+    [dimensions, entity],
+  );
+
+  const onMeasure = _.debounce(setGraphDimensions, 100);
+
+  const scale = entity.getScale();
+  const bounds = entity.getBounds();
+  const xBounds = bounds.x;
+  const yBounds = bounds.y;
+
+  const renderMeasure = ({ measureRef }: any) => {
+    return (
+      <svg
+        style={{ width: '100%', height: '100%', flexGrow: 1, flexShrink: 1 }}
+        onContextMenu={stopEvent}
+        ref={measureRef}
+      >
+        <SvgDefsProvider>
+          <g
+            ref={panZoomRef}
+            transform={`translate(${xBounds}, ${yBounds}) scale(${scale})`}
+            data-id={entity.getId()}
+            data-kind={entity.kind}
+            data-type={entity.getType()}
+          >
+            <Inner entity={entity} />
+          </g>
+        </SvgDefsProvider>
+      </svg>
+    );
+  };
 
   return (
-    <svg
-      style={{ width: '100%', height: '100%', flexGrow: 1, flexShrink: 1 }}
-      onContextMenu={stopEvent}
-    >
-      <SvgDefsProvider>
-        <g
-          ref={panZoomRef}
-          transform={`translate(${entity.getBounds().x}, ${
-            entity.getBounds().y
-          }) scale(${entity.getScale()})`}
-          data-id={entity.getId()}
-          data-kind={entity.kind}
-          data-type={entity.getType()}
-        >
-          <Inner entity={entity} />
-        </g>
-      </SvgDefsProvider>
-    </svg>
+    <ReactMeasure client onResize={onMeasure}>
+      {renderMeasure}
+    </ReactMeasure>
   );
 };
 

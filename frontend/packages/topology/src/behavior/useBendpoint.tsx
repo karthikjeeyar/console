@@ -37,12 +37,12 @@ export const useBendpoint = <DropResult, CollectedProps, Props = {}>(
       const sourceSpec: DragSourceSpec<any, any, any, Props> = {
         item: { type: '#useBendpoint#' },
         begin: action((monitor: DragSourceMonitor, p: Props) => {
-          entityRef.current.raise();
           return spec && spec.begin ? spec.begin(monitor, p) : undefined;
         }),
         drag: action((event: DragEvent, monitor: DragSourceMonitor, p: Props) => {
           // assumes the edge is in absolute coordinate space
           pointRef.current.translate(event.dx, event.dy);
+          entityRef.current.raise();
           spec && spec.drag && spec.drag(event, monitor, p);
         }),
         canDrag: spec ? spec.canDrag : undefined,

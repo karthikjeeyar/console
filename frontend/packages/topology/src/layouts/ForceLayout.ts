@@ -1,8 +1,10 @@
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 import { action } from 'mobx';
-import { EdgeEntity, Layout, NodeEntity } from '../types';
+import { EdgeEntity, ElementEntity, GraphEntity, Layout, NodeEntity } from '../types';
 import { leafNodeEntities } from '../utils/leafNodeEntities';
+import { groupNodeEntities } from '../utils/groupNodeEntities';
+import BaseEdgeEntity from '../entities/BaseEdgeEntity';
 
 class D3Node implements d3.SimulationNodeDatum {
   private node: NodeEntity;
@@ -94,16 +96,40 @@ class D3Link implements d3.SimulationLinkDatum<D3Node> {
 }
 
 export default class ForceLayout implements Layout {
-  layout = (nodeEntities: NodeEntity[], edgeEntities: EdgeEntity[]) => {
-    // Get all the leaf nodes and create the D3 nodes from them
+  private graph: GraphEntity;
+
+  constructor(graph: GraphEntity) {
+    this.graph = graph;
+  }
+
+  layout = (
+    nodeEntities: NodeEntity[],
+    edgeEntities: EdgeEntity[],
+  ) => {
+    const groups: ElementEntity[] = groupNodeEntities(nodeEntities);
     const nodes: D3Node[] = leafNodeEntities(nodeEntities).map((e: NodeEntity) => new D3Node(e));
-    const edges: D3Link[] = edgeEntities.map((e: EdgeEntity) => new D3Link(e));
+    const edges: D3Link[] = edgeEntities.map((e: EdgeEntity) => {
+      e.setBendpoints([]);
+      return new D3Link(e);
+    });
+
+    // Create faux edges for the grouped nodes to form group clusters
+    groups.forEach((group: NodeEntity) => {
+      const groupNodes = group.getNodes().filter((node: NodeEntity) => !_.size(node.getNodes()));
+      for (let i = 0; i < groupNodes.length; i++) {
+        for (let j = i + 1; j < groupNodes.length; j++) {
+          const fauxEdge = new BaseEdgeEntity();
+          fauxEdge.setSource(groupNodes[i]);
+          fauxEdge.setTarget(groupNodes[j]);
+          fauxEdge.setController(groupNodes[i].getController());
+          edges.push(new D3Link(fauxEdge));
+        }
+      }
+    });
 
     // force center
-    // TODO: Use bounding component size rather than document.body
-    const bodyRect = document.body.getBoundingClientRect();
-    const cx = bodyRect.width / 2;
-    const cy = bodyRect.height / 2;
+    const cx = this.graph.getBounds().width / 2;
+    const cy = this.graph.getBounds().height / 2;
 
     _.forEach(nodes, (node: D3Node) => {
       node.setPosition(cx, cy);
@@ -114,6 +140,7 @@ export default class ForceLayout implements Layout {
       .forceSimulation<D3Node>()
       .force('collide', d3.forceCollide<D3Node>().radius((d) => d.getRadius() + 5))
       .force('charge', d3.forceManyBody())
+      .force('center', d3.forceCenter(cx, cy))
       .nodes(nodes)
       .force(
         'link',
@@ -122,7 +149,7 @@ export default class ForceLayout implements Layout {
           .id((e) => e.id)
           .distance((d) =>
             (d.source as D3Node).entity.getParent() !== (d.target as D3Node).entity.getParent()
-              ? 200
+              ? 100
               : 50,
           ),
       )

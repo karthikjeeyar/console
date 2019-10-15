@@ -1,6 +1,6 @@
 import * as dagre from 'dagre';
 import * as _ from 'lodash';
-import { EdgeEntity, ElementEntity, Layout, NodeEntity } from '../types';
+import { EdgeEntity, ElementEntity, GraphEntity, Layout, NodeEntity } from '../types';
 import Point from '../geom/Point';
 import { leafNodeEntities } from '../utils/leafNodeEntities';
 
@@ -63,19 +63,28 @@ class DagreEdge {
 }
 
 export default class DagreLayout implements Layout {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  private graph: GraphEntity; // Usage is TBD
+
+  constructor(graph: GraphEntity) {
+    this.graph = graph;
+  }
+
   layout = (nodeEntities: NodeEntity[], edgeEntities: EdgeEntity[]) => {
     const nodes: DagreNode[] = leafNodeEntities(nodeEntities).map(
       (node: ElementEntity) => new DagreNode(node as NodeEntity),
     );
-    const edges: DagreEdge[] = edgeEntities.map(
-      (node: ElementEntity) => new DagreEdge(node as EdgeEntity),
-    );
+    const edges: DagreEdge[] = edgeEntities.map((edge: EdgeEntity) => {
+      edge.setBendpoints([]);
+      return new DagreEdge(edge as EdgeEntity);
+    });
 
     const graph = new dagre.graphlib.Graph({ compound: true });
     graph.setGraph({
       marginx: 0,
       marginy: 0,
-      nodesep: 50,
+      nodesep: 20,
       ranker: 'tight-tree',
     });
 

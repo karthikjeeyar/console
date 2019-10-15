@@ -27,7 +27,6 @@ export const useDragNode = <DropResult, CollectedProps, Props = {}>(
       const sourceSpec: DragSourceSpec<any, any, any, Props> = {
         item: { type: '#useDragNode#' },
         begin: action((monitor: DragSourceMonitor, p: Props) => {
-          entityRef.current.raise();
           if (entityRef.current.isGroup()) {
             entityRef.current.getChildren().forEach((c) => {
               c.raise();
@@ -46,6 +45,7 @@ export const useDragNode = <DropResult, CollectedProps, Props = {}>(
           } else {
             entityRef.current.getBounds().translate(dx, dy);
           }
+          entityRef.current.raise();
           spec && spec.drag && spec.drag(event, monitor, p);
         }),
         canDrag: spec ? spec.canDrag : undefined,

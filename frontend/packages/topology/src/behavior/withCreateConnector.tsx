@@ -53,9 +53,13 @@ const CreateConnectorWidget: React.FC<CreateConnectorWidgetProps> = observer((pr
       item: { type: CREATE_CONNECTOR_DROP_TYPE },
       begin: action((monitor: DragSourceMonitor, dragProps: CreateConnectorWidgetProps) => {
         setActive(true);
-        dragProps.entity.raise();
         return dragProps.entity;
       }),
+      drag: action(
+        (event: DragEvent, monitor: DragSourceMonitor, p: CreateConnectorWidgetProps) => {
+          p.entity.raise();
+        },
+      ),
       end: (
         dropResult: NodeEntity,
         monitor: DragSourceMonitor,

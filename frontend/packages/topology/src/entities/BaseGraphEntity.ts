@@ -24,13 +24,15 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
   @observable.ref
   private bounds: Rect = new Rect();
 
+  private currentLayout: Layout | undefined;
+
   isDetached(): boolean {
     return !this.getController();
   }
 
   @computed
   private get graphLayout(): Layout | undefined {
-    return this.layoutType ? this.getController().getLayout(this.layoutType) : undefined;
+    return this.currentLayout;
   }
 
   @computed
@@ -67,8 +69,13 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
     return this.layoutType;
   }
 
-  setLayout(layout: string): void {
+  setLayout(layout: string | undefined): void {
+    if (layout === this.layoutType) {
+      return;
+    }
+
     this.layoutType = layout;
+    this.currentLayout = this.getController().getLayout(layout);
   }
 
   layout(): void {
@@ -90,7 +97,7 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
     super.setModel(model);
 
     if ('layout' in model) {
-      this.layoutType = model.layout;
+      this.setLayout(model.layout);
     }
     if ('scale' in model && typeof model.scale === 'number') {
       this.scale = +model.scale;

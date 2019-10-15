@@ -142,7 +142,7 @@ export default class VisualizationController extends Stateful implements Control
 
   getLayout(type: string): Layout | undefined {
     for (const factory of this.layoutFactories) {
-      const layout = factory(type);
+      const layout = factory(type, this.getGraph());
       if (layout) {
         return layout;
       }

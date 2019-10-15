@@ -2,22 +2,35 @@ import * as _ from 'lodash';
 import * as webcola from 'webcola';
 import * as d3 from 'd3';
 import { action } from 'mobx';
-import { EdgeEntity, Layout, NodeEntity } from '../types';
+import { EdgeEntity, ElementEntity, GraphEntity, Layout, NodeEntity } from '../types';
 import { leafNodeEntities } from '../utils/leafNodeEntities';
+import { groupNodeEntities } from '../utils/groupNodeEntities';
+import BaseEdgeEntity from '../entities/BaseEdgeEntity';
 
 class ColaNode implements webcola.Node {
   private node: NodeEntity;
+
+  private nodeIndexx: number;
 
   private xx?: number;
 
   private yy?: number;
 
-  constructor(node: NodeEntity) {
+  constructor(node: NodeEntity, index: number) {
     this.node = node;
+    this.nodeIndexx = index;
   }
 
   get entity(): NodeEntity {
     return this.node;
+  }
+
+  set nodeIndex(newIndex: number) {
+    this.nodeIndexx = newIndex;
+  }
+
+  get nodeIndex(): number {
+    return this.nodeIndexx;
   }
 
   get id(): string {
@@ -61,36 +74,34 @@ class ColaNode implements webcola.Node {
 class ColaLink implements webcola.Link<ColaNode | number> {
   private edge: EdgeEntity;
 
-  private colaSource: ColaNode;
+  private sourceIndex: number;
 
-  private colaTarget: ColaNode;
+  private targetIndex: number;
 
-  constructor(edge: EdgeEntity) {
+  constructor(edge: EdgeEntity, sourceIndex: number, targetIndex: number) {
     this.edge = edge;
+    this.sourceIndex = sourceIndex;
+    this.targetIndex = targetIndex;
   }
 
   get entity(): EdgeEntity {
     return this.edge;
   }
 
-  get source(): ColaNode | number {
-    return this.colaSource || parseInt(this.edge.getSource().getId(), 10);
+  get source(): number {
+    return this.sourceIndex;
   }
 
-  set source(node: ColaNode | number) {
-    if (node instanceof ColaNode) {
-      this.colaSource = node;
-    }
+  set source(node: number) {
+    this.sourceIndex = node;
   }
 
-  get target(): ColaNode | number {
-    return this.colaTarget || parseInt(this.edge.getTarget().getId(), 10);
+  get target(): number {
+    return this.targetIndex;
   }
 
-  set target(node: ColaNode | number) {
-    if (node instanceof ColaNode) {
-      this.colaTarget = node;
-    }
+  set target(node: number) {
+    this.targetIndex = node;
   }
 
   get id(): string {
@@ -98,45 +109,58 @@ class ColaLink implements webcola.Link<ColaNode | number> {
   }
 }
 
-class ColaGroup implements webcola.Group {
-  public bounds?: webcola.Rectangle;
-
-  public leaves?: ColaNode[];
-
-  public groups?: ColaGroup[];
-
-  public padding: 200;
-
-  constructor(children: NodeEntity[] | undefined, allNodes: ColaNode[]) {
-    this.leaves = _.reduce(
-      children,
-      (nodes: ColaNode[], nodeEntity: NodeEntity) => {
-        const nextChild: ColaNode | undefined = allNodes.find(
-          (nextNode: ColaNode) => nextNode.id === nodeEntity.getId(),
-        );
-        if (nextChild) {
-          nodes.push(nextChild);
-        }
-        return nodes;
-      },
-      [],
-    );
-  }
-}
+const getNodeIndex = (nodes: ColaNode[], id: string): number => {
+  const node = _.find(nodes, { id });
+  return node ? node.nodeIndex : -1;
+};
 
 export default class ColaLayout implements Layout {
+  private graph: GraphEntity;
+
+  constructor(graph: GraphEntity) {
+    this.graph = graph;
+  }
+
   layout = (nodeEntities: NodeEntity[], edgeEntities: EdgeEntity[]) => {
     const nodes: ColaNode[] = leafNodeEntities(nodeEntities).map(
-      (e: NodeEntity) => new ColaNode(e),
+      (e: NodeEntity, index) => new ColaNode(e, index),
     );
-    const groups: ColaGroup[] = nodeEntities
-      .filter((e) => e.getType() === 'group-hull')
-      .map((group: NodeEntity) => new ColaGroup(group.getNodes(), nodes));
+    const groups: ElementEntity[] = groupNodeEntities(nodeEntities);
     const edges: ColaLink[] = edgeEntities.map((e: EdgeEntity) => {
-      const edge: ColaLink = new ColaLink(e);
-      edge.source = _.find(nodes, { id: edge.entity.getSource().getId() }) || 0;
-      edge.target = _.find(nodes, { id: edge.entity.getTarget().getId() }) || 0;
+      e.setBendpoints([]);
+      const edge: ColaLink = new ColaLink(
+        e,
+        getNodeIndex(nodes, e.getSource().getId()),
+        getNodeIndex(nodes, e.getTarget().getId()),
+      );
       return edge;
+    });
+
+    // Create faux edges for the grouped nodes to form group clusters
+    groups.forEach((group: NodeEntity) => {
+      const groupNodes = group.getNodes().filter((node: NodeEntity) => !_.size(node.getNodes()));
+      for (let i = 0; i < groupNodes.length; i++) {
+        for (let j = i + 1; j < groupNodes.length; j++) {
+          const fauxEdge = new BaseEdgeEntity();
+          fauxEdge.setSource(groupNodes[i]);
+          fauxEdge.setTarget(groupNodes[j]);
+          fauxEdge.setController(groupNodes[i].getController());
+          const fauxLink: ColaLink = new ColaLink(
+            fauxEdge,
+            getNodeIndex(nodes, groupNodes[i].getId()),
+            getNodeIndex(nodes, groupNodes[j].getId()),
+          );
+          edges.push(fauxLink);
+        }
+      }
+    });
+
+    // force center
+    const cx = this.graph.getBounds().width / 2;
+    const cy = this.graph.getBounds().height / 2;
+
+    _.forEach(nodes, (node: ColaNode) => {
+      node.setPosition(cx, cy);
     });
 
     let tickCount = 0;
@@ -145,13 +169,15 @@ export default class ColaLayout implements Layout {
       .size([1000, 400])
       .nodes(nodes)
       .links(edges)
-      .groups(groups)
-      .linkDistance((link: ColaLink) =>
-        (link.source as ColaNode).entity.getParent() !==
-        (link.target as ColaNode).entity.getParent()
-          ? 200
-          : 50,
-      )
+      .linkDistance((link: ColaLink) => {
+        const source = _.find(nodes, (node: ColaNode) => node.nodeIndex === link.source);
+        const target = _.find(nodes, (node: ColaNode) => node.nodeIndex === link.target);
+        if (!source || !target) {
+          return 50;
+        }
+
+        return source.entity.getParent() !== target.entity.getParent() ? 100 : 50;
+      })
       .on('tick', () => {
         // speed up the simulation
         if (++tickCount % 10 === 0) {

@@ -138,7 +138,7 @@ export interface GraphEntity<E extends Graph = Graph, D = any> extends ElementEn
   setScale(scale: number): void;
   getLayout(): string | undefined;
   setLayout(type: string | undefined): void;
-  layout(): void;
+  layout(width?: number, height?: number): void;
 }
 
 export type EventListener<Args extends any[] = any[]> = (...args: Args) => void;
@@ -172,7 +172,7 @@ export interface Controller extends WithState {
   getEntities(): ElementEntity[];
 }
 
-export type LayoutFactory = (type: string) => Layout | undefined;
+export type LayoutFactory = (type: string, graph: GraphEntity) => Layout | undefined;
 
 export type WidgetFactory = (
   entity: ElementEntity,
