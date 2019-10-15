@@ -1,6 +1,6 @@
 import * as React from 'react';
 import useCombineRefs from '../../src/utils/useCombineRefs';
-import { WithDragGroupProps } from '../../src/behavior/useDragGroup';
+import { WithDragNodeProps } from '../../src/behavior/useDragNode';
 import { WithSelectionProps } from '../../src/behavior/useSelection';
 import { NodeEntity } from '../../src/types';
 import Rect from '../../src/geom/Rect';
@@ -15,7 +15,7 @@ type GroupWidgetProps = {
   hover?: boolean;
   canDrop?: boolean;
 } & WithSelectionProps &
-  WithDragGroupProps &
+  WithDragNodeProps &
   WithDndDragProps &
   WithDndDropProps;
 
@@ -23,7 +23,7 @@ const GroupWidget: React.FC<GroupWidgetProps> = ({
   entity,
   selected,
   onSelect,
-  dragGroupRef,
+  dragNodeRef,
   dndDragRef,
   dndDropRef,
   droppable,
@@ -31,22 +31,14 @@ const GroupWidget: React.FC<GroupWidgetProps> = ({
   canDrop,
 }) => {
   const boxRef = React.useRef<Rect | null>(null);
-  const refs = useCombineRefs<SVGRectElement>(dragGroupRef, dndDragRef, dndDropRef);
+  const refs = useCombineRefs<SVGRectElement>(dragNodeRef, dndDragRef, dndDropRef);
 
   if (!droppable || !boxRef.current) {
-    const children = entity.getNodes();
-    if (children.length === 0) {
-      return null;
-    }
-    const box: Rect = children[0].getBounds().clone();
-    for (let i = 1, l = children.length; i < l; i++) {
-      box.union(children[i].getBounds());
-    }
-    // add padding
-    box.expand(10, 10);
-
     // change the box only when not dragging
-    boxRef.current = box;
+    boxRef.current = entity
+      .getBounds()
+      .clone()
+      .expand(10, 10);
   }
 
   return (

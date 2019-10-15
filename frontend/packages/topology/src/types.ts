@@ -34,6 +34,7 @@ export interface Node extends Element {
   y?: number;
   width?: number;
   height?: number;
+  group?: boolean;
 }
 
 export interface Edge extends Element {
@@ -78,6 +79,7 @@ export enum ModelKind {
 }
 export interface ElementEntity<E extends Element = Element, D = any> extends WithState {
   readonly kind: ModelKind;
+  getOrderKey(): number[];
   isDetached(): boolean;
   getController(): Controller;
   setController(controller?: Controller): void;
@@ -98,8 +100,6 @@ export interface ElementEntity<E extends Element = Element, D = any> extends Wit
   remove(): void;
   setModel(model: E): void;
   raise(): void;
-  getBounds(): Rect;
-  setBounds(bounds: Rect): void;
   translateToAbsolute(t: Translatable): void;
   translateFromAbsolute(t: Translatable): void;
   translateToParent(t: Translatable): void;
@@ -110,6 +110,9 @@ export interface NodeEntity<E extends Node = Node, D = any> extends ElementEntit
   getAnchor(): Anchor;
   setAnchor(anchor: Anchor): void;
   getNodes(): NodeEntity[];
+  getBounds(): Rect;
+  setBounds(bounds: Rect): void;
+  isGroup(): boolean;
 }
 
 export interface EdgeEntity<E extends Edge = Edge, D = any> extends ElementEntity<E, D> {
@@ -129,6 +132,8 @@ export interface EdgeEntity<E extends Edge = Edge, D = any> extends ElementEntit
 export interface GraphEntity<E extends Graph = Graph, D = any> extends ElementEntity<E, D> {
   getNodes(): NodeEntity[];
   getEdges(): EdgeEntity[];
+  getBounds(): Rect;
+  setBounds(bounds: Rect): void;
   getScale(): number;
   setScale(scale: number): void;
   getLayout(): string | undefined;

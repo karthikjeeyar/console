@@ -21,6 +21,7 @@ const model: Model = {
     {
       id: 'gr1',
       type: 'group-hull',
+      group: true,
       children: ['n1', 'n2'],
     },
     {

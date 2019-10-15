@@ -64,7 +64,7 @@ export const singleEdge = () => {
         type: 'edge',
         source: 'n1',
         target: 'n2',
-        bendpoints: [[50, 30], [110, 10]],
+        bendpoints: [[80, 30], [110, 10]],
       },
     ],
   };
@@ -85,6 +85,7 @@ const groupStory = (groupType: string) => {
       {
         id: 'gr1',
         type: groupType,
+        group: true,
         children: ['n1', 'n2', 'n3'],
       },
       {

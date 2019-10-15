@@ -1,7 +1,6 @@
 import * as React from 'react';
-import LayersContext from './LayersContext';
+import LayersContext, { DEFAULT_LAYER } from './LayersContext';
 
-export const DEFAULT_LAYER = 'default';
 type LayersProviderProps = {
   layers?: string[];
   children?: React.ReactNode;
@@ -15,10 +14,25 @@ export default class LayersProvider extends React.Component<LayersProviderProps,
     this.state = {};
   }
 
-  private setDomLayers = (node: Element, id: string) => {
+  private contextValue = (id: string): Element => {
+    if (this.state[id]) {
+      return this.state[id];
+    }
+    throw new Error(`Unknown layer '${id}'`);
+  };
+
+  private setDomLayers = (node: SVGGElement | null, id: string) => {
     if (node && this.state[id] !== node) {
       this.setState((state) => ({ ...state, [id]: node }));
     }
+  };
+
+  getLayerNode = (id: string): Element => {
+    const node = this.state[id];
+    if (node) {
+      return node;
+    }
+    throw new Error(`Unknown layer '${id}'`);
   };
 
   render() {
@@ -28,16 +42,9 @@ export default class LayersProvider extends React.Component<LayersProviderProps,
     }
     const layerIds = layers || [DEFAULT_LAYER];
     return (
-      <LayersContext.Provider
-        value={(id: string): Element => {
-          if (this.state[id]) {
-            return this.state[id];
-          }
-          throw new Error(`Unknown layer '${id}'`);
-        }}
-      >
+      <LayersContext.Provider value={this.contextValue}>
         {layerIds.map((id) => (
-          <g key={id} data-layer-id={id} ref={(r: any) => this.setDomLayers(r, id)}>
+          <g key={id} data-layer-id={id} ref={(r) => this.setDomLayers(r, id)}>
             {id === DEFAULT_LAYER && this.state[id] ? children : undefined}
           </g>
         ))}

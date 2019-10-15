@@ -2,7 +2,7 @@ import * as React from 'react';
 import { polygonHull } from 'd3-polygon';
 import * as _ from 'lodash';
 import { hullPath } from '@console/dev-console/src/utils/svg-utils';
-import { WithDragGroupProps } from '../../src/behavior/useDragGroup';
+import { WithDragNodeProps } from '../../src/behavior/useDragNode';
 import { WithSelectionProps } from '../../src/behavior/useSelection';
 import Layer from '../../src/layers/Layer';
 import { NodeEntity, PointTuple } from '../../src/types';
@@ -17,7 +17,7 @@ type GroupHullWidgetProps = {
   hover?: boolean;
   canDrop?: boolean;
 } & WithSelectionProps &
-  WithDragGroupProps &
+  WithDragNodeProps &
   WithDndDragProps &
   WithDndDropProps;
 
@@ -29,7 +29,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   entity,
   selected,
   onSelect,
-  dragGroupRef,
+  dragNodeRef,
   dndDragRef,
   dndDropRef,
   hover,
@@ -37,7 +37,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   canDrop,
 }) => {
   const pathRef = React.useRef<string | null>(null);
-  const refs = useCombineRefs<SVGPathElement>(dragGroupRef, dndDragRef, dndDropRef);
+  const refs = useCombineRefs<SVGPathElement>(dragNodeRef, dndDragRef, dndDropRef);
 
   if (!droppable || !pathRef.current) {
     const children = entity.getNodes();

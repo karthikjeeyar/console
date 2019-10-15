@@ -2,6 +2,7 @@ import * as React from 'react';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import EntityContext from '../utils/EntityContext';
+import { isNodeEntity } from '../types';
 import { useDndDrag, WithDndDragProps } from './useDndDrag';
 import {
   DragSourceSpec,
@@ -16,6 +17,9 @@ export const useDragNode = <DropResult, CollectedProps, Props = {}>(
   props?: Props,
 ): [CollectedProps, ConnectDragSource] => {
   const entity = React.useContext(EntityContext);
+  if (!isNodeEntity(entity)) {
+    throw new Error('useDragNode must be used within the scope of a NodeEntity');
+  }
   const entityRef = React.useRef(entity);
   entityRef.current = entity;
   return useDndDrag(
@@ -24,11 +28,24 @@ export const useDragNode = <DropResult, CollectedProps, Props = {}>(
         item: { type: '#useDragNode#' },
         begin: action((monitor: DragSourceMonitor, p: Props) => {
           entityRef.current.raise();
+          if (entityRef.current.isGroup()) {
+            entityRef.current.getChildren().forEach((c) => {
+              c.raise();
+            });
+          }
           return spec && spec.begin ? spec.begin(monitor, p) : undefined;
         }),
         drag: action((event: DragEvent, monitor: DragSourceMonitor, p: Props) => {
           const { dx, dy } = event;
-          entityRef.current.getBounds().translate(dx, dy);
+          if (entityRef.current.isGroup()) {
+            entityRef.current.getChildren().forEach((c) => {
+              if (isNodeEntity(c)) {
+                c.getBounds().translate(dx, dy);
+              }
+            });
+          } else {
+            entityRef.current.getBounds().translate(dx, dy);
+          }
           spec && spec.drag && spec.drag(event, monitor, p);
         }),
         canDrag: spec ? spec.canDrag : undefined,

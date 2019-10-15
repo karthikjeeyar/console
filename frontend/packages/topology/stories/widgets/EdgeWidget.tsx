@@ -50,7 +50,7 @@ const EdgeWidget: React.FC<EdgeWidgetProps> = ({
 
   return (
     <>
-      <Layer id={dragging ? 'top' : null}>
+      <Layer id={dragging ? 'top' : undefined}>
         <path
           strokeWidth={1}
           stroke={(entity.getData() && entity.getData().color) || 'red'}

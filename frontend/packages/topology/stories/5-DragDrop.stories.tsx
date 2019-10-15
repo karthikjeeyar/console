@@ -32,11 +32,13 @@ export const dnd = () => {
       {
         id: 'gr1',
         type: 'group-drop',
+        group: true,
         children: ['n2', 'n3'],
       },
       {
         id: 'gr2',
         type: 'group-drop',
+        group: true,
         children: ['n4', 'n5'],
       },
       {

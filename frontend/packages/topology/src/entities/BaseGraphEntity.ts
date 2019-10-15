@@ -1,4 +1,5 @@
 import { computed, observable } from 'mobx';
+import Rect from '../geom/Rect';
 import {
   GraphEntity,
   EdgeEntity,
@@ -19,6 +20,9 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
 
   @observable
   private layoutType: string | undefined;
+
+  @observable.ref
+  private bounds: Rect = new Rect();
 
   isDetached(): boolean {
     return !this.getController();
@@ -41,6 +45,14 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
 
   get kind(): ModelKind {
     return ModelKind.graph;
+  }
+
+  getBounds(): Rect {
+    return this.bounds;
+  }
+
+  setBounds(bounds: Rect): void {
+    this.bounds.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
   }
 
   getNodes(): NodeEntity[] {

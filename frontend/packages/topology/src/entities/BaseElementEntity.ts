@@ -1,6 +1,5 @@
-import { observable } from 'mobx';
+import { observable, computed } from 'mobx';
 import * as _ from 'lodash';
-import Rect from '../geom/Rect';
 import {
   Element,
   GraphEntity,
@@ -34,17 +33,29 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   @observable.ref
   private controller: Controller;
 
-  @observable.ref
-  private bounds: Rect = new Rect();
-
   abstract get kind(): ModelKind;
 
-  getBounds(): Rect {
-    return this.bounds;
+  @computed({ equals: _.isEqual })
+  private get ordering(): number[] {
+    if (!this.parent) {
+      return [];
+    }
+    const idx = this.parent.getChildren().indexOf(this);
+    const result = [...this.parent.getOrderKey(), idx];
+    return result;
   }
 
-  setBounds(bounds: Rect): void {
-    this.bounds.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+  @computed
+  private get childElements(): ElementEntity[] {
+    if (this.children) {
+      const controller = this.getGraph().getController();
+      return this.children.map((id) => controller.getEntityById(id));
+    }
+    return [];
+  }
+
+  getOrderKey(): number[] {
+    return this.ordering;
   }
 
   getController(): Controller {
@@ -59,6 +70,7 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   }
 
   getGraph(): GraphEntity {
+    // TODO fix project eslint rules
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     let p: ElementEntity = this;
     while (!isGraphEntity(p)) {
@@ -119,20 +131,15 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
     this.data = data;
   }
 
-  // @computed (switch to getter)
   getChildren(): ElementEntity[] {
-    if (this.children) {
-      const controller = this.getGraph().getController();
-      return this.children.map((id) => controller.getEntityById(id));
-    }
-    return [];
+    return this.childElements;
   }
 
   appendChild(child: ElementEntity) {
     if (!this.children) {
       this.children = [child.getId()];
       child.setParent(this);
-    } else {
+    } else if (this.children[this.children.length - 1] !== child.getId()) {
       const idx = this.children.indexOf(child.getId());
       this.children.push(child.getId());
       if (idx !== -1) {
@@ -164,6 +171,7 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
     if (Array.isArray(model.children)) {
       const controller = this.getController();
 
+      // TODO distinguish between model based nodes and those added through other means?
       // remove all unknown nodes
       _.difference(this.children, model.children).forEach((id) =>
         controller.getEntityById(id).remove(),
@@ -208,13 +216,13 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
     this.translateFromParent(t);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   translateToParent(t: Translatable): void {
-    const { x, y } = this.getBounds();
-    t.translate(x, y);
+    // nothing to do
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   translateFromParent(t: Translatable): void {
-    const { x, y } = this.getBounds();
-    t.translate(-x, -y);
+    // nothing to do
   }
 }

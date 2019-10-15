@@ -24,6 +24,7 @@ const create2NodeModel = (): Model => ({
     {
       id: 'gr1',
       type: 'group',
+      group: true,
       children: ['n1', 'n2'],
     },
     {

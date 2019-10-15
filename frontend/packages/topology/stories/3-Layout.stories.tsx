@@ -4,7 +4,6 @@ import { Edge, Model, ModelKind, Node } from '../src/types';
 import Visualization from '../src/Visualization';
 import { withPanZoom } from '../src/behavior/usePanZoom';
 import GraphWidget from '../src/widgets/GraphWidget';
-import { withDragGroup } from '../src/behavior/useDragGroup';
 import { withDragNode } from '../src/behavior/useDragNode';
 import VisualizationWidget from '../src/VisualizationWidget';
 import defaultLayoutFactory from './layouts/defaultLayoutFactory';
@@ -39,6 +38,7 @@ const getModel = (layout: string): Model => {
   const groupNodes: Node[] = _.map(_.groupBy(nodes, (n) => n.data.group), (v, k) => ({
     type: 'group-hull',
     id: k,
+    group: true,
     children: v.map((n: Node) => n.id),
     label: `group-${k}`,
   }));
@@ -81,10 +81,10 @@ const getVisualization = (model: Model): Visualization => {
       return withPanZoom()(GraphWidget);
     }
     if (entity.getType() === 'group-hull') {
-      return withDragGroup()(GroupHullWidget);
+      return withDragNode()(GroupHullWidget);
     }
     if (entity.getType() === 'group') {
-      return withDragGroup()(GroupWidget);
+      return withDragNode()(GroupWidget);
     }
     if (entity.kind === ModelKind.node) {
       return withDragNode()(NodeWidget);

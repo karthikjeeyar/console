@@ -2,7 +2,8 @@ import * as React from 'react';
 import SvgDefsProvider from '@console/dev-console/src/components/svg/SvgDefsProvider';
 import { GraphEntity } from '../types';
 import { WithPanZoomProps } from '../behavior/usePanZoom';
-import LayersProvider, { DEFAULT_LAYER } from '../layers/LayersProvider';
+import LayersProvider from '../layers/LayersProvider';
+import { DEFAULT_LAYER } from '../layers/LayersContext';
 import widget from '../widget';
 import EntityWidget from './EntityWidget';
 
@@ -28,7 +29,7 @@ const EntityChildren: React.FC<EntityProps> = widget(({ entity }) => {
 
 // This inner Component will prevent re-rendering layers when the panZoomTransform changes
 const Inner: React.FC<EntityProps> = React.memo(({ entity }) => (
-  <LayersProvider layers={['groups', DEFAULT_LAYER, 'top']}>
+  <LayersProvider layers={['bottom', 'groups', DEFAULT_LAYER, 'top']}>
     <EntityChildren entity={entity} />
   </LayersProvider>
 ));
