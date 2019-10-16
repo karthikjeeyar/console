@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { observable, computed } from 'mobx';
+import { observable } from 'mobx';
 import ControllerContext from '../utils/ControllerContext';
 import {
   DndManager,
@@ -33,16 +33,6 @@ export const matchesType = (
 
 export class DndManagerImpl implements DndManager {
   private state: DndState;
-
-  @computed
-  private get itemType(): Identifier | undefined {
-    const sourceId = this.getSourceId();
-    if (!sourceId) {
-      return undefined;
-    }
-    const source = this.sources[sourceId];
-    return source && source.type;
-  }
 
   constructor(state: DndState) {
     this.state = state;
@@ -131,7 +121,7 @@ export class DndManagerImpl implements DndManager {
   }
 
   getItemType(): Identifier | undefined {
-    return this.itemType;
+    return this.state.itemType;
   }
 
   getItem(): any {
@@ -178,6 +168,7 @@ export class DndManagerImpl implements DndManager {
         const source = this.getSource(sourceId);
         if (source) {
           this.state.sourceId = sourceId;
+          this.state.itemType = source.type;
           this.state.event = {
             pageX,
             pageY,

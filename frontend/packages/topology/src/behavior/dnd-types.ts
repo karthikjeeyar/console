@@ -31,6 +31,7 @@ export interface DndState {
   isDragging?: boolean;
   sourceId?: string;
   targetIds?: string[];
+  itemType?: string;
   item?: any;
   dropResult?: any;
   didDrop?: boolean;
