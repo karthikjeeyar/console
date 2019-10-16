@@ -121,7 +121,7 @@ const CreateConnectorWidget: React.FC<CreateConnectorWidgetProps> = observer((pr
       </Layer>
       {prompt && (
         <ContextMenu
-          reference={{ x: prompt.event.x, y: prompt.event.y }}
+          reference={{ x: prompt.event.pageX, y: prompt.event.pageY }}
           open
           onRequestClose={() => {
             setActive(false);

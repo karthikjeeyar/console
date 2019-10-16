@@ -158,7 +158,13 @@ export class DndManagerImpl implements DndManager {
     return this.state.event;
   }
 
-  beginDrag(sourceIds: string | string[], x: number, y: number): void {
+  beginDrag(
+    sourceIds: string | string[],
+    x: number,
+    y: number,
+    pageX: number,
+    pageY: number,
+  ): void {
     const ids = Array.isArray(sourceIds) ? sourceIds : [sourceIds];
     if (ids.length) {
       let sourceId: string | null = null;
@@ -173,6 +179,8 @@ export class DndManagerImpl implements DndManager {
         if (source) {
           this.state.sourceId = sourceId;
           this.state.event = {
+            pageX,
+            pageY,
             initialX: x,
             initialY: y,
             x,
@@ -234,7 +242,7 @@ export class DndManagerImpl implements DndManager {
       });
   }
 
-  drag(x: number, y: number): void {
+  drag(x: number, y: number, pageX: number, pageY: number): void {
     if (!this.state.event) {
       throw new Error('Drag event not initialized');
     }
@@ -244,6 +252,8 @@ export class DndManagerImpl implements DndManager {
     this.state.event.dy = y - this.state.event.y;
     this.state.event.x = x;
     this.state.event.y = y;
+    this.state.event.pageX = pageX;
+    this.state.event.pageY = pageY;
     const source = this.getSource(this.getSourceId());
     if (source) {
       source.drag(this);

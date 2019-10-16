@@ -7,6 +7,8 @@ export type DragEvent = {
   y: number;
   dx: number;
   dy: number;
+  pageX: number;
+  pageY: number;
 };
 
 export type DragSource = {
@@ -40,10 +42,10 @@ export type DndStateContainer = {
 };
 
 export interface DndActions {
-  beginDrag(sourceIds: string | string[], x: number, y: number): void;
+  beginDrag(sourceIds: string | string[], x: number, y: number, pageX: number, pageY: number): void;
   hover(targetIds: string[]): void;
   endDrag(): void;
-  drag(x: number, y: number): void;
+  drag(x: number, y: number, pageX: number, pageY: number): void;
   drop(): void;
 }
 
