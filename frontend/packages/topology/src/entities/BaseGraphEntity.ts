@@ -75,6 +75,10 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
       return;
     }
 
+    if (this.currentLayout) {
+      this.currentLayout.destroy();
+    }
+
     this.layoutType = layout;
     this.currentLayout = this.getController().getLayout(layout);
   }
@@ -82,7 +86,7 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
   layout(): void {
     const layout = this.graphLayout;
     if (layout) {
-      layout.layout(this.nodes, this.edges);
+      layout.layout();
     }
   }
 

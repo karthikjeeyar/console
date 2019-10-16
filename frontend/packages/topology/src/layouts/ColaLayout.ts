@@ -121,12 +121,14 @@ export default class ColaLayout implements Layout {
     this.graph = graph;
   }
 
-  layout = (nodeEntities: NodeEntity[], edgeEntities: EdgeEntity[]) => {
-    const nodes: ColaNode[] = leafNodeEntities(nodeEntities).map(
+  destroy(): void {}
+
+  layout = () => {
+    const nodes: ColaNode[] = leafNodeEntities(this.graph.getNodes()).map(
       (e: NodeEntity, index) => new ColaNode(e, index),
     );
-    const groups: ElementEntity[] = groupNodeEntities(nodeEntities);
-    const edges: ColaLink[] = edgeEntities.map((e: EdgeEntity) => {
+    const groups: ElementEntity[] = groupNodeEntities(this.graph.getNodes());
+    const edges: ColaLink[] = this.graph.getEdges().map((e: EdgeEntity) => {
       e.setBendpoints([]);
       const edge: ColaLink = new ColaLink(
         e,

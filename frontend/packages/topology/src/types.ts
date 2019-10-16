@@ -7,7 +7,8 @@ import { Translatable } from './geom/types';
 export type PointTuple = [number, number];
 
 export interface Layout {
-  layout: (nodes: NodeEntity[], edges: EdgeEntity[]) => void;
+  layout(): void;
+  destroy(): void;
 }
 
 export interface LayoutConstraint {
@@ -143,7 +144,7 @@ export interface GraphEntity<E extends Graph = Graph, D = any> extends ElementEn
   setScale(scale: number): void;
   getLayout(): string | undefined;
   setLayout(type: string | undefined): void;
-  layout(width?: number, height?: number): void;
+  layout(): void;
 
   // viewport operations
   reset(): void;
@@ -176,8 +177,8 @@ export interface Controller extends WithState {
   registerLayoutFactory(factory: LayoutFactory): void;
   registerWidgetFactory(factory: WidgetFactory): void;
   registerEntityFactory(factory: EntityFactory): void;
-  addEventListener<L extends EventListener = EventListener>(type: string, listener: L): void;
-  removeEventListener(type: string, listener: EventListener): void;
+  addEventListener<L extends EventListener = EventListener>(type: string, listener: L): Controller;
+  removeEventListener(type: string, listener: EventListener): Controller;
   fireEvent(type: string, ...args: any): void;
   getEntities(): ElementEntity[];
 }

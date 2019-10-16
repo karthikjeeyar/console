@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
 import { ElementEntity, NodeEntity } from '../types';
 
-const groupNodeEntities = (nodes: ElementEntity[]): ElementEntity[] => {
+const groupNodeEntities = (nodes: ElementEntity[]): NodeEntity[] => {
   if (!_.size(nodes)) {
     return [];
   }
-  const groupNodes: ElementEntity[] = [];
+  const groupNodes: NodeEntity[] = [];
   _.forEach(nodes, (nextNode: NodeEntity) => {
     if (nextNode.isGroup()) {
       groupNodes.push(nextNode);

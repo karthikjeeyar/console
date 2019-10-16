@@ -2,7 +2,7 @@ import * as React from 'react';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import EntityContext from '../utils/EntityContext';
-import { isNodeEntity } from '../types';
+import { EventListener, isNodeEntity } from '../types';
 import { useDndDrag, WithDndDragProps } from './useDndDrag';
 import {
   DragSourceSpec,
@@ -11,6 +11,13 @@ import {
   DragObjectWithType,
   DragSourceMonitor,
 } from './dnd-types';
+
+export const DRAG_NODE_EVENT = 'drag_node';
+export const DRAG_NODE_START_EVENT = `${DRAG_NODE_EVENT}_start`;
+export const DRAG_NODE_END_EVENT = `${DRAG_NODE_EVENT}_end`;
+
+//                                                 id,     x,      y,      dx,     dy
+export type DragNodeEventListener = EventListener<[string, number, number, number, number]>;
 
 export const useDragNode = <DropResult, CollectedProps, Props = {}>(
   spec?: Omit<DragSourceSpec<DragObjectWithType, DropResult, CollectedProps>, 'type'>,
@@ -22,22 +29,28 @@ export const useDragNode = <DropResult, CollectedProps, Props = {}>(
   }
   const entityRef = React.useRef(entity);
   entityRef.current = entity;
+  const id = entity.getId();
   return useDndDrag(
     React.useMemo(() => {
       const sourceSpec: DragSourceSpec<any, any, any, Props> = {
         item: { type: '#useDragNode#' },
         begin: action((monitor: DragSourceMonitor, p: Props) => {
+          entityRef.current.raise();
           if (entityRef.current.isGroup()) {
             entityRef.current.getChildren().forEach((c) => {
               c.raise();
             });
           }
+
           spec && spec.begin && spec.begin(monitor, p);
+
+          entityRef.current.getController().fireEvent(DRAG_NODE_START_EVENT, id);
+
           // always return the entity as drag item
           return entityRef.current;
         }),
         drag: action((event: DragEvent, monitor: DragSourceMonitor, p: Props) => {
-          const { dx, dy } = event;
+          const { x, y, dx, dy } = event;
           if (entityRef.current.isGroup()) {
             entityRef.current.getChildren().forEach((c) => {
               if (isNodeEntity(c)) {
@@ -47,15 +60,18 @@ export const useDragNode = <DropResult, CollectedProps, Props = {}>(
           } else {
             entityRef.current.getBounds().translate(dx, dy);
           }
-          entityRef.current.raise();
           spec && spec.drag && spec.drag(event, monitor, p);
+          entityRef.current.getController().fireEvent(DRAG_NODE_START_EVENT, id, x, y, dx, dy);
         }),
         canDrag: spec ? spec.canDrag : undefined,
-        end: spec ? spec.end : undefined,
+        end: action(() => {
+          entityRef.current.getController().fireEvent(DRAG_NODE_END_EVENT, id);
+          return spec ? spec.end : undefined;
+        }),
         collect: spec ? spec.collect : undefined,
       };
       return sourceSpec;
-    }, [spec]),
+    }, [id, spec]),
     props,
   );
 };

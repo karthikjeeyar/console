@@ -5,6 +5,11 @@ import { EdgeEntity, ElementEntity, GraphEntity, Layout, NodeEntity } from '../t
 import { leafNodeEntities } from '../utils/leafNodeEntities';
 import { groupNodeEntities } from '../utils/groupNodeEntities';
 import BaseEdgeEntity from '../entities/BaseEdgeEntity';
+import {
+  DRAG_NODE_START_EVENT,
+  DRAG_NODE_END_EVENT,
+  DragNodeEventListener,
+} from '../behavior/useDragNode';
 
 class D3Node implements d3.SimulationNodeDatum {
   private node: NodeEntity;
@@ -12,6 +17,8 @@ class D3Node implements d3.SimulationNodeDatum {
   private xx?: number;
 
   private yy?: number;
+
+  private isFixed: boolean = false;
 
   constructor(node: NodeEntity) {
     this.node = node;
@@ -23,6 +30,14 @@ class D3Node implements d3.SimulationNodeDatum {
 
   get id(): string {
     return this.node.getId();
+  }
+
+  set fixed(fixed: boolean) {
+    this.isFixed = fixed;
+  }
+
+  get fixed(): boolean {
+    return this.isFixed;
   }
 
   get x(): number {
@@ -39,6 +54,14 @@ class D3Node implements d3.SimulationNodeDatum {
 
   set y(y: number) {
     this.yy = y;
+  }
+
+  get fx(): number | undefined {
+    return this.isFixed ? this.node.getBounds().getCenter().x : undefined;
+  }
+
+  get fy(): number | undefined {
+    return this.isFixed ? this.node.getBounds().getCenter().y : undefined;
   }
 
   setPosition(x: number, y: number) {
@@ -98,14 +121,85 @@ class D3Link implements d3.SimulationLinkDatum<D3Node> {
 export default class ForceLayout implements Layout {
   private graph: GraphEntity;
 
+  private simulation: d3.Simulation<D3Node, undefined>;
+
   constructor(graph: GraphEntity) {
     this.graph = graph;
+    graph
+      .getController()
+      .addEventListener<DragNodeEventListener>(DRAG_NODE_START_EVENT, this.handleDragStart)
+      .addEventListener<DragNodeEventListener>(DRAG_NODE_END_EVENT, this.handleDragEnd);
   }
 
-  layout = (nodeEntities: NodeEntity[], edgeEntities: EdgeEntity[]) => {
-    const groups: ElementEntity[] = groupNodeEntities(nodeEntities);
-    const nodes: D3Node[] = leafNodeEntities(nodeEntities).map((e: NodeEntity) => new D3Node(e));
-    const edges: D3Link[] = edgeEntities.map((e: EdgeEntity) => {
+  destroy(): void {
+    this.graph
+      .getController()
+      .removeEventListener(DRAG_NODE_START_EVENT, this.handleDragStart)
+      .removeEventListener(DRAG_NODE_END_EVENT, this.handleDragEnd);
+  }
+
+  getGroupNodes = (group: NodeEntity): D3Node[] => {
+    return leafNodeEntities(group).reduce((nodes: D3Node[], nextNode: NodeEntity) => {
+      const d3Node = this.simulation.nodes().find((node: D3Node) => node.id === nextNode.getId());
+      if (d3Node) {
+        nodes.push(d3Node);
+      }
+      return nodes;
+    }, []);
+  };
+
+  handleDragStart = (id: string) => {
+    let found = false;
+    const dragNode: D3Node | undefined = this.simulation
+      .nodes()
+      .find((node: D3Node) => node.id === id);
+    if (dragNode) {
+      dragNode.fixed = true;
+      found = true;
+    }
+    if (!found) {
+      const dragGroup: NodeEntity | undefined = groupNodeEntities(this.graph.getNodes()).find(
+        (group: NodeEntity) => group.getId() === id,
+      );
+      if (dragGroup) {
+        const groupNodes = this.getGroupNodes(dragGroup);
+        groupNodes.forEach((node: D3Node) => {
+          node.fixed = true;
+        });
+        found = true;
+      }
+    }
+    if (found) {
+      this.simulation.alphaTarget(0.1).restart();
+    }
+  };
+
+  handleDragEnd = (id: string) => {
+    this.simulation.alphaTarget(0);
+    const dragNode: D3Node | undefined = this.simulation
+      .nodes()
+      .find((node: D3Node) => node.id === id);
+    if (dragNode) {
+      dragNode.fixed = false;
+    } else {
+      const dragGroup: NodeEntity | undefined = groupNodeEntities(this.graph.getNodes()).find(
+        (group: NodeEntity) => group.getId() === id,
+      );
+      if (dragGroup) {
+        const groupNodes = this.getGroupNodes(dragGroup);
+        groupNodes.forEach((node: D3Node) => {
+          node.fixed = false;
+        });
+      }
+    }
+  };
+
+  layout = () => {
+    const groups: ElementEntity[] = groupNodeEntities(this.graph.getNodes());
+    const nodes: D3Node[] = leafNodeEntities(this.graph.getNodes()).map(
+      (e: NodeEntity) => new D3Node(e),
+    );
+    const edges: D3Link[] = this.graph.getEdges().map((e: EdgeEntity) => {
       e.setBendpoints([]);
       return new D3Link(e);
     });
@@ -133,7 +227,7 @@ export default class ForceLayout implements Layout {
     });
 
     // create force simulation
-    const simulation = d3
+    this.simulation = d3
       .forceSimulation<D3Node>()
       .force('collide', d3.forceCollide<D3Node>().radius((d) => d.getRadius() + 5))
       .force('charge', d3.forceManyBody())
@@ -155,7 +249,7 @@ export default class ForceLayout implements Layout {
         action(() => {
           // speed up the simulation
           for (let i = 0; i < 10; i++) {
-            simulation.tick();
+            this.simulation.tick();
           }
           nodes.forEach((d) => d.update());
         }),

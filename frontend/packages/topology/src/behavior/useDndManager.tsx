@@ -181,13 +181,10 @@ export class DndManagerImpl implements DndManager {
             totalDx: 0,
             totalDy: 0,
           };
-          this.state.isDragging = true;
           this.state.sourceId = sourceId;
-          this.state.item = source.beginDrag(this);
         }
       }
     }
-    this.performHitTests();
   }
 
   hover(targetIds: string[]): void {
@@ -245,6 +242,15 @@ export class DndManagerImpl implements DndManager {
     this.state.event.y = y;
     this.state.event.pageX = pageX;
     this.state.event.pageY = pageY;
+
+    if (!this.isDragging()) {
+      if (Math.abs(this.state.event.totalDx) >= 5 || Math.abs(this.state.event.totalDy) >= 5) {
+        this.state.isDragging = true;
+        this.performHitTests();
+      }
+      return;
+    }
+
     const source = this.getSource(this.getSourceId());
     if (source) {
       source.drag(this);

@@ -37,6 +37,8 @@ import GroupHullWidget from './widgets/GroupHullWidget';
 import GroupWidget from './widgets/GroupWidget';
 import NodeWidget from './widgets/NodeWidget';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
+import '@patternfly/patternfly/patternfly.css';
+import '@patternfly/patternfly/patternfly-addons.css';
 
 export default {
   title: 'Topology Package',
@@ -154,7 +156,7 @@ const TopologyViewComponent: React.FC<TopologyViewComponentProps> = ({ vis, useS
   const layoutDropdown = (
     <Split>
       <SplitItem>
-        <label style={{ paddingRight: 15, paddingTop: 8, display: 'inline-block' }}>Layout</label>
+        <label className="pf-u-display-inline-block pf-u-mr-md pf-u-mt-sm">Layout</label>
       </SplitItem>
       <SplitItem>
         <Dropdown
@@ -181,7 +183,7 @@ const TopologyViewComponent: React.FC<TopologyViewComponentProps> = ({ vis, useS
     </Split>
   );
   const viewToolbar = (
-    <Toolbar style={{ padding: 15 }}>
+    <Toolbar className="pf-u-mx-md pf-u-my-md">
       <ToolbarGroup>
         <ToolbarItem>{layoutDropdown}</ToolbarItem>
       </ToolbarGroup>

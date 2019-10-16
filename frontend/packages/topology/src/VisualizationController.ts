@@ -158,17 +158,18 @@ export default class VisualizationController extends Stateful implements Control
     this.entityFactories.unshift(factory);
   }
 
-  addEventListener<L extends EventListener = EventListener>(type: string, listener: L): void {
+  addEventListener<L extends EventListener = EventListener>(type: string, listener: L): Controller {
     if (!this.eventListeners[type]) {
       this.eventListeners[type] = [listener];
     } else {
       this.eventListeners[type].push(listener);
     }
+    return this;
   }
 
-  removeEventListener(type: string, listener: EventListener): void {
+  removeEventListener(type: string, listener: EventListener): Controller {
     if (!this.eventListeners[type]) {
-      return;
+      return this;
     }
     const listeners = this.eventListeners[type];
     const l: EventListener[] = [];
@@ -182,6 +183,7 @@ export default class VisualizationController extends Stateful implements Control
     } else {
       delete this.eventListeners[type];
     }
+    return this;
   }
 
   fireEvent(type: string, ...args: any): void {

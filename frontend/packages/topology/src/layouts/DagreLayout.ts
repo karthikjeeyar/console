@@ -71,11 +71,13 @@ export default class DagreLayout implements Layout {
     this.graph = graph;
   }
 
-  layout = (nodeEntities: NodeEntity[], edgeEntities: EdgeEntity[]) => {
-    const nodes: DagreNode[] = leafNodeEntities(nodeEntities).map(
+  destroy(): void {}
+
+  layout = () => {
+    const nodes: DagreNode[] = leafNodeEntities(this.graph.getNodes()).map(
       (node: ElementEntity) => new DagreNode(node as NodeEntity),
     );
-    const edges: DagreEdge[] = edgeEntities.map((edge: EdgeEntity) => {
+    const edges: DagreEdge[] = this.graph.getEdges().map((edge: EdgeEntity) => {
       edge.setBendpoints([]);
       return new DagreEdge(edge as EdgeEntity);
     });
