@@ -6,7 +6,7 @@ import DefaultCreateConnectorWidget from '../widgets/DefaultCreateConnectorWidge
 import Point from '../geom/Point';
 import Layer from '../layers/Layer';
 import ContextMenu, { ContextMenuItem } from '../contextmenu/ContextMenu';
-import { NodeEntity, isNodeEntity } from '../types';
+import { NodeEntity, isNodeEntity, AnchorEnd } from '../types';
 import { DragSourceSpec, DragSourceMonitor, DragEvent } from './dnd-types';
 import { useDndDrag } from './useDndDrag';
 
@@ -99,7 +99,7 @@ const CreateConnectorWidget: React.FC<CreateConnectorWidgetProps> = observer((pr
     const bounds = entity.getBounds();
     endPoint = new Point(bounds.right() + X_OFFSET, Y_OFFSET + bounds.y + bounds.height / 2);
   }
-  const startPoint = entity.getAnchor().getLocation(endPoint);
+  const startPoint = entity.getAnchor(AnchorEnd.source).getLocation(endPoint);
 
   // bring into the coordinate space of the entity
   entity.translateFromParent(startPoint);

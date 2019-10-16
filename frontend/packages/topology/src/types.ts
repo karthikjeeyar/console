@@ -20,6 +20,12 @@ export type Model = {
   edges?: Edge[];
 };
 
+export enum AnchorEnd {
+  target,
+  source,
+  both,
+}
+
 export interface Element {
   id: string;
   type: string;
@@ -55,7 +61,6 @@ export interface Graph extends LayoutNode {
 }
 
 export interface Anchor<E extends NodeEntity = NodeEntity> {
-  setOwner(owner: E): void;
   getLocation(reference: Point): Point;
   getReferencePoint(): Point;
 }
@@ -107,8 +112,8 @@ export interface ElementEntity<E extends Element = Element, D = any> extends Wit
 }
 
 export interface NodeEntity<E extends Node = Node, D = any> extends ElementEntity<E, D> {
-  getAnchor(): Anchor;
-  setAnchor(anchor: Anchor): void;
+  getAnchor(end: AnchorEnd, type?: string): Anchor;
+  setAnchor(anchor: Anchor, end?: AnchorEnd, type?: string): void;
   getNodes(): NodeEntity[];
   getBounds(): Rect;
   setBounds(bounds: Rect): void;

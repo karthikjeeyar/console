@@ -2,7 +2,7 @@ import * as React from 'react';
 import { action } from 'mobx';
 import Visualization from '../src/Visualization';
 import VisualizationWidget from '../src/VisualizationWidget';
-import { Model, ModelKind, EdgeEntity, NodeEntity } from '../src/types';
+import { Model, ModelKind, EdgeEntity, NodeEntity, AnchorEnd } from '../src/types';
 import { withTargetDrag, withSourceDrag } from '../src/behavior/useReconnect';
 import { DragSourceMonitor, DragEvent } from '../src/behavior/dnd-types';
 import { withDndDrop } from '../src/behavior/useDndDrop';
@@ -13,9 +13,13 @@ import {
   CREATE_CONNECTOR_DROP_TYPE,
   ConnectorChoice,
 } from '../src/behavior/withCreateConnector';
+import { useSvgAnchor } from '../src/behavior/useSvgAnchor';
+import { withDragNode, WithDragNodeProps } from '../src/behavior/useDragNode';
+import Layer from '../src/layers/Layer';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 import EdgeWidget from './widgets/EdgeWidget';
 import NodeWidget from './widgets/NodeWidget';
+import NodeRectWidget from './widgets/NodeRectWidget';
 
 export default {
   title: 'Connector',
@@ -249,6 +253,93 @@ export const createConnector = () => {
           }),
         })(NodeWidget),
       );
+    }
+    return undefined;
+  });
+  vis.fromModel(model);
+  return <VisualizationWidget visualization={vis} />;
+};
+
+export const anchors = () => {
+  const NodeWithPointAnchor: React.FC<{ entity: NodeEntity } & WithDragNodeProps> = (props) => {
+    const nodeRef = useSvgAnchor();
+    const targetRef = useSvgAnchor(AnchorEnd.target, 'edge-point');
+    const bounds = props.entity.getBounds();
+    return (
+      <>
+        <Layer id="bottom">
+          <NodeRectWidget ref={nodeRef} {...props as any} />
+        </Layer>
+        <circle
+          ref={nodeRef}
+          fill="lightgreen"
+          r="5"
+          cx={bounds.width * 0.25}
+          cy={bounds.height * 0.25}
+        />
+        <circle
+          ref={targetRef}
+          fill="red"
+          r="5"
+          cx={bounds.width * 0.75}
+          cy={bounds.height * 0.75}
+        />
+      </>
+    );
+  };
+  const model: Model = {
+    graph: {
+      id: 'g1',
+      type: 'graph',
+      children: ['n1', 'n2', 'n3', 'e1', 'e2'],
+    },
+    nodes: [
+      {
+        id: 'n1',
+        type: 'node',
+        x: 150,
+        y: 10,
+        width: 100,
+        height: 100,
+      },
+      {
+        id: 'n2',
+        type: 'node',
+        x: 25,
+        y: 250,
+        width: 50,
+        height: 50,
+      },
+      {
+        id: 'n3',
+        type: 'node',
+        x: 225,
+        y: 250,
+        width: 50,
+        height: 50,
+      },
+    ],
+    edges: [
+      {
+        id: 'e1',
+        type: 'edge-point',
+        source: 'n1',
+        target: 'n3',
+      },
+      {
+        id: 'e2',
+        type: 'edge-point',
+        source: 'n2',
+        target: 'n1',
+      },
+    ],
+  };
+
+  const vis = new Visualization();
+  vis.registerWidgetFactory(defaultWidgetFactory);
+  vis.registerWidgetFactory((entity) => {
+    if (entity.kind === ModelKind.node) {
+      return withDragNode()(NodeWithPointAnchor);
     }
     return undefined;
   });

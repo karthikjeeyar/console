@@ -1,7 +1,7 @@
 // import { computed } from 'mobx';
 import { observable } from 'mobx';
 import Point from '../geom/Point';
-import { EdgeEntity, NodeEntity, Edge, ModelKind } from '../types';
+import { EdgeEntity, NodeEntity, Edge, ModelKind, AnchorEnd } from '../types';
 import BaseElementEntity from './BaseElementEntity';
 
 export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends BaseElementEntity<E, D>
@@ -73,7 +73,7 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     } else {
       const target = this.getTarget();
       if (target) {
-        referencePoint = target.getAnchor().getReferencePoint();
+        referencePoint = target.getAnchor(AnchorEnd.target, this.getType()).getReferencePoint();
       } else {
         throw new Error('Cannot compute start point. Missing target.');
       }
@@ -82,7 +82,7 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     if (!source) {
       throw new Error('Cannot compute start point. Missing source.');
     }
-    return source.getAnchor().getLocation(referencePoint);
+    return source.getAnchor(AnchorEnd.source, this.getType()).getLocation(referencePoint);
   }
 
   setStartPoint(x?: number, y?: number): void {
@@ -109,7 +109,7 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     } else {
       const source = this.getSource();
       if (source) {
-        referencePoint = source.getAnchor().getReferencePoint();
+        referencePoint = source.getAnchor(AnchorEnd.source, this.getType()).getReferencePoint();
       } else {
         throw new Error('Cannot compute end point. Missing source.');
       }
@@ -118,7 +118,7 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     if (!target) {
       throw new Error('Cannot compute end point. Missing target.');
     }
-    return target.getAnchor().getLocation(referencePoint);
+    return target.getAnchor(AnchorEnd.target, this.getType()).getLocation(referencePoint);
   }
 
   setEndPoint(x?: number, y?: number): void {

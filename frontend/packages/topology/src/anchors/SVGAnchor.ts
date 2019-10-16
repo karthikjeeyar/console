@@ -1,3 +1,4 @@
+import { observable } from 'mobx';
 import Point from '../geom/Point';
 import Rect from '../geom/Rect';
 import AbstractAnchor from './AbstractAnchor';
@@ -9,10 +10,23 @@ import {
 } from './svgAnchorUtils';
 
 export default class SVGAnchor extends AbstractAnchor {
+  @observable.ref
   private svgElement: SVGElement;
 
   setSVGElement(svgElement: SVGElement) {
     this.svgElement = svgElement;
+  }
+
+  getCircleLocation(circle: SVGCircleElement, reference: Point): Point {
+    const bounds: Rect = this.getOwner().getBounds();
+    const center: Point = new Point(circle.cx.baseVal.value, circle.cy.baseVal.value).translate(
+      bounds.x,
+      bounds.y,
+    );
+    const radius = circle.r.baseVal.value * 2;
+
+    // TODO use an circle algo
+    return getEllipseAnchorPoint(center, radius, radius, reference);
   }
 
   getEllipseLocation(ellipse: SVGEllipseElement, reference: Point): Point {
@@ -57,6 +71,10 @@ export default class SVGAnchor extends AbstractAnchor {
   }
 
   getLocation(reference: Point): Point {
+    if (this.svgElement instanceof SVGCircleElement) {
+      return this.getCircleLocation(this.svgElement, reference);
+    }
+
     if (this.svgElement instanceof SVGEllipseElement) {
       return this.getEllipseLocation(this.svgElement, reference);
     }

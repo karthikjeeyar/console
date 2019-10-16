@@ -11,10 +11,6 @@ export default abstract class AbstractAnchor<E extends NodeEntity = NodeEntity>
     }
   }
 
-  setOwner(owner: E): void {
-    this.owner = owner;
-  }
-
   protected getOwner(): NodeEntity {
     return this.owner;
   }

@@ -1,14 +1,19 @@
 import { observable, computed } from 'mobx';
-import { NodeEntity, Anchor, Node, ModelKind, isNodeEntity } from '../types';
+import { NodeEntity, Anchor, Node, ModelKind, isNodeEntity, AnchorEnd } from '../types';
 import CenterAnchor from '../anchors/CenterAnchor';
 import Rect from '../geom/Rect';
 import { Translatable } from '../geom/types';
 import BaseElementEntity from './BaseElementEntity';
 
+const createAnchorKey = (end: AnchorEnd = AnchorEnd.both, type: string = ''): string =>
+  `${end}:${type}`;
+
 export default class BaseNodeEntity<E extends Node = Node, D = any> extends BaseElementEntity<E, D>
   implements NodeEntity<E, D> {
-  @observable.ref
-  private anchor: Anchor = new CenterAnchor(this);
+  @observable.shallow
+  private anchors: { [type: string]: Anchor } = {
+    [createAnchorKey()]: new CenterAnchor(this),
+  };
 
   @observable.ref
   private bounds: Rect = new Rect();
@@ -50,13 +55,27 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
     this.bounds.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
   }
 
-  getAnchor(): Anchor {
-    return this.anchor;
+  getAnchor(end?: AnchorEnd, type?: string): Anchor {
+    let anchor = this.anchors[createAnchorKey(end, type)];
+    if (!anchor && type) {
+      anchor = this.anchors[createAnchorKey(end)];
+    }
+    if (!anchor && (end === AnchorEnd.source || end === AnchorEnd.target)) {
+      anchor = this.anchors[createAnchorKey(AnchorEnd.both, type)];
+      if (!anchor && type) {
+        anchor = this.anchors[createAnchorKey(AnchorEnd.both)];
+      }
+    }
+    return anchor;
   }
 
-  setAnchor(anchor: Anchor): void {
-    anchor.setOwner(this);
-    this.anchor = anchor;
+  setAnchor(anchor: Anchor, end?: AnchorEnd, type?: string): void {
+    const key = createAnchorKey(end, type);
+    if (anchor) {
+      this.anchors[key] = anchor;
+    } else {
+      delete this.anchors[key];
+    }
   }
 
   getNodes(): NodeEntity[] {
