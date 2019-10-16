@@ -97,7 +97,12 @@ export const useDndDrag = <
             .on(
               'drag',
               action(() => {
-                dndManagerRef.current.drag(d3.event.x, d3.event.y, d3.event.pageX, d3.event.pageY);
+                dndManagerRef.current.drag(
+                  d3.event.x,
+                  d3.event.y,
+                  d3.event.sourceEvent.pageX,
+                  d3.event.sourceEvent.pageY,
+                );
               }),
             )
             .on(
@@ -108,8 +113,8 @@ export const useDndDrag = <
                     idRef.current,
                     d3.event.x,
                     d3.event.y,
-                    d3.event.pageX,
-                    d3.event.pageY,
+                    d3.event.sourceEvent.pageX,
+                    d3.event.sourceEvent.pageY,
                   );
                 }
               }),
