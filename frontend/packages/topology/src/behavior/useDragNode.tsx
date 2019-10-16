@@ -32,7 +32,9 @@ export const useDragNode = <DropResult, CollectedProps, Props = {}>(
               c.raise();
             });
           }
-          return spec && spec.begin ? spec.begin(monitor, p) : undefined;
+          spec && spec.begin && spec.begin(monitor, p);
+          // always return the entity as drag item
+          return entityRef.current;
         }),
         drag: action((event: DragEvent, monitor: DragSourceMonitor, p: Props) => {
           const { dx, dy } = event;
