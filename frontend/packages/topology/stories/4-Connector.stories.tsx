@@ -268,7 +268,7 @@ export const anchors = () => {
     return (
       <>
         <Layer id="bottom">
-          <NodeRectWidget ref={nodeRef} {...props as any} />
+          <NodeRectWidget {...props as any} />
         </Layer>
         <circle
           ref={nodeRef}
