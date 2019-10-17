@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as _ from 'lodash';
+import { action } from 'mobx';
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore-next-line
 import ReactMeasure from 'react-measure';
@@ -17,7 +18,7 @@ type EntityProps = {
 
 type GraphWidgetProps = EntityProps & WithPanZoomProps;
 
-// This inner Component will prevent the re-rendering of all children when the panZoomTransform changes
+// This inner Component will prevent the re-rendering of all children when the transform changes
 const EntityChildren: React.FC<EntityProps> = widget(({ entity }) => {
   return (
     <>
@@ -31,81 +32,84 @@ const EntityChildren: React.FC<EntityProps> = widget(({ entity }) => {
   );
 });
 
-// This inner Component will prevent re-rendering layers when the panZoomTransform changes
+// This inner Component will prevent re-rendering layers when the transform changes
 const Inner: React.FC<EntityProps> = React.memo(({ entity }) => (
   <LayersProvider layers={['bottom', 'groups', DEFAULT_LAYER, 'top']}>
     <EntityChildren entity={entity} />
   </LayersProvider>
 ));
 
+const TransformGroup: React.FC<EntityProps & WithPanZoomProps> = widget(
+  ({ entity, panZoomRef }) => {
+    const bounds = entity.getBounds();
+    return (
+      <g
+        ref={panZoomRef}
+        transform={`translate(${bounds.x}, ${bounds.y}) scale(${entity.getScale()})`}
+        data-id={entity.getId()}
+        data-kind={entity.kind}
+        data-type={entity.getType()}
+      >
+        <Inner entity={entity} />
+      </g>
+    );
+  },
+);
+
 function stopEvent(e: React.MouseEvent): void {
   e.preventDefault();
   e.stopPropagation();
 }
 
-type Dimensions = {
-  width: number;
-  height: number;
-};
-
-const layoutGraph = (entity: GraphEntity, dimensions: Dimensions | null) => {
-  if (dimensions) {
-    entity.getBounds().setSize(dimensions.width, dimensions.height);
-    entity.layout();
-  }
-};
-
 const GraphWidget: React.FC<GraphWidgetProps> = ({ entity, panZoomRef }) => {
-  const [dimensions, setDimensions] = React.useState<Dimensions | null>(null);
   const layout = entity.getLayout();
-
   React.useEffect(() => {
-    layoutGraph(entity, dimensions);
+    entity.layout();
+    // Only re-run if the layout changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entity, layout]);
+  }, [layout]);
 
-  const setGraphDimensions = React.useCallback(
-    (contentRect) => {
-      const newDimensions: Dimensions = {
-        width: contentRect.client.width,
-        height: contentRect.client.height,
-      };
-      if (!dimensions) {
-        layoutGraph(entity, newDimensions);
-      }
-      setDimensions(newDimensions);
-    },
-    [dimensions, entity],
+  const onMeasure = React.useMemo(
+    () =>
+      _.debounce<any>(
+        action((contentRect: { client: { width: number; height: number } }) => {
+          entity.getBounds().setSize(contentRect.client.width, contentRect.client.height);
+        }),
+        100,
+        { leading: true, trailing: true },
+      ),
+    [entity],
   );
 
-  const onMeasure = _.debounce(setGraphDimensions, 100);
+  // dispose of onMesure
+  React.useEffect(() => () => onMeasure.cancel(), [onMeasure]);
 
-  const scale = entity.getScale();
-  const bounds = entity.getBounds();
-  const xBounds = bounds.x;
-  const yBounds = bounds.y;
-
-  const renderMeasure = ({ measureRef }: any) => {
-    return (
+  const renderMeasure = ({ measureRef }: { measureRef: React.LegacyRef<any> }) => (
+    // render an outer div because react-measure doesn't seem to fire events properly on svg resize
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        flexGrow: 1,
+        flexShrink: 1,
+        overflow: 'hidden',
+        position: 'relative',
+      }}
+      ref={measureRef}
+    >
       <svg
-        style={{ width: '100%', height: '100%', flexGrow: 1, flexShrink: 1 }}
+        style={{
+          width: '100%',
+          height: '100%',
+        }}
         onContextMenu={stopEvent}
-        ref={measureRef}
       >
         <SvgDefsProvider>
-          <g
-            ref={panZoomRef}
-            transform={`translate(${xBounds}, ${yBounds}) scale(${scale})`}
-            data-id={entity.getId()}
-            data-kind={entity.kind}
-            data-type={entity.getType()}
-          >
-            <Inner entity={entity} />
-          </g>
+          <TransformGroup entity={entity} panZoomRef={panZoomRef} />
         </SvgDefsProvider>
       </svg>
-    );
-  };
+    </div>
+  );
 
   return (
     <ReactMeasure client onResize={onMeasure}>

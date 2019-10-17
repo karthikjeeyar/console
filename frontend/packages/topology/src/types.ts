@@ -144,6 +144,11 @@ export interface GraphEntity<E extends Graph = Graph, D = any> extends ElementEn
   getLayout(): string | undefined;
   setLayout(type: string | undefined): void;
   layout(width?: number, height?: number): void;
+
+  // viewport operations
+  reset(): void;
+  scaleBy(scale: number, location?: Point): void;
+  fit(padding?: number): void;
 }
 
 export type EventListener<Args extends any[] = any[]> = (...args: Args) => void;

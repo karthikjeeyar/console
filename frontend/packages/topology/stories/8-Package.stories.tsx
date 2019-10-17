@@ -195,16 +195,16 @@ const TopologyViewComponent: React.FC<TopologyViewComponentProps> = ({ vis, useS
           controlButtons={createTopologyControlButtons({
             ...defaultControlButtonsOptions,
             zoomInCallback: () => {
-              vis.getRoot().setScale((vis.getRoot().getScale() * 4) / 3);
+              vis.getRoot().scaleBy(4 / 3);
             },
             zoomOutCallback: () => {
-              vis.getRoot().setScale(vis.getRoot().getScale() * 0.75);
+              vis.getRoot().scaleBy(0.75);
             },
             fitToScreenCallback: () => {
-              console.log('Fit to Screen');
+              vis.getRoot().fit(80);
             },
             resetViewCallback: () => {
-              vis.getRoot().setScale(1);
+              vis.getRoot().reset();
               vis.getRoot().layout();
             },
             legend: false,

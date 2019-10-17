@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as d3 from 'd3';
 import { observer } from 'mobx-react';
-import { action } from 'mobx';
+import { action, autorun } from 'mobx';
 import EntityContext from '../utils/EntityContext';
 import useCallbackRef from '../utils/useCallbackRef';
 import { isGraphEntity } from '../types';
@@ -14,7 +14,7 @@ export type PanZoomTransform = {
 
 const ZOOM_EXTENT: [number, number] = [0.25, 4];
 
-export type PanZoomRef = (node: SVGElement | null) => void;
+export type PanZoomRef = (node: SVGGElement | null) => void;
 
 export const usePanZoom = (zoomExtent: [number, number] = ZOOM_EXTENT): PanZoomRef => {
   const entity = React.useContext(EntityContext);
@@ -26,7 +26,7 @@ export const usePanZoom = (zoomExtent: [number, number] = ZOOM_EXTENT): PanZoomR
 
   const refCallback = useCallbackRef<PanZoomRef>(
     React.useCallback(
-      (node: SVGElement | null) => {
+      (node: SVGGElement | null) => {
         if (node) {
           // TODO fix any type
           const $svg = d3.select(node.ownerSVGElement) as any;
@@ -43,6 +43,25 @@ export const usePanZoom = (zoomExtent: [number, number] = ZOOM_EXTENT): PanZoomR
               }),
             );
           zoom($svg);
+
+          // FIXME this is kinda hacky
+          autorun(() => {
+            const scale = entityRef.current.getScale();
+
+            // update the min scaling value such that the user can zoom out to the new scale in case
+            // it is smaller than the default zoom out scale
+            zoom.scaleExtent([Math.min(scale, zoomExtent[0]), zoomExtent[1]]);
+            const b = entityRef.current.getBounds();
+
+            // update d3 zoom data directly
+            // eslint-disable-next-line no-underscore-dangle
+            Object.assign($svg.node().__zoom, {
+              k: scale,
+              x: b.x,
+              y: b.y,
+            });
+          });
+
           // disable double click zoom
           // $svg.on('dblclick.zoom', null);
         }
@@ -62,7 +81,6 @@ export const usePanZoom = (zoomExtent: [number, number] = ZOOM_EXTENT): PanZoomR
 
 export type WithPanZoomProps = {
   panZoomRef: PanZoomRef;
-  panZoomTransform: PanZoomTransform;
 };
 
 export const withPanZoom = (zoomExtent: [number, number] = ZOOM_EXTENT) => <

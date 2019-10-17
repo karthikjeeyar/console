@@ -97,16 +97,16 @@ const getVisualization = (model: Model): Visualization => {
 };
 
 export const Force = () => {
-  const vis: Visualization = getVisualization(getModel('force'));
+  const vis: Visualization = getVisualization(getModel('Force'));
   return <VisualizationWidget visualization={vis} />;
 };
 
 export const Dagre = () => {
-  const vis: Visualization = getVisualization(getModel('dagre'));
+  const vis: Visualization = getVisualization(getModel('Dagre'));
   return <VisualizationWidget visualization={vis} />;
 };
 
 export const Cola = () => {
-  const vis: Visualization = getVisualization(getModel('cola'));
+  const vis: Visualization = getVisualization(getModel('Cola'));
   return <VisualizationWidget visualization={vis} />;
 };

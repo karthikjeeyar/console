@@ -102,10 +102,7 @@ export default class ForceLayout implements Layout {
     this.graph = graph;
   }
 
-  layout = (
-    nodeEntities: NodeEntity[],
-    edgeEntities: EdgeEntity[],
-  ) => {
+  layout = (nodeEntities: NodeEntity[], edgeEntities: EdgeEntity[]) => {
     const groups: ElementEntity[] = groupNodeEntities(nodeEntities);
     const nodes: D3Node[] = leafNodeEntities(nodeEntities).map((e: NodeEntity) => new D3Node(e));
     const edges: D3Link[] = edgeEntities.map((e: EdgeEntity) => {
