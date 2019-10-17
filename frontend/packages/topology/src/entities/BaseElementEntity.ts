@@ -33,6 +33,9 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   @observable.ref
   private controller: Controller;
 
+  @observable
+  private label: string | undefined;
+
   abstract get kind(): ModelKind;
 
   @computed({ equals: _.isEqual })
@@ -52,6 +55,14 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
       return this.children.map((id) => controller.getEntityById(id));
     }
     return [];
+  }
+
+  getLabel(): string {
+    return this.label || '';
+  }
+
+  setLabel(label: string): void {
+    this.label = label;
   }
 
   getOrderKey(): number[] {
@@ -189,6 +200,9 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
     }
     if ('data' in model) {
       this.data = model.data;
+    }
+    if ('label' in model) {
+      this.label = model.label;
     }
   }
 

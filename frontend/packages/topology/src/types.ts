@@ -11,10 +11,6 @@ export interface Layout {
   destroy(): void;
 }
 
-export interface LayoutConstraint {
-  type: string;
-}
-
 export type Model = {
   graph?: Graph;
   nodes?: Node[];
@@ -30,13 +26,13 @@ export enum AnchorEnd {
 export interface Element {
   id: string;
   type: string;
+  label?: string;
   visible?: boolean;
   children?: string[];
   data?: any;
 }
 
 export interface Node extends Element {
-  layoutConstraints?: LayoutConstraint[];
   x?: number;
   y?: number;
   width?: number;
@@ -50,12 +46,8 @@ export interface Edge extends Element {
   bendpoints?: PointTuple[];
 }
 
-export interface LayoutNode extends Node {
+export interface Graph extends Element {
   layout?: string;
-}
-
-export interface Graph extends LayoutNode {
-  name?: string;
   x?: number;
   y?: number;
   scale?: number;
@@ -85,6 +77,8 @@ export enum ModelKind {
 }
 export interface ElementEntity<E extends Element = Element, D = any> extends WithState {
   readonly kind: ModelKind;
+  getLabel(): string;
+  setLabel(label: string): void;
   getOrderKey(): number[];
   isDetached(): boolean;
   getController(): Controller;
