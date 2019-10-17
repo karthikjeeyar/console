@@ -145,10 +145,9 @@ const TopologyViewComponent: React.FC<TopologyViewComponentProps> = ({ vis, useS
   );
 
   const updateLayout = (newLayout: string) => {
-    vis
-      .getController()
-      .getGraph()
-      .setLayout(newLayout);
+    // FIXME reset followed by layout causes a flash of the reset prior to the layout
+    vis.getRoot().reset();
+    vis.getRoot().setLayout(newLayout);
     setLayout(newLayout);
     setLayoutDropdownOpen(false);
   };

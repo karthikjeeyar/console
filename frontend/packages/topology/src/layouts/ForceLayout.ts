@@ -148,7 +148,8 @@ export default class ForceLayout implements Layout {
     }, []);
   };
 
-  handleDragStart = (id: string) => {
+  handleDragStart = (entity: NodeEntity) => {
+    const id = entity.getId();
     let found = false;
     const dragNode: D3Node | undefined = this.simulation
       .nodes()
@@ -174,7 +175,8 @@ export default class ForceLayout implements Layout {
     }
   };
 
-  handleDragEnd = (id: string) => {
+  handleDragEnd = (entity: NodeEntity) => {
+    const id = entity.getId();
     this.simulation.alphaTarget(0);
     const dragNode: D3Node | undefined = this.simulation
       .nodes()

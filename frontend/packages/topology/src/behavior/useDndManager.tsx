@@ -170,6 +170,8 @@ export class DndManagerImpl implements DndManager {
           this.state.sourceId = sourceId;
           this.state.itemType = source.type;
           this.state.event = {
+            initialPageX: pageX,
+            initialPageY: pageY,
             pageX,
             pageY,
             initialX: x,
@@ -178,8 +180,6 @@ export class DndManagerImpl implements DndManager {
             y,
             dx: 0,
             dy: 0,
-            totalDx: 0,
-            totalDy: 0,
           };
           this.state.sourceId = sourceId;
         }
@@ -234,8 +234,6 @@ export class DndManagerImpl implements DndManager {
     if (!this.state.event) {
       throw new Error('Drag event not initialized');
     }
-    this.state.event.totalDx = x - this.state.event.initialX;
-    this.state.event.totalDy = y - this.state.event.initialY;
     this.state.event.dx = x - this.state.event.x;
     this.state.event.dy = y - this.state.event.y;
     this.state.event.x = x;
@@ -244,7 +242,10 @@ export class DndManagerImpl implements DndManager {
     this.state.event.pageY = pageY;
 
     if (!this.isDragging()) {
-      if (Math.abs(this.state.event.totalDx) >= 5 || Math.abs(this.state.event.totalDy) >= 5) {
+      if (
+        Math.abs(pageX - this.state.event.initialPageX) >= 5 ||
+        Math.abs(pageY - this.state.event.initialPageY) >= 5
+      ) {
         this.state.isDragging = true;
         this.performHitTests();
       }

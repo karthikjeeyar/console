@@ -1,12 +1,14 @@
 export type DragEvent = {
+  // in subject coordinates
   initialX: number;
   initialY: number;
-  totalDx: number;
-  totalDy: number;
   x: number;
   y: number;
   dx: number;
   dy: number;
+  // in page coordinates
+  initialPageX: number;
+  initialPageY: number;
   pageX: number;
   pageY: number;
 };
