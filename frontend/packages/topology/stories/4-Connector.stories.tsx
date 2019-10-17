@@ -106,7 +106,6 @@ export const reconnect = () => {
     graph: {
       id: 'g1',
       type: 'graph',
-      children: ['n1', 'n2', 'n3', 'e1', 'e2'],
     },
     nodes: [
       {
@@ -163,7 +162,6 @@ export const createConnector = () => {
     graph: {
       id: 'g1',
       type: 'graph',
-      children: ['n1', 'n2', 'n3'],
     },
     nodes: [
       {
@@ -291,7 +289,6 @@ export const anchors = () => {
     graph: {
       id: 'g1',
       type: 'graph',
-      children: ['n1', 'n2', 'n3', 'e1', 'e2'],
     },
     nodes: [
       {

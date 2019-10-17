@@ -85,6 +85,7 @@ export interface ElementEntity<E extends Element = Element, D = any> extends Wit
   setController(controller?: Controller): void;
   getGraph(): GraphEntity;
   getParent(): ElementEntity;
+  hasParent(): boolean;
   setParent(parent: ElementEntity | undefined): void;
   getId(): string;
   setId(id: string): void;

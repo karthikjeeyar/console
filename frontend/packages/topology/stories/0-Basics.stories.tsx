@@ -14,7 +14,6 @@ export const singleNode = () => {
     graph: {
       id: 'g1',
       type: 'graph',
-      children: ['n1'],
     },
     nodes: [
       {
@@ -38,7 +37,6 @@ export const singleEdge = () => {
     graph: {
       id: 'g1',
       type: 'graph',
-      children: ['n1', 'n2', 'e1'],
     },
     nodes: [
       {
@@ -79,7 +77,6 @@ const groupStory = (groupType: string) => {
     graph: {
       id: 'g1',
       type: 'graph',
-      children: ['gr1'],
     },
     nodes: [
       {

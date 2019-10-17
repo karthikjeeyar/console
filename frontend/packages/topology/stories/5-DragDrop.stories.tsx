@@ -26,7 +26,6 @@ export const dnd = () => {
     graph: {
       id: 'g1',
       type: 'graph',
-      children: ['n1', 'gr1', 'gr2'],
     },
     nodes: [
       {

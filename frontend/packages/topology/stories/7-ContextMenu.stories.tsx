@@ -61,7 +61,6 @@ export const ContextMenuOnNode = () => {
     graph: {
       id: 'g1',
       type: 'graph',
-      children: ['n1'],
     },
     nodes: [
       {

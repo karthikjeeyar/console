@@ -110,6 +110,10 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
     }
   }
 
+  hasParent(): boolean {
+    return this.parent !== undefined;
+  }
+
   getId(): string {
     return this.id;
   }

@@ -18,7 +18,6 @@ const create2NodeModel = (): Model => ({
   graph: {
     id: 'g1',
     type: 'graph',
-    children: ['gr1'],
   },
   nodes: [
     {
@@ -118,7 +117,6 @@ export const performance = () => {
     graph: {
       id: 'g1',
       type: 'graph',
-      children: [],
     },
     nodes: [],
   };

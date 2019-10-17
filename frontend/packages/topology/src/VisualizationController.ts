@@ -43,13 +43,32 @@ export default class VisualizationController extends Stateful implements Control
     return this.store as S;
   }
 
+  parentOrphansToGraph(graph: GraphEntity): void {
+    this.getEntities().forEach((entity: ElementEntity) => {
+      if (entity !== this.graph && !entity.hasParent()) {
+        graph.appendChild(entity);
+      }
+    });
+  }
+
   fromModel(model: Model): void {
     // create entities
     if (model.graph) {
       this.graph = this.createEntity<GraphEntity>(ModelKind.graph, model.graph);
     }
-    model.nodes && model.nodes.forEach((n) => this.createEntity<NodeEntity>(ModelKind.node, n));
-    model.edges && model.edges.forEach((e) => this.createEntity<EdgeEntity>(ModelKind.edge, e));
+    const validIds: string[] = [];
+
+    model.nodes &&
+      model.nodes.forEach((n) => {
+        this.createEntity<NodeEntity>(ModelKind.node, n);
+        validIds.push(n.id);
+      });
+
+    model.edges &&
+      model.edges.forEach((n) => {
+        this.createEntity<EdgeEntity>(ModelKind.edge, n);
+        validIds.push(n.id);
+      });
 
     // merge data
     if (model.graph && this.graph) {
@@ -64,10 +83,14 @@ export default class VisualizationController extends Stateful implements Control
 
     // remove all stale entities
     _.forIn(this.entities, (entity) => {
-      if (entity.isDetached()) {
+      if (!validIds.includes(entity.getId())) {
         this.removeEntity(entity);
       }
     });
+
+    if (this.graph) {
+      this.parentOrphansToGraph(this.graph);
+    }
   }
 
   getGraph(): GraphEntity {

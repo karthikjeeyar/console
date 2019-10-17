@@ -15,7 +15,6 @@ const model: Model = {
   graph: {
     id: 'g1',
     type: 'graph',
-    children: ['gr1'],
   },
   nodes: [
     {
