@@ -94,6 +94,17 @@ export const useDndDrag = <
                   )
                   .node() as any,
             )
+            .on('start', function() {
+              d3.select(node.ownerDocument).on('keydown.useDndDrag', () => {
+                const e = d3.event as KeyboardEvent;
+                if (e.key === 'Escape') {
+                  d3.select(d3.event.view).on('.drag', null);
+                  d3.select(node.ownerDocument).on('.useDndDrag', null);
+                  dndManagerRef.current.cancel();
+                  dndManagerRef.current.endDrag();
+                }
+              });
+            })
             .on(
               'drag',
               action(() => {

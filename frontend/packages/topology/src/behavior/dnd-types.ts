@@ -50,6 +50,7 @@ export interface DndActions {
   endDrag(): void;
   drag(x: number, y: number, pageX: number, pageY: number): void;
   drop(): void;
+  cancel(): void;
 }
 
 export type Unregister = () => void;

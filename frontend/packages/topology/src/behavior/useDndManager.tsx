@@ -250,6 +250,18 @@ export class DndManagerImpl implements DndManager {
     this.performHitTests();
   }
 
+  cancel(): void {
+    if (!this.state.event) {
+      throw new Error('Drag event not initialized');
+    }
+    this.drag(
+      this.state.event.initialX,
+      this.state.event.initialY,
+      this.state.event.pageX,
+      this.state.event.pageY,
+    );
+  }
+
   private performHitTests(): void {
     const event = this.getDragEvent();
     if (event) {
