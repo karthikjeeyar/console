@@ -43,7 +43,7 @@ export default class VisualizationController extends Stateful implements Control
     return this.store as S;
   }
 
-  parentOrphansToGraph(graph: GraphEntity): void {
+  private parentOrphansToGraph(graph: GraphEntity): void {
     this.getEntities().forEach((entity: ElementEntity) => {
       if (entity !== this.graph && !entity.hasParent()) {
         graph.appendChild(entity);
