@@ -4,8 +4,10 @@ import { observer } from 'mobx-react';
 import { isNodeEntity, Anchor, NodeEntity, AnchorEnd } from '../types';
 import EntityContext from '../utils/EntityContext';
 
+type AnchorConstructor = new () => Anchor;
+
 export const useAnchor = (
-  anchorCallback: (entity: NodeEntity) => Anchor | undefined,
+  anchorCallback: ((entity: NodeEntity) => Anchor | undefined) | AnchorConstructor,
   end: AnchorEnd = AnchorEnd.both,
   type?: string,
 ): void => {
@@ -13,9 +15,11 @@ export const useAnchor = (
   if (!isNodeEntity(entity)) {
     throw new Error('useAnchor must be used within the scope of a NodeEntity');
   }
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     action(() => {
-      const anchor = anchorCallback(entity);
+      const anchor = anchorCallback.constructor
+        ? new (anchorCallback as any)(entity)
+        : (anchorCallback as any)(entity);
       if (anchor) {
         entity.setAnchor(anchor, end, type);
       }

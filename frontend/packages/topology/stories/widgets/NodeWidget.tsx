@@ -2,13 +2,14 @@ import * as React from 'react';
 import { WithCreateConnectorProps } from '../../src/behavior/withCreateConnector';
 import { NodeEntity } from '../../src/types';
 import widget from '../../src/widget';
-import { useSvgAnchor } from '../../src/behavior/useSvgAnchor';
 import { WithDragNodeProps } from '../../src/behavior/useDragNode';
 import { WithSelectionProps } from '../../src/behavior/useSelection';
 import { WithDndDragProps } from '../../src/behavior/useDndDrag';
 import { WithDndDropProps } from '../../src/behavior/useDndDrop';
 import useCombineRefs from '../../src/utils/useCombineRefs';
 import { WithContextMenuProps } from '../../src/behavior/withContextMenu';
+import { useAnchor } from '../../src/behavior/useAnchor';
+import EllipseAnchor from '../../src/anchors/EllipseAnchor';
 
 type NodeWidgetProps = {
   entity: NodeEntity;
@@ -36,8 +37,8 @@ const NodeWidget: React.FC<NodeWidgetProps> = ({
   onHideCreateConnector,
   onShowCreateConnector,
 }) => {
-  const anchorRef = useSvgAnchor();
-  const refs = useCombineRefs<SVGEllipseElement>(dragNodeRef, dndDragRef, dndDropRef, anchorRef);
+  useAnchor(EllipseAnchor);
+  const refs = useCombineRefs<SVGEllipseElement>(dragNodeRef, dndDragRef, dndDropRef);
   const { width, height } = entity.getBounds();
 
   return (
