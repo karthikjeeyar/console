@@ -1,22 +1,16 @@
 import * as React from 'react';
-import { action } from 'mobx';
 import Visualization from '../src/Visualization';
 import VisualizationWidget from '../src/VisualizationWidget';
-import { Model, isNodeEntity, NodeEntity, ModelKind } from '../src/types';
-import { withDndDrag } from '../src/behavior/useDndDrag';
+import { Model, isNodeEntity, ModelKind } from '../src/types';
 import GraphWidget from '../src/widgets/GraphWidget';
 import { withPanZoom } from '../src/behavior/usePanZoom';
-import { DragSourceMonitor, DragEvent } from '../src/behavior/dnd-types';
+import { withDragNode } from '../src/behavior/useDragNode';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 import shapesWidgetFactory from './widgets/shapesWidgetFactory';
 import NodeWidget from './widgets/NodeWidget';
 
 export default {
   title: 'Shapes',
-};
-
-type EntityProps = {
-  entity: NodeEntity;
 };
 
 export const shapes = () => {
@@ -132,21 +126,7 @@ export const shapes = () => {
       return withPanZoom()(GraphWidget);
     }
     if (isNodeEntity(entity) && entity.getType() === 'node-drag') {
-      return withDndDrag<any, NodeEntity, any, EntityProps>({
-        item: { type: 'test' },
-        begin: action((monitor: DragSourceMonitor, props: EntityProps) => {
-          props.entity.raise();
-          return props.entity;
-        }),
-        drag: action((event: DragEvent, monitor: DragSourceMonitor, props: EntityProps) => {
-          props.entity.getBounds().translate(event.dx, event.dy);
-        }),
-        end: action((dropResult: NodeEntity, monitor: DragSourceMonitor, props: EntityProps) => {
-          if (monitor.didDrop() && dropResult && props) {
-            dropResult.appendChild(props.entity);
-          }
-        }),
-      })(NodeWidget);
+      return withDragNode()(NodeWidget);
     }
     return undefined;
   });
