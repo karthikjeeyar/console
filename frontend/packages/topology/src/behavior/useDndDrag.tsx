@@ -97,25 +97,19 @@ export const useDndDrag = <
             .on(
               'drag',
               action(() => {
-                dndManagerRef.current.drag(
-                  d3.event.x,
-                  d3.event.y,
-                  d3.event.sourceEvent.pageX,
-                  d3.event.sourceEvent.pageY,
-                );
-              }),
-            )
-            .on(
-              'start',
-              action(() => {
-                if (idRef.current) {
-                  dndManagerRef.current.beginDrag(
-                    idRef.current,
-                    d3.event.x,
-                    d3.event.y,
-                    d3.event.sourceEvent.pageX,
-                    d3.event.sourceEvent.pageY,
-                  );
+                const { pageX, pageY } = d3.event.sourceEvent;
+                if (!dndManagerRef.current.isDragging()) {
+                  if (idRef.current) {
+                    dndManagerRef.current.beginDrag(
+                      idRef.current,
+                      d3.event.x,
+                      d3.event.y,
+                      pageX,
+                      pageY,
+                    );
+                  }
+                } else {
+                  dndManagerRef.current.drag(d3.event.x, d3.event.y, pageX, pageY);
                 }
               }),
             )
