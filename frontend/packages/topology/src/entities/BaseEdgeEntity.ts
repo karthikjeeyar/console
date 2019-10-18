@@ -37,7 +37,6 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     if (!source) {
       throw new Error('Cannot compute start point. Missing source.');
     }
-    console.log('get source anchor');
     return source.getAnchor(AnchorEnd.source, this.getType());
   }
 
