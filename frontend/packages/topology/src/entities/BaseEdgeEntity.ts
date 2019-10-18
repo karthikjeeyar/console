@@ -1,16 +1,16 @@
 // import { computed } from 'mobx';
-import { observable } from 'mobx';
+import { observable, computed } from 'mobx';
 import Point from '../geom/Point';
-import { EdgeEntity, NodeEntity, Edge, ModelKind, AnchorEnd } from '../types';
+import { EdgeEntity, NodeEntity, Edge, ModelKind, AnchorEnd, Anchor } from '../types';
 import BaseElementEntity from './BaseElementEntity';
 
 export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends BaseElementEntity<E, D>
   implements EdgeEntity<E, D> {
   @observable
-  private source: string;
+  private sourceId: string;
 
   @observable
-  private target: string;
+  private targetId: string;
 
   @observable.shallow
   private bendpoints: Point[];
@@ -21,26 +21,53 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
   @observable.ref
   private endPoint?: Point;
 
+  @computed
+  private get source(): NodeEntity {
+    return this.getController().getNodeById(this.sourceId);
+  }
+
+  @computed
+  private get target(): NodeEntity {
+    return this.getController().getNodeById(this.targetId);
+  }
+
+  @computed
+  private get sourceAnchor(): Anchor {
+    const source = this.getSource();
+    if (!source) {
+      throw new Error('Cannot compute start point. Missing source.');
+    }
+    console.log('get source anchor');
+    return source.getAnchor(AnchorEnd.source, this.getType());
+  }
+
+  @computed
+  private get targetAnchor(): Anchor {
+    const target = this.getTarget();
+    if (!target) {
+      throw new Error('Cannot compute start point. Missing target.');
+    }
+    return target.getAnchor(AnchorEnd.target, this.getType());
+  }
+
   get kind(): ModelKind {
     return ModelKind.edge;
   }
 
-  // @computed (switch to getter)
   getSource(): NodeEntity {
-    return this.getController().getNodeById(this.source);
+    return this.source;
   }
 
   setSource(source: NodeEntity) {
-    this.source = source.getId();
+    this.sourceId = source.getId();
   }
 
-  // @computed (switch to getter)
   getTarget(): NodeEntity {
-    return this.getController().getNodeById(this.target);
+    return this.target;
   }
 
   setTarget(target: NodeEntity) {
-    this.target = target.getId();
+    this.targetId = target.getId();
   }
 
   getBendpoints(): Point[] {
@@ -59,7 +86,6 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     }
   }
 
-  // @computed (switch to getter)
   getStartPoint(): Point {
     if (this.startPoint) {
       return this.startPoint;
@@ -71,18 +97,9 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     } else if (this.endPoint) {
       referencePoint = this.endPoint;
     } else {
-      const target = this.getTarget();
-      if (target) {
-        referencePoint = target.getAnchor(AnchorEnd.target, this.getType()).getReferencePoint();
-      } else {
-        throw new Error('Cannot compute start point. Missing target.');
-      }
+      referencePoint = this.targetAnchor.getReferencePoint();
     }
-    const source = this.getSource();
-    if (!source) {
-      throw new Error('Cannot compute start point. Missing source.');
-    }
-    return source.getAnchor(AnchorEnd.source, this.getType()).getLocation(referencePoint);
+    return this.sourceAnchor.getLocation(referencePoint);
   }
 
   setStartPoint(x?: number, y?: number): void {
@@ -95,7 +112,6 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     }
   }
 
-  // @computed (switch to getter)
   getEndPoint(): Point {
     if (this.endPoint) {
       return this.endPoint;
@@ -107,18 +123,9 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
     } else if (this.startPoint) {
       referencePoint = this.startPoint;
     } else {
-      const source = this.getSource();
-      if (source) {
-        referencePoint = source.getAnchor(AnchorEnd.source, this.getType()).getReferencePoint();
-      } else {
-        throw new Error('Cannot compute end point. Missing source.');
-      }
+      referencePoint = this.sourceAnchor.getReferencePoint();
     }
-    const target = this.getTarget();
-    if (!target) {
-      throw new Error('Cannot compute end point. Missing target.');
-    }
-    return target.getAnchor(AnchorEnd.target, this.getType()).getLocation(referencePoint);
+    return this.targetAnchor.getLocation(referencePoint);
   }
 
   setEndPoint(x?: number, y?: number): void {
@@ -134,10 +141,10 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
   setModel(model: E): void {
     super.setModel(model);
     if (model.source) {
-      this.source = model.source;
+      this.sourceId = model.source;
     }
     if (model.target) {
-      this.target = model.target;
+      this.targetId = model.target;
     }
     if ('bendpoints' in model) {
       this.bendpoints = model.bendpoints ? model.bendpoints.map((b) => new Point(b[0], b[1])) : [];
