@@ -28,7 +28,9 @@ class DagreNode {
   }
 
   set x(value: number) {
-    this.node.getBounds().setCenter(value, this.node.getBounds().getCenter().y);
+    this.node.setBounds(
+      this.node.getBounds().setCenter(value, this.node.getBounds().getCenter().y),
+    );
   }
 
   get y(): number {
@@ -36,7 +38,12 @@ class DagreNode {
   }
 
   set y(value: number) {
-    this.node.getBounds().setCenter(this.node.getBounds().getCenter().x, value);
+    this.node.setBounds(
+      this.node
+        .getBounds()
+        .clone()
+        .setCenter(this.node.getBounds().getCenter().x, value),
+    );
   }
 }
 

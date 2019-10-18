@@ -54,12 +54,22 @@ class ColaNode implements webcola.Node {
   }
 
   setPosition(x: number, y: number) {
-    this.node.getBounds().setCenter(x, y);
+    this.node.setBounds(
+      this.node
+        .getBounds()
+        .clone()
+        .setCenter(x, y),
+    );
   }
 
   update() {
     if (this.xx != null && this.yy != null) {
-      this.node.getBounds().setCenter(this.xx, this.yy);
+      this.node.setBounds(
+        this.node
+          .getBounds()
+          .clone()
+          .setCenter(this.xx, this.yy),
+      );
     }
     this.xx = undefined;
     this.yy = undefined;

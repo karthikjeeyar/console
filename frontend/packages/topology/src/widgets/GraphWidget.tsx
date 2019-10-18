@@ -73,7 +73,12 @@ const GraphWidget: React.FC<GraphWidgetProps> = ({ entity, panZoomRef }) => {
     () =>
       _.debounce<any>(
         action((contentRect: { client: { width: number; height: number } }) => {
-          entity.getBounds().setSize(contentRect.client.width, contentRect.client.height);
+          entity.setBounds(
+            entity
+              .getBounds()
+              .clone()
+              .setSize(contentRect.client.width, contentRect.client.height),
+          );
         }),
         100,
         { leading: true, trailing: true },

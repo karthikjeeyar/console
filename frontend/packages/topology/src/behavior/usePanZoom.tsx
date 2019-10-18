@@ -36,9 +36,12 @@ export const usePanZoom = (zoomExtent: [number, number] = ZOOM_EXTENT): PanZoomR
             .on(
               'zoom',
               action(() => {
-                entityRef.current
-                  .getBounds()
-                  .setLocation(d3.event.transform.x, d3.event.transform.y);
+                entityRef.current.setBounds(
+                  entityRef.current
+                    .getBounds()
+                    .clone()
+                    .setLocation(d3.event.transform.x, d3.event.transform.y),
+                );
                 entityRef.current.setScale(d3.event.transform.k);
               }),
             );

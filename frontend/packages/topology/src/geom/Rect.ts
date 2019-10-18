@@ -1,20 +1,15 @@
-import { observable } from 'mobx';
 import { Translatable } from './types';
 import Point from './Point';
 
 export default class Rect implements Translatable {
   static readonly EMPTY = new Rect();
 
-  @observable
   width: number = 0;
 
-  @observable
   height: number = 0;
 
-  @observable
   x: number = 0;
 
-  @observable
   y: number = 0;
 
   private static SINGLETON = new Rect();
@@ -127,5 +122,9 @@ export default class Rect implements Translatable {
 
   clone(): Rect {
     return Rect.fromRect(this);
+  }
+
+  equals(r: Rect) {
+    return r.x === this.x && r.y === this.y && r.width === this.width && r.height === this.height;
   }
 }

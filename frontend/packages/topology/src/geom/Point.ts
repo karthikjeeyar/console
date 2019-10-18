@@ -1,13 +1,10 @@
-import { observable } from 'mobx';
 import { Translatable } from './types';
 
 export default class Point implements Translatable {
   static readonly EMPTY = new Point();
 
-  @observable
   x: number;
 
-  @observable
   y: number;
 
   private static SINGLETON = new Point();
@@ -53,5 +50,9 @@ export default class Point implements Translatable {
 
   clone(): Point {
     return Point.fromPoint(this);
+  }
+
+  equals(p: Point) {
+    return p.x === this.x && p.y === this.y;
   }
 }

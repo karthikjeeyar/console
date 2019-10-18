@@ -52,7 +52,9 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
   }
 
   setBounds(bounds: Rect): void {
-    this.bounds.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+    if (!this.bounds.equals(bounds)) {
+      this.bounds = bounds;
+    }
   }
 
   getAnchor(end?: AnchorEnd, type?: string): Anchor {
@@ -89,18 +91,35 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
   setModel(model: E): void {
     super.setModel(model);
     const bounds = this.getBounds();
+    let r: Rect | undefined;
     // update width and height before position
     if ('width' in model && model.width != null) {
-      bounds.width = model.width;
+      if (!r) {
+        r = bounds.clone();
+      }
+      r.width = model.width;
     }
     if ('height' in model && model.height != null) {
-      bounds.height = model.height;
+      if (!r) {
+        r = bounds.clone();
+      }
+      r.height = model.height;
     }
     if ('x' in model && model.x != null) {
-      bounds.x = model.x;
+      if (!r) {
+        r = bounds.clone();
+      }
+      r.x = model.x;
     }
     if ('y' in model && model.y != null) {
-      bounds.y = model.y;
+      if (!r) {
+        r = bounds.clone();
+      }
+      r.y = model.y;
+    }
+
+    if (r) {
+      this.setBounds(r);
     }
     if ('group' in model) {
       this.group = !!model.group;

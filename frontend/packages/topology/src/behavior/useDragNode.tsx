@@ -55,11 +55,21 @@ export const useDragNode = <DropResult, CollectedProps, Props = {}>(
           if (entityRef.current.isGroup()) {
             entityRef.current.getChildren().forEach((c) => {
               if (isNodeEntity(c)) {
-                c.getBounds().translate(dx, dy);
+                c.setBounds(
+                  c
+                    .getBounds()
+                    .clone()
+                    .translate(dx, dy),
+                );
               }
             });
           } else {
-            entityRef.current.getBounds().translate(dx, dy);
+            entityRef.current.setBounds(
+              entityRef.current
+                .getBounds()
+                .clone()
+                .translate(dx, dy),
+            );
           }
           spec && spec.drag && spec.drag(event, monitor, p);
           entityRef.current

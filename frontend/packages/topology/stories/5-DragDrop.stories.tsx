@@ -110,7 +110,12 @@ export const dnd = () => {
           return props.entity;
         }),
         drag: action((event: DragEvent, monitor: DragSourceMonitor, props: EntityProps) => {
-          props.entity.getBounds().translate(event.dx, event.dy);
+          props.entity.setBounds(
+            props.entity
+              .getBounds()
+              .clone()
+              .translate(event.dx, event.dy),
+          );
         }),
         end: action((dropResult: NodeEntity, monitor: DragSourceMonitor, props: EntityProps) => {
           if (monitor.didDrop() && dropResult && props) {

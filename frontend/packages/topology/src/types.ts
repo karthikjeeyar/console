@@ -111,6 +111,7 @@ export interface NodeEntity<E extends Node = Node, D = any> extends ElementEntit
   getAnchor(end: AnchorEnd, type?: string): Anchor;
   setAnchor(anchor: Anchor, end?: AnchorEnd, type?: string): void;
   getNodes(): NodeEntity[];
+  // TODO return an immutable rect
   getBounds(): Rect;
   setBounds(bounds: Rect): void;
   isGroup(): boolean;

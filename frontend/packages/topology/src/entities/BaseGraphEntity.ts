@@ -55,7 +55,9 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
   }
 
   setBounds(bounds: Rect): void {
-    this.bounds.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+    if (!this.bounds.equals(bounds)) {
+      this.bounds = bounds;
+    }
   }
 
   getNodes(): NodeEntity[] {
@@ -173,11 +175,21 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
       this.scale = +model.scale;
     }
     const bounds = this.getBounds();
+    let r: Rect | undefined;
     if ('x' in model && model.x != null) {
-      bounds.x = model.x;
+      if (!r) {
+        r = bounds.clone();
+      }
+      r.x = model.x;
     }
     if ('y' in model && model.y != null) {
-      bounds.y = model.y;
+      if (!r) {
+        r = bounds.clone();
+      }
+      r.y = model.y;
+    }
+    if (r) {
+      this.setBounds(r);
     }
   }
 
