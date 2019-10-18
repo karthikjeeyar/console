@@ -17,6 +17,11 @@ interface VisualizationWidgetProps {
   state?: State;
 }
 
+function stopEvent(e: React.MouseEvent): void {
+  e.preventDefault();
+  e.stopPropagation();
+}
+
 const VisualizationWidget: React.FC<VisualizationWidgetProps> = ({ visualization, state }) => {
   React.useEffect(() => {
     state && visualization.setState(state);
@@ -64,6 +69,7 @@ const VisualizationWidget: React.FC<VisualizationWidgetProps> = ({ visualization
                 width: '100%',
                 height: '100%',
               }}
+              onContextMenu={stopEvent}
             >
               <SvgDefsProvider>
                 <EntityWidget entity={visualization.getRoot()} />
