@@ -11,8 +11,47 @@ import {
   DragSourceMonitor,
   Identifier,
   DragEvent,
+  DragSpecOperation,
 } from './dnd-types';
 import { useDndManager } from './useDndManager';
+
+export const Modifiers = {
+  NONE: 0,
+  ALT: 0x01,
+  CTRL: 0x02,
+  META: 0x04,
+  SHIFT: 0x08,
+};
+
+const getModifiers = (event: MouseEvent | TouchEvent | KeyboardEvent): number => {
+  let modifiers = Modifiers.NONE;
+  if (event.altKey) {
+    // eslint-disable-next-line no-bitwise
+    modifiers |= Modifiers.ALT;
+  }
+  if (event.ctrlKey) {
+    // eslint-disable-next-line no-bitwise
+    modifiers |= Modifiers.CTRL;
+  }
+  if (event.metaKey) {
+    // eslint-disable-next-line no-bitwise
+    modifiers |= Modifiers.META;
+  }
+  if (event.shiftKey) {
+    // eslint-disable-next-line no-bitwise
+    modifiers |= Modifiers.SHIFT;
+  }
+  return modifiers;
+};
+
+const getOperation = (operation: DragSpecOperation | undefined): string => {
+  if (typeof operation === 'string') {
+    return operation;
+  }
+  return (
+    (operation && operation[getModifiers((d3.event && d3.event.sourceEvent) || d3.event)]) || ''
+  );
+};
 
 export const useDndDrag = <
   DragObject extends DragObjectWithType,
@@ -30,8 +69,6 @@ export const useDndDrag = <
   propsRef.current = props;
 
   const dndManager = useDndManager();
-  const dndManagerRef = React.useRef(dndManager);
-  dndManagerRef.current = dndManager;
 
   const entity = React.useContext(EntityContext);
   const entityRef = React.useRef(entity);
@@ -49,95 +86,130 @@ export const useDndDrag = <
         idRef.current = sourceId;
       },
       canDrag: (): boolean => {
-        return dndManagerRef.current.canDragSource(idRef.current);
+        return dndManager.canDragSource(idRef.current);
       },
       isDragging: (): boolean => {
-        return dndManagerRef.current.isDraggingSource(idRef.current);
+        return dndManager.isDraggingSource(idRef.current);
       },
       getItemType: (): Identifier | undefined => {
-        return dndManagerRef.current.getItemType();
+        return dndManager.getItemType();
       },
       getItem: (): any => {
-        return dndManagerRef.current.getItem();
+        return dndManager.getItem();
       },
       getDropResult: (): any => {
-        return dndManagerRef.current.getDropResult();
+        return dndManager.getDropResult();
       },
       didDrop: (): boolean => {
-        return dndManagerRef.current.didDrop();
+        return dndManager.didDrop();
       },
       getDragEvent: (): DragEvent | undefined => {
-        return dndManagerRef.current.getDragEvent();
+        return dndManager.getDragEvent();
+      },
+      getOperation: (): string => {
+        return dndManager.getOperation();
       },
     };
     return sourceMonitor;
-  }, []);
-  const monitorRef = React.useRef(monitor);
-  monitorRef.current = monitor;
+  }, [dndManager]);
 
   const refCallback = useCallbackRef(
-    React.useCallback((node: SVGElement | null) => {
-      if (node) {
-        d3.select(node).call(
-          d3
-            .drag()
-            .container(
-              // TODO bridge the gap between scene tree and dom tree
-              () =>
-                d3
-                  .select(node.ownerSVGElement)
-                  .select(
-                    `[data-id="${entityRef.current
-                      .getController()
-                      .getGraph()
-                      .getId()}"]`,
-                  )
-                  .node() as any,
-            )
-            .on('start', function() {
-              d3.select(node.ownerDocument).on('keydown.useDndDrag', () => {
-                const e = d3.event as KeyboardEvent;
-                if (e.key === 'Escape') {
-                  d3.select(d3.event.view).on('.drag', null);
-                  d3.select(node.ownerDocument).on('.useDndDrag', null);
-                  dndManagerRef.current.cancel();
-                  dndManagerRef.current.endDrag();
-                }
-              });
-            })
-            .on(
-              'drag',
-              action(() => {
-                const { pageX, pageY } = d3.event.sourceEvent;
-                if (!dndManagerRef.current.isDragging()) {
-                  if (idRef.current) {
-                    dndManagerRef.current.beginDrag(
-                      idRef.current,
-                      d3.event.x,
-                      d3.event.y,
-                      pageX,
-                      pageY,
-                    );
+    React.useCallback(
+      (node: SVGElement | null) => {
+        if (node) {
+          d3.select(node).call(
+            d3
+              .drag()
+              .container(
+                // TODO bridge the gap between scene tree and dom tree
+                () =>
+                  d3
+                    .select(node.ownerSVGElement)
+                    .select(
+                      `[data-id="${entityRef.current
+                        .getController()
+                        .getGraph()
+                        .getId()}"]`,
+                    )
+                    .node() as any,
+              )
+              .on('start', function() {
+                const updateOperation = () => {
+                  const { operation } = specRef.current;
+                  if (operation) {
+                    const op = getOperation(operation);
+                    if (dndManager.getOperation() !== op) {
+                      // restart the drag with the new operation
+                      const event = { ...(dndManager.getDragEvent() as DragEvent) };
+                      const sourceId = dndManager.getSourceId() as string;
+                      dndManager.cancel();
+                      dndManager.endDrag();
+                      dndManager.beginDrag(
+                        sourceId,
+                        op,
+                        event.initialX,
+                        event.initialY,
+                        event.initialPageX,
+                        event.initialPageY,
+                      );
+                      dndManager.drag(event.x, event.y, event.pageX, event.pageY);
+                    }
                   }
-                } else {
-                  dndManagerRef.current.drag(d3.event.x, d3.event.y, pageX, pageY);
-                }
-              }),
-            )
-            .on(
-              'end',
-              action(() => {
-                dndManagerRef.current.drop();
-                dndManagerRef.current.endDrag();
-              }),
-            )
-            .filter(() => dndManagerRef.current.canDragSource(idRef.current)),
-        );
-      }
-      return () => {
-        node && d3.select(node).on('mousedown.drag', null);
-      };
-    }, []),
+                };
+                d3.select(node.ownerDocument)
+                  .on(
+                    'keydown.useDndDrag',
+                    action(() => {
+                      const e = d3.event as KeyboardEvent;
+                      if (e.key === 'Escape') {
+                        d3.select(d3.event.view).on('.drag', null);
+                        d3.select(node.ownerDocument).on('.useDndDrag', null);
+                        dndManager.cancel();
+                        dndManager.endDrag();
+                      } else {
+                        updateOperation();
+                      }
+                    }),
+                  )
+                  .on('keyup.useDndDrag', action(updateOperation));
+              })
+              .on(
+                'drag',
+                action(() => {
+                  const { pageX, pageY } = d3.event.sourceEvent;
+                  if (!dndManager.isDragging()) {
+                    if (idRef.current) {
+                      dndManager.beginDrag(
+                        idRef.current,
+                        getOperation(spec.operation),
+                        d3.event.x,
+                        d3.event.y,
+                        pageX,
+                        pageY,
+                      );
+                    }
+                  } else {
+                    dndManager.drag(d3.event.x, d3.event.y, pageX, pageY);
+                  }
+                }),
+              )
+              .on(
+                'end',
+                action(() => {
+                  d3.select(node.ownerDocument).on('.useDndDrag', null);
+                  dndManager.drop();
+                  dndManager.endDrag();
+                }),
+              )
+              .filter(() => dndManager.canDragSource(idRef.current)),
+          );
+        }
+        return () => {
+          node && d3.select(node).on('mousedown.drag', null);
+        };
+      },
+      [dndManager, spec.operation],
+    ),
   );
 
   React.useEffect(() => {
@@ -147,26 +219,22 @@ export const useDndDrag = <
         typeof specRef.current.canDrag === 'boolean'
           ? specRef.current.canDrag
           : typeof specRef.current.canDrag === 'function'
-          ? specRef.current.canDrag(monitorRef.current, propsRef.current)
+          ? specRef.current.canDrag(monitor, propsRef.current)
           : true,
       beginDrag: (): any =>
-        specRef.current.begin && specRef.current.begin(monitorRef.current, propsRef.current),
+        specRef.current.begin && specRef.current.begin(monitor, propsRef.current),
 
       drag: (): void => {
         if (specRef.current.drag) {
-          const event = monitorRef.current.getDragEvent();
+          const event = monitor.getDragEvent();
           if (event) {
-            specRef.current.drag(event, monitorRef.current, propsRef.current);
+            specRef.current.drag(event, monitor, propsRef.current);
           }
         }
       },
       endDrag: (): void =>
         specRef.current.end &&
-        specRef.current.end(
-          monitorRef.current.getDropResult(),
-          monitorRef.current,
-          propsRef.current,
-        ),
+        specRef.current.end(monitor.getDropResult(), monitor, propsRef.current),
     });
     monitor.receiveHandlerId(sourceId);
     return unregister;

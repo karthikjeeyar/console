@@ -27,7 +27,7 @@ export const matchesType = (
     return targetType === null;
   }
   return Array.isArray(targetType)
-    ? (targetType as Identifier[]).some((t) => t === draggedItemType)
+    ? targetType.some((t) => t === draggedItemType)
     : targetType === draggedItemType;
 };
 
@@ -148,8 +148,13 @@ export class DndManagerImpl implements DndManager {
     return this.state.event;
   }
 
+  getOperation(): string {
+    return this.state.operation || '';
+  }
+
   beginDrag(
     sourceIds: string | string[],
+    operation: string,
     x: number,
     y: number,
     pageX: number,
@@ -181,6 +186,7 @@ export class DndManagerImpl implements DndManager {
             dx: 0,
             dy: 0,
           };
+          this.state.operation = operation;
           this.state.isDragging = true;
           this.state.item = source.beginDrag(this);
         }
@@ -213,6 +219,7 @@ export class DndManagerImpl implements DndManager {
     delete this.state.item;
     delete this.state.sourceId;
     delete this.state.targetIds;
+    delete this.state.operation;
   }
 
   drop(): void {
@@ -286,15 +293,15 @@ export class DndManagerImpl implements DndManager {
 
 export const useDndManager = () => {
   const controller = React.useContext(ControllerContext);
-  const state = controller.getState<DndStateContainer>();
-  let { dragDrop } = state;
-  if (!dragDrop) {
-    dragDrop = observable<DndState>({});
-    state.dragDrop = dragDrop;
-  }
   const store = controller.getStore<DndStore>();
   let { dndManager } = store;
   if (!dndManager) {
+    const state = controller.getState<DndStateContainer>();
+    let { dragDrop } = state;
+    if (!dragDrop) {
+      dragDrop = observable<DndState>({});
+      state.dragDrop = dragDrop;
+    }
     dndManager = new DndManagerImpl(dragDrop);
     store.dndManager = dndManager;
   }

@@ -32,8 +32,6 @@ export const useDndDrop = <
   propsRef.current = props;
 
   const dndManager = useDndManager();
-  const dndManagerRef = React.useRef(dndManager);
-  dndManagerRef.current = dndManager;
 
   const nodeRef = React.useRef<SVGElement | null>(null);
   const idRef = React.useRef<string>();
@@ -47,34 +45,35 @@ export const useDndDrop = <
         idRef.current = sourceId;
       },
       canDrop: (): boolean => {
-        return dndManagerRef.current.canDropOnTarget(idRef.current);
+        return dndManager.canDropOnTarget(idRef.current);
       },
       isDragging: (): boolean => {
-        return dndManagerRef.current.isDragging();
+        return dndManager.isDragging();
       },
       isOver(options?: { shallow?: boolean }): boolean {
-        return dndManagerRef.current.isOverTarget(idRef.current, options);
+        return dndManager.isOverTarget(idRef.current, options);
       },
       getItemType: (): Identifier | undefined => {
-        return dndManagerRef.current.getItemType();
+        return dndManager.getItemType();
       },
       getItem: (): any => {
-        return dndManagerRef.current.getItem();
+        return dndManager.getItem();
       },
       getDropResult: (): any => {
-        return dndManagerRef.current.getDropResult();
+        return dndManager.getDropResult();
       },
       didDrop: (): boolean => {
-        return dndManagerRef.current.didDrop();
+        return dndManager.didDrop();
       },
       getDragEvent: (): DragEvent | undefined => {
-        return dndManagerRef.current.getDragEvent();
+        return dndManager.getDragEvent();
+      },
+      getOperation: (): string => {
+        return dndManager.getOperation();
       },
     };
     return targetMonitor;
-  }, []);
-  const monitorRef = React.useRef(monitor);
-  monitorRef.current = monitor;
+  }, [dndManager]);
 
   const entity = React.useContext(EntityContext);
   const entityRef = React.useRef(entity);
@@ -141,17 +140,17 @@ export const useDndDrop = <
       },
       hover: (): void =>
         specRef.current.hover &&
-        specRef.current.hover(monitorRef.current.getItem(), monitorRef.current, propsRef.current),
+        specRef.current.hover(monitor.getItem(), monitor, propsRef.current),
       canDrop: (): boolean =>
         typeof specRef.current.canDrop === 'boolean'
           ? specRef.current.canDrop
           : typeof specRef.current.canDrop === 'function'
-          ? specRef.current.canDrop(monitorRef.current.getItem(), monitor, propsRef.current)
+          ? specRef.current.canDrop(monitor.getItem(), monitor, propsRef.current)
           : true,
       drop: () =>
         specRef.current.drop
-          ? specRef.current.drop(monitorRef.current.getItem(), monitorRef.current, propsRef.current)
-          : !monitorRef.current.didDrop()
+          ? specRef.current.drop(monitor.getItem(), monitor, propsRef.current)
+          : !monitor.didDrop()
           ? entityRef.current
           : undefined,
     });

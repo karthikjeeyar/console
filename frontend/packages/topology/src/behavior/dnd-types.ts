@@ -38,6 +38,7 @@ export interface DndState {
   dropResult?: any;
   didDrop?: boolean;
   event?: DragEvent;
+  operation?: string;
 }
 
 export type DndStateContainer = {
@@ -45,7 +46,14 @@ export type DndStateContainer = {
 };
 
 export interface DndActions {
-  beginDrag(sourceIds: string | string[], x: number, y: number, pageX: number, pageY: number): void;
+  beginDrag(
+    sourceIds: string | string[],
+    operation: string,
+    x: number,
+    y: number,
+    pageX: number,
+    pageY: number,
+  ): void;
   hover(targetIds: string[]): void;
   endDrag(): void;
   drag(x: number, y: number, pageX: number, pageY: number): void;
@@ -74,6 +82,7 @@ export interface DndManager extends DndActions {
   getDropResult(): any;
   didDrop(): boolean;
   getDragEvent(): DragEvent | undefined;
+  getOperation(): string;
 }
 
 export type DndStore = {
@@ -98,6 +107,8 @@ export interface DragObjectWithType {
   type: SourceType;
 }
 
+export type DragSpecOperation = string | { [ModifierFlags: number]: string };
+
 export interface DragSourceSpec<
   DragObject extends DragObjectWithType,
   DropResult,
@@ -105,6 +116,7 @@ export interface DragSourceSpec<
   Props extends {} = {}
 > {
   item: DragObject;
+  operation?: DragSpecOperation;
   begin?: (monitor: DragSourceMonitor, props?: Props) => any;
   drag?: (event: DragEvent, monitor: DragSourceMonitor, props?: Props) => void;
   end?: (dropResult: DropResult | undefined, monitor: DragSourceMonitor, props?: Props) => void;
@@ -139,6 +151,7 @@ export interface DragSourceMonitor extends HandlerManager {
   getDropResult(): any;
   didDrop(): boolean;
   getDragEvent(): DragEvent | undefined;
+  getOperation(): string | undefined;
 }
 
 export interface DropTargetMonitor extends HandlerManager {
@@ -150,4 +163,5 @@ export interface DropTargetMonitor extends HandlerManager {
   getDropResult(): any;
   didDrop(): boolean;
   getDragEvent(): DragEvent | undefined;
+  getOperation(): string | undefined;
 }
