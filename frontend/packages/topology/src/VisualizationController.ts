@@ -17,6 +17,7 @@ import {
   ModelKind,
   LayoutFactory,
   Layout,
+  isGraphEntity,
 } from './types';
 import defaultEntityFactory from './entities/defaultEntityFactory';
 import Stateful from './utils/Stateful';
@@ -83,7 +84,7 @@ export default class VisualizationController extends Stateful implements Control
 
     // remove all stale entities
     _.forIn(this.entities, (entity) => {
-      if (!validIds.includes(entity.getId())) {
+      if (!isGraphEntity(entity) && !validIds.includes(entity.getId())) {
         this.removeEntity(entity);
       }
     });

@@ -228,8 +228,6 @@ export const createConnector = () => {
               color: choice.color,
             },
           });
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          model.graph!.children!.push(id);
           vis.fromModel(model);
           return null;
         },
