@@ -252,8 +252,8 @@ export default class ForceLayout implements Layout {
           .id((e) => e.id)
           .distance((d) =>
             (d.source as D3Node).entity.getParent() !== (d.target as D3Node).entity.getParent()
-              ? 100
-              : 50,
+              ? (d.source as D3Node).entity.getBounds().width / 2 + (d.target as D3Node).entity.getBounds().width / 2 + 100
+              : (d.source as D3Node).entity.getBounds().width / 2 + (d.target as D3Node).entity.getBounds().width / 2 + 50,
           ),
       )
       .on(

@@ -6,6 +6,7 @@ import { ConnectDragSource } from '../behavior/dnd-types';
 
 type ConnectorArrowProps = {
   edge: EdgeEntity;
+  className?: string;
   isTarget?: boolean;
   size?: number;
   dragRef?: ConnectDragSource | undefined;
@@ -23,6 +24,7 @@ const pointsStringFromPoints = (points: [number, number][]): string => {
 
 const ConnectorArrow: React.FC<ConnectorArrowProps> = ({
   edge,
+  className = '',
   isTarget = true,
   size = 8,
   dragRef,
@@ -66,6 +68,7 @@ const ConnectorArrow: React.FC<ConnectorArrowProps> = ({
     <g
       transform={`translate(${startPoint[0]}, ${startPoint[1]}) rotate(${angleDeg})`}
       ref={dragRef}
+      className={className}
     >
       <polygon points={pointsStringFromPoints(arrowPoints)} />
       <polygon points={pointsStringFromPoints(boundingBox)} fillOpacity={0} />
