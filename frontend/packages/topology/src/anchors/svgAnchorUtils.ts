@@ -6,32 +6,21 @@ const getEllipseAnchorPoint = (
   height: number,
   reference: Point,
 ): Point => {
-  const ellipseReference = center
-    .clone()
-    .negate()
-    .translate(reference.x, reference.y);
+  const { x, y } = reference;
+  const dispX = (center.x - x) / (width / 2);
+  const dispY = (center.y - y) / (height / 2);
 
-  if (ellipseReference.x === 0) {
-    ellipseReference.setLocation(
-      reference.x,
-      ellipseReference.y > 0 ? center.y + height / 2 : center.y,
-    );
-    return ellipseReference;
-  }
-  if (ellipseReference.y === 0) {
-    ellipseReference.setLocation(
-      ellipseReference.x > 0 ? center.x + width / 2 : center.x,
-      reference.y,
-    );
-    return ellipseReference;
+  const len = Math.sqrt(dispX * dispX + dispY * dispY);
+
+  const newLength = len - 1;
+
+  if (newLength < 0) {
+    return center;
   }
 
-  const dx = ellipseReference.x > 0 ? 0.5 : -0.5;
-  const dy = ellipseReference.y > 0 ? 0.5 : -0.5;
-  let k = (ellipseReference.y * width) / (ellipseReference.x * height);
-  k *= k;
+  const lenProportion = newLength / len;
 
-  return center.translate((width * dx) / Math.sqrt(1 + k), (height * dy) / Math.sqrt(1 + 1 / k));
+  return new Point((center.x - x) * lenProportion + x, (center.y - y) * lenProportion + y);
 };
 
 const getRectAnchorPoint = (
