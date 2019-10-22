@@ -41,6 +41,8 @@ export type WorkloadNodeWidgetProps = {
   WithContextMenuProps &
   WithCreateConnectorProps;
 
+const NODE_MARGIN = 40;
+
 const WorkloadNodeWidget: React.FC<WorkloadNodeWidgetProps> = ({
   icon,
   kind,
@@ -50,13 +52,15 @@ const WorkloadNodeWidget: React.FC<WorkloadNodeWidgetProps> = ({
   ...rest
 }) => {
   const workloadData = entity.getData().data;
-  const size = entity.getBounds().width;
+  const size = entity.getBounds().width - NODE_MARGIN;
   const { build, donutStatus } = workloadData;
   const { radius, decoratorRadius } = calculateRadius(size);
   const repoIcon = routeDecoratorIcon(workloadData.editUrl, decoratorRadius);
+  const cx = entity.getBounds().width / 2;
+  const cy = entity.getBounds().height / 2;
 
   return (
-    <g transform={`translate(${entity.getBounds().width / 2}, ${entity.getBounds().width / 2})`}>
+    <g>
       <BaseNodeWidget
         outerRadius={radius}
         innerRadius={donutStatus && donutStatus.isRollingOut ? radius * 0.45 : radius * 0.55}
@@ -68,8 +72,8 @@ const WorkloadNodeWidget: React.FC<WorkloadNodeWidgetProps> = ({
           repoIcon && (
             <Tooltip key="edit" content="Edit Source Code" position={TooltipPosition.right}>
               <Decorator
-                x={radius - decoratorRadius * 0.7}
-                y={radius - decoratorRadius * 0.7}
+                x={cx + radius - decoratorRadius * 0.7}
+                y={cy + radius - decoratorRadius * 0.7}
                 radius={decoratorRadius}
                 href={workloadData.editUrl}
                 external
@@ -83,8 +87,8 @@ const WorkloadNodeWidget: React.FC<WorkloadNodeWidgetProps> = ({
           workloadData.url && (
             <Tooltip key="route" content="Open URL" position={TooltipPosition.right}>
               <Decorator
-                x={radius - decoratorRadius * 0.7}
-                y={-radius + decoratorRadius * 0.7}
+                x={cx + radius - decoratorRadius * 0.7}
+                y={cy + -radius + decoratorRadius * 0.7}
                 radius={decoratorRadius}
                 href={workloadData.url}
                 external
@@ -110,8 +114,8 @@ const WorkloadNodeWidget: React.FC<WorkloadNodeWidgetProps> = ({
                 className="odc-decorator__link"
               >
                 <Decorator
-                  x={-radius + decoratorRadius * 0.7}
-                  y={radius - decoratorRadius * 0.7}
+                  x={cx - radius + decoratorRadius * 0.7}
+                  y={cy + radius - decoratorRadius * 0.7}
                   radius={decoratorRadius}
                 >
                   <g transform={`translate(-${decoratorRadius / 2}, -${decoratorRadius / 2})`}>
@@ -129,11 +133,11 @@ const WorkloadNodeWidget: React.FC<WorkloadNodeWidgetProps> = ({
           ),
         ]}
       >
-        <PodSet size={size} data={workloadData.donutStatus} />
+        <PodSet size={size} x={cx} y={cy} data={workloadData.donutStatus} />
         {workloadData.isKnativeResource && (
           <KnativeIcon
-            x={-radius * 0.15}
-            y={-radius * 0.65}
+            x={cx - radius * 0.15}
+            y={cy - radius * 0.65}
             width={radius * 0.39}
             height={radius * 0.31}
           />

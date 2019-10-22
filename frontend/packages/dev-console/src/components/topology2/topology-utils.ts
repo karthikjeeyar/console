@@ -4,8 +4,8 @@ import { TopologyDataModel } from '../topology/topology-types';
 const topologyModelFromDataModel = (dataModel: TopologyDataModel): Model => {
   const nodes: Node[] = dataModel.graph.nodes.map((d) => {
     return {
-      width: 104,
-      height: 104,
+      width: 144,
+      height: 144,
       id: d.id,
       type: d.type,
       label: dataModel.topology[d.id].name,

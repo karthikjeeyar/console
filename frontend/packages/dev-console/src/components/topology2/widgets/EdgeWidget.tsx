@@ -76,7 +76,7 @@ const EdgeWidget: React.FC<EdgeWidgetProps> = ({
 
   return (
     <>
-      <Layer id={dragging ? 'top' : undefined}>
+      <Layer id={dragging || hover ? 'top' : undefined}>
         <g
           data-test-id="connects-to-handler"
           onMouseEnter={() => setHover(true)}

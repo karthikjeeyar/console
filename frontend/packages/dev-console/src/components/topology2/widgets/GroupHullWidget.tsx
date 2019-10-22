@@ -30,7 +30,7 @@ const FILTER_ID_HOVER = 'DefaultGroupDropShadowFilterId--hover';
 
 type PointWithSize = PointTuple | [number, number, number];
 
-const hullPadding = (point: PointWithSize) => (point[2] || 0) + 40;
+const hullPadding = (point: PointWithSize) => (point[2] || 0) + 20;
 
 // Return the point whose Y is the largest value.
 function findLowestPoint<P extends Point>(points: P[]): P {

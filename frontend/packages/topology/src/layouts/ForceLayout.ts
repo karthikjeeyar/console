@@ -133,8 +133,23 @@ export default class ForceLayout implements Layout {
 
   private simulation: d3.Simulation<D3Node, undefined>;
 
-  constructor(graph: GraphEntity) {
+  private groupPadding: number;
+
+  private nodeSep: number;
+
+  private collideDist: number;
+
+  constructor(
+    graph: GraphEntity,
+    groupPadding: number = 55,
+    nodeSep: number = 80,
+    collideDist: number = 25,
+  ) {
     this.graph = graph;
+    this.groupPadding = groupPadding;
+    this.nodeSep = nodeSep;
+    this.collideDist = collideDist;
+
     graph
       .getController()
       .addEventListener<DragNodeEventListener>(DRAG_NODE_START_EVENT, this.handleDragStart)
@@ -241,7 +256,7 @@ export default class ForceLayout implements Layout {
     // create force simulation
     this.simulation = d3
       .forceSimulation<D3Node>()
-      .force('collide', d3.forceCollide<D3Node>().radius((d) => d.getRadius() + 5))
+      .force('collide', d3.forceCollide<D3Node>().radius((d) => d.getRadius() + this.collideDist))
       .force('charge', d3.forceManyBody())
       .force('center', d3.forceCenter(cx, cy))
       .nodes(nodes)
@@ -250,10 +265,14 @@ export default class ForceLayout implements Layout {
         d3
           .forceLink<D3Node, D3Link>(edges)
           .id((e) => e.id)
-          .distance((d) =>
-            (d.source as D3Node).entity.getParent() !== (d.target as D3Node).entity.getParent()
-              ? (d.source as D3Node).entity.getBounds().width / 2 + (d.target as D3Node).entity.getBounds().width / 2 + 100
-              : (d.source as D3Node).entity.getBounds().width / 2 + (d.target as D3Node).entity.getBounds().width / 2 + 50,
+          .distance(
+            (d) =>
+              (d.source as D3Node).entity.getBounds().width / 2 +
+              (d.target as D3Node).entity.getBounds().width / 2 +
+              this.nodeSep +
+              ((d.source as D3Node).entity.getParent() !== (d.target as D3Node).entity.getParent()
+                ? this.groupPadding * 2
+                : 0),
           ),
       )
       .on(

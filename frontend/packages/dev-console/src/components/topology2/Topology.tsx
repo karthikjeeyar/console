@@ -43,12 +43,12 @@ const findEntityForId = (id: string, visualization: Visualization): ElementEntit
 const Topology: React.FC<TopologyProps> = ({ data }) => {
   const visRef = React.useRef<Visualization | null>(null);
   const [model, setModel] = React.useState<Model>();
-  const [selected, setSelected] = React.useState<string | undefined>();
+  const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
   const [selectedEntity, setSelectedEntity] = React.useState<ElementEntity | undefined>();
   const { topology } = data;
 
   const onSelection = (ids: string[]) => {
-    setSelected(ids ? ids[0] : undefined);
+    setSelectedIds(ids);
   };
 
   if (!visRef.current) {
@@ -73,11 +73,11 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
   }, [data]);
 
   React.useEffect(() => {
-    setSelectedEntity(selected ? findEntityForId(selected, visRef.current) : undefined);
-  }, [selected, topology]);
+    setSelectedEntity(selectedIds[0] ? findEntityForId(selectedIds[0], visRef.current) : undefined);
+  }, [selectedIds, topology]);
 
   const onSidebarClose = () => {
-    setSelected(undefined);
+    visRef.current.getController().fireEvent(SELECTION_EVENT, []);
   };
 
   const renderControlBar = () => {
@@ -126,8 +126,8 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
   };
 
   const topologySideBar = (
-    <TopologySideBar show={!!selected} onClose={onSidebarClose}>
-      {selected && selectedItemDetails()}
+    <TopologySideBar show={!!selectedEntity} onClose={onSidebarClose}>
+      {selectedEntity && selectedItemDetails()}
     </TopologySideBar>
   );
 
@@ -139,9 +139,9 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
     <TopologyView
       controlBar={renderControlBar()}
       sideBar={topologySideBar}
-      sideBarOpen={!!selected}
+      sideBarOpen={!!selectedEntity}
     >
-      <VisualizationWidget visualization={visRef.current} state={{ selected }} />
+      <VisualizationWidget visualization={visRef.current} state={{ selectedIds }} />
     </TopologyView>
   );
 };

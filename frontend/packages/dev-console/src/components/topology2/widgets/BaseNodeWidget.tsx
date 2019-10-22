@@ -4,17 +4,15 @@ import { NodeEntity } from '@console/topology/src/types';
 import { WithCreateConnectorProps } from '@console/topology/src/behavior/withCreateConnector';
 import { WithDragNodeProps } from '@console/topology/src/behavior/useDragNode';
 import { WithSelectionProps } from '@console/topology/src/behavior/useSelection';
+import { useSvgAnchor } from '@console/topology/src/behavior/useSvgAnchor';
 import { WithDndDragProps } from '@console/topology/src/behavior/useDndDrag';
 import { WithDndDropProps } from '@console/topology/src/behavior/useDndDrop';
 import { WithContextMenuProps } from '@console/topology/src/behavior/withContextMenu';
-import { useAnchor } from '@console/topology/src/behavior/useAnchor';
-import EllipseAnchor from '@console/topology/src/anchors/EllipseAnchor';
+import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
 import SvgBoxedText from '../../svg/SvgBoxedText';
 import { createSvgIdUrl } from '../../../utils/svg-utils';
 import SvgDropShadowFilter from '../../svg/SvgDropShadowFilter';
-
 import '../../topology/shapes/BaseNode.scss';
-import useCombineRefs from "@console/topology/src/utils/useCombineRefs";
 
 export interface State {
   hover?: boolean;
@@ -68,7 +66,9 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   const [hover, setHover] = React.useState();
   const [hoverTimer, setHoverTimer] = React.useState();
   const [labelHover, setLabelHover] = React.useState(false);
-  useAnchor(EllipseAnchor);
+  const svgAnchorRef = useSvgAnchor();
+  const cx = entity.getBounds().width / 2;
+  const cy = entity.getBounds().height / 2;
 
   const onLabelEnter = () => {
     if (!hoverTimer) {
@@ -104,15 +104,16 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
         <SvgDropShadowFilter id={FILTER_ID_HOVER} dy={3} stdDeviation={7} floodOpacity={0.24} />
         <circle
           className="odc-base-node__bg"
-          cx={0}
-          cy={0}
+          ref={svgAnchorRef}
+          cx={cx}
+          cy={cy}
           r={outerRadius}
           filter={hover ? createSvgIdUrl(FILTER_ID_HOVER) : createSvgIdUrl(FILTER_ID)}
         />
         <g className={contentsClasses}>
           <image
-            x={-innerRadius}
-            y={-innerRadius}
+            x={cx - innerRadius}
+            y={cy - innerRadius}
             width={innerRadius * 2}
             height={innerRadius * 2}
             xlinkHref={icon}
@@ -120,8 +121,8 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
           {entity.getLabel() != null && (
             <SvgBoxedText
               className="odc-base-node__label"
-              y={outerRadius + 20}
-              x={0}
+              x={cx}
+              y={cy + outerRadius + 20}
               paddingX={8}
               paddingY={4}
               kind={kind}
@@ -134,8 +135,8 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
           {selected && (
             <circle
               className="odc-base-node__selection"
-              cx={0}
-              cy={0}
+              cx={cx}
+              cy={cy}
               r={outerRadius + 1}
               strokeWidth={2}
             />
