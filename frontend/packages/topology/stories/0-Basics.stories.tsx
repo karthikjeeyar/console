@@ -1,8 +1,10 @@
 import * as React from 'react';
 import Visualization from '../src/Visualization';
 import VisualizationWidget from '../src/VisualizationWidget';
-import { Model } from '../src/types';
+import { Model, ModelKind } from '../src/types';
+import { withDragNode } from '../src/behavior/useDragNode';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
+import NodeWidget from './widgets/NodeWidget';
 
 export default {
   title: 'Basic',
@@ -68,6 +70,103 @@ export const singleEdge = () => {
   };
   vis.fromModel(model);
   vis.registerWidgetFactory(defaultWidgetFactory);
+  return <VisualizationWidget visualization={vis} />;
+};
+
+export const multiEdge = () => {
+  const vis = new Visualization();
+  const model: Model = {
+    graph: {
+      id: 'g1',
+      type: 'graph',
+    },
+    nodes: [
+      {
+        id: 'n1',
+        type: 'node',
+        x: 50,
+        y: 50,
+        width: 100,
+        height: 100,
+      },
+      {
+        id: 'n2',
+        type: 'node',
+        x: 400,
+        y: 50,
+        width: 100,
+        height: 100,
+      },
+      {
+        id: 'n3',
+        type: 'node',
+        x: 50,
+        y: 200,
+        width: 100,
+        height: 100,
+      },
+      {
+        id: 'n4',
+        type: 'node',
+        x: 400,
+        y: 200,
+        width: 100,
+        height: 100,
+      },
+    ],
+    edges: [
+      {
+        id: 'e1',
+        type: 'multi-edge',
+        source: 'n1',
+        target: 'n2',
+      },
+      {
+        id: 'e2',
+        type: 'multi-edge',
+        source: 'n1',
+        target: 'n2',
+      },
+      {
+        id: 'e3',
+        type: 'multi-edge',
+        source: 'n3',
+        target: 'n4',
+      },
+      {
+        id: 'e4',
+        type: 'multi-edge',
+        source: 'n3',
+        target: 'n4',
+      },
+      {
+        id: 'e5',
+        type: 'multi-edge',
+        source: 'n3',
+        target: 'n4',
+      },
+      {
+        id: 'e6',
+        type: 'multi-edge',
+        source: 'n3',
+        target: 'n4',
+      },
+      {
+        id: 'e7',
+        type: 'multi-edge',
+        source: 'n3',
+        target: 'n4',
+      },
+    ],
+  };
+  vis.fromModel(model);
+  vis.registerWidgetFactory(defaultWidgetFactory);
+  vis.registerWidgetFactory((entity) => {
+    if (entity.kind === ModelKind.node) {
+      return withDragNode()(NodeWidget);
+    }
+    return undefined;
+  });
   return <VisualizationWidget visualization={vis} />;
 };
 
