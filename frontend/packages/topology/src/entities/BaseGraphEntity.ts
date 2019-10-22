@@ -165,6 +165,46 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
     this.getBounds().setLocation(tx, ty);
   }
 
+  makeEntityVisible = (nodeEntity: NodeEntity): void => {
+    if (!nodeEntity) {
+      return;
+    }
+    const { x: viewX, y: viewY, width: viewWidth, height: viewHeight } = this.getBounds();
+    const boundingBox = Rect.fromRect(nodeEntity.getBounds())
+      .scale(this.getScale())
+      .translate(viewX, viewY);
+    const { x, y, width, height } = boundingBox;
+    let move = false;
+    const panOffset = 20 * this.getScale();
+    const minVisibleSize = 40 * this.getScale();
+
+    const newLocation = {
+      x: viewX,
+      y: viewY,
+    };
+
+    if (x + width - minVisibleSize < 0) {
+      newLocation.x -= x - panOffset;
+      move = true;
+    }
+    if (x + minVisibleSize > viewWidth) {
+      newLocation.x -= x + width - viewWidth + panOffset;
+      move = true;
+    }
+    if (y + height - minVisibleSize < 0) {
+      newLocation.y -= y - panOffset;
+      move = true;
+    }
+    if (y + minVisibleSize > viewHeight) {
+      newLocation.y -= y + height - viewHeight + panOffset;
+      move = true;
+    }
+
+    if (move) {
+      this.setBounds(new Rect(newLocation.x, newLocation.y, viewWidth, viewHeight));
+    }
+  };
+
   setModel(model: E): void {
     super.setModel(model);
 

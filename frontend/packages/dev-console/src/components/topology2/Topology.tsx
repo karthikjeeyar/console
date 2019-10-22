@@ -7,7 +7,7 @@ import {
 } from '@patternfly/react-topology';
 import Visualization from '@console/topology/src/Visualization';
 import VisualizationWidget from '@console/topology/src/VisualizationWidget';
-import { ElementEntity, Model } from '@console/topology/src/types';
+import { ElementEntity, Model, NodeEntity } from '@console/topology/src/types';
 import {
   SELECTION_EVENT,
   SelectionEventListener,
@@ -35,16 +35,21 @@ const graphModel: Model = {
   },
 };
 
-const findEntityForId = (id: string, visualization: Visualization): ElementEntity => {
+const findEntityForId = (id: string, visualization: Visualization): NodeEntity => {
   const entities: ElementEntity[] = visualization.getEntities();
-  return entities.find((entity: ElementEntity) => entity.getId() === id);
+  const foundEntity = entities.find((entity: ElementEntity) => entity.getId() === id);
+  if (foundEntity instanceof BaseNodeEntity) {
+    return foundEntity as NodeEntity;
+  }
+
+  return undefined;
 };
 
 const Topology: React.FC<TopologyProps> = ({ data }) => {
   const visRef = React.useRef<Visualization | null>(null);
   const [model, setModel] = React.useState<Model>();
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
-  const [selectedEntity, setSelectedEntity] = React.useState<ElementEntity | undefined>();
+  const [selectedEntity, setSelectedEntity] = React.useState<NodeEntity | undefined>();
   const { topology } = data;
 
   const onSelection = (ids: string[]) => {
@@ -73,8 +78,19 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
   }, [data]);
 
   React.useEffect(() => {
-    setSelectedEntity(selectedIds[0] ? findEntityForId(selectedIds[0], visRef.current) : undefined);
+    const selected: NodeEntity = selectedIds[0]
+      ? findEntityForId(selectedIds[0], visRef.current)
+      : undefined;
+    setSelectedEntity(selected);
   }, [selectedIds, topology]);
+
+  React.useEffect(() => {
+    if (selectedEntity) {
+      setTimeout(() => {
+        visRef.current.getRoot().makeEntityVisible(selectedEntity);
+      }, 500);
+    }
+  }, [selectedEntity]);
 
   const onSidebarClose = () => {
     visRef.current.getController().fireEvent(SELECTION_EVENT, []);
