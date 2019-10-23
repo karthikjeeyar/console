@@ -28,12 +28,18 @@ export const shapes = () => {
         type: 'group-hull',
         group: true,
         children: ['n2', 'n3'],
+        style: {
+          padding: 10,
+        },
       },
       {
         id: 'gr2',
         type: 'group-hull',
         group: true,
         children: ['n4', 'n5'],
+        style: {
+          padding: 10,
+        },
       },
       {
         id: 'n1',

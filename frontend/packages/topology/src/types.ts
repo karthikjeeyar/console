@@ -23,6 +23,15 @@ export enum AnchorEnd {
   both,
 }
 
+export type GroupStyle = {
+  padding?: number;
+};
+
+export enum NodeShape {
+  circle,
+  rect,
+}
+
 export interface Element {
   id: string;
   type: string;
@@ -30,6 +39,7 @@ export interface Element {
   visible?: boolean;
   children?: string[];
   data?: any;
+  style?: { [key: string]: any };
 }
 
 export interface Node extends Element {
@@ -38,6 +48,7 @@ export interface Node extends Element {
   width?: number;
   height?: number;
   group?: boolean;
+  shape?: NodeShape;
 }
 
 export interface Edge extends Element {
@@ -101,6 +112,7 @@ export interface ElementEntity<E extends Element = Element, D = any> extends Wit
   remove(): void;
   setModel(model: E): void;
   raise(): void;
+  getStyle<T extends {}>(): T;
   translateToAbsolute(t: Translatable): void;
   translateFromAbsolute(t: Translatable): void;
   translateToParent(t: Translatable): void;
@@ -115,6 +127,8 @@ export interface NodeEntity<E extends Node = Node, D = any> extends ElementEntit
   getBounds(): Rect;
   setBounds(bounds: Rect): void;
   isGroup(): boolean;
+  getNodeShape(): NodeShape;
+  setNodeShape(shape: NodeShape): void;
 }
 
 export interface EdgeEntity<E extends Edge = Edge, D = any> extends ElementEntity<E, D> {

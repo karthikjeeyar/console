@@ -22,6 +22,9 @@ const model: Model = {
       type: 'group-hull',
       group: true,
       children: ['n1', 'n2'],
+      style: {
+        padding: 10,
+      },
     },
     {
       id: 'n1',

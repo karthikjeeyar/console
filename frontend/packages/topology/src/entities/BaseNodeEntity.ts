@@ -1,5 +1,14 @@
 import { observable, computed } from 'mobx';
-import { NodeEntity, Anchor, Node, ModelKind, isNodeEntity, AnchorEnd } from '../types';
+import {
+  NodeEntity,
+  Anchor,
+  Node,
+  ModelKind,
+  isNodeEntity,
+  AnchorEnd,
+  GroupStyle,
+  NodeShape,
+} from '../types';
 import CenterAnchor from '../anchors/CenterAnchor';
 import Rect from '../geom/Rect';
 import { Translatable } from '../geom/types';
@@ -26,6 +35,9 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
   @observable
   private group = false;
 
+  @observable
+  private shape: NodeShape = NodeShape.circle;
+
   @computed
   private get groupBounds(): Rect {
     let rect: Rect | undefined;
@@ -40,7 +52,12 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
       }
     });
 
-    return rect || new Rect();
+    if (!rect) {
+      rect = new Rect();
+    }
+
+    const { padding } = this.getStyle<GroupStyle>();
+    return padding ? rect.expand(padding, padding) : rect;
   }
 
   get kind(): ModelKind {
@@ -88,6 +105,14 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
     return this.group;
   }
 
+  getNodeShape(): NodeShape {
+    return this.shape;
+  }
+
+  setNodeShape(shape: NodeShape): void {
+    this.shape = shape;
+  }
+
   setModel(model: E): void {
     super.setModel(model);
     const bounds = this.getBounds();
@@ -123,6 +148,9 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
     }
     if ('group' in model) {
       this.group = !!model.group;
+    }
+    if ('shape' in model) {
+      this.shape = model.shape || NodeShape.circle;
     }
   }
 

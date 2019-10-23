@@ -21,6 +21,7 @@ type GroupWidgetProps = {
 
 const GroupWidget: React.FC<GroupWidgetProps> = ({
   entity,
+  children,
   selected,
   onSelect,
   dragNodeRef,
@@ -35,10 +36,7 @@ const GroupWidget: React.FC<GroupWidgetProps> = ({
 
   if (!droppable || !boxRef.current) {
     // change the box only when not dragging
-    boxRef.current = entity
-      .getBounds()
-      .clone()
-      .expand(10, 10);
+    boxRef.current = entity.getBounds().clone();
   }
 
   return (
@@ -54,6 +52,7 @@ const GroupWidget: React.FC<GroupWidgetProps> = ({
         strokeWidth={2}
         stroke={selected ? 'blue' : '#cdcdcd'}
       />
+      {children}
     </Layer>
   );
 };

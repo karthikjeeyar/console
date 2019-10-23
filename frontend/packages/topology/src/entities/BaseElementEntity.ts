@@ -36,6 +36,9 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   @observable
   private label: string | undefined;
 
+  @observable
+  private style: any = {};
+
   abstract get kind(): ModelKind;
 
   @computed({ equals: _.isEqual })
@@ -146,6 +149,10 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
     this.data = data;
   }
 
+  getStyle<T extends {}>(): T {
+    return this.style;
+  }
+
   getChildren(): ElementEntity[] {
     return this.childElements;
   }
@@ -208,9 +215,12 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
     if ('label' in model) {
       this.label = model.label;
     }
+    if ('style' in model) {
+      _.merge(this.style, model.style);
+    }
   }
 
-  raise() {
+  raise(): void {
     const { parent } = this;
     if (parent) {
       parent.appendChild(this);

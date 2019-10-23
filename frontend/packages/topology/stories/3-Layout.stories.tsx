@@ -41,6 +41,9 @@ const getModel = (layout: string): Model => {
     group: true,
     children: v.map((n: Node) => n.id),
     label: `group-${k}`,
+    style: {
+      padding: 10,
+    },
   }));
 
   // create links from data

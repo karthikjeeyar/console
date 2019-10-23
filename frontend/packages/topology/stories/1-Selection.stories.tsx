@@ -25,6 +25,9 @@ const create2NodeModel = (): Model => ({
       type: 'group',
       group: true,
       children: ['n1', 'n2'],
+      style: {
+        padding: 10,
+      },
     },
     {
       id: 'n1',

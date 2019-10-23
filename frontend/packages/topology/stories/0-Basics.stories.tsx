@@ -183,6 +183,9 @@ const groupStory = (groupType: string) => {
         type: groupType,
         group: true,
         children: ['n1', 'n2', 'n3'],
+        style: {
+          padding: 10,
+        },
       },
       {
         id: 'n1',
