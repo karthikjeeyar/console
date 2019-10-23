@@ -98,7 +98,13 @@ export default class SVGAnchor extends AbstractAnchor {
     ) {
       const bbox = this.svgElement.getBBox();
       const ref = new Point(bbox.x + bbox.width / 2, bbox.y + bbox.height / 2);
+
+      // this touches the bounds for non-groups
       this.getOwner().translateToParent(ref);
+
+      // touch the bounds to force a re-render in case this anchor is for a group
+      this.getOwner().getBounds();
+
       return ref;
     }
 

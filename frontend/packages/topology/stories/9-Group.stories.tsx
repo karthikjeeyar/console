@@ -1,16 +1,19 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import Visualization from '../src/Visualization';
 import VisualizationWidget from '../src/VisualizationWidget';
-import { Model, NodeEntity, AnchorEnd, NodeShape } from '../src/types';
+import { Model, NodeEntity, AnchorEnd, NodeShape, ModelKind, isNodeEntity } from '../src/types';
 import { useSvgAnchor } from '../src/behavior/useSvgAnchor';
+import { withDragNode } from '../src/behavior/useDragNode';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 import GroupWidget from './widgets/GroupWidget';
+import NodeWidget from './widgets/NodeWidget';
 
 export default {
   title: 'Complex Group',
 };
 
-const GroupWithDecorator: React.FC<{ entity: NodeEntity }> = (props) => {
+const GroupWithDecorator: React.FC<{ entity: NodeEntity }> = observer((props) => {
   const trafficSourceRef = useSvgAnchor(AnchorEnd.source, 'traffic');
   const b = props.entity.getBounds();
   return (
@@ -26,7 +29,8 @@ const GroupWithDecorator: React.FC<{ entity: NodeEntity }> = (props) => {
       />
     </GroupWidget>
   );
-};
+});
+
 export const complexGroup = () => {
   const vis = new Visualization();
   const model: Model = {
@@ -108,6 +112,9 @@ export const complexGroup = () => {
   vis.registerWidgetFactory((entity) => {
     if (entity.getType() === 'service') {
       return GroupWithDecorator;
+    }
+    if (entity.kind === ModelKind.node && isNodeEntity(entity) && !entity.isGroup()) {
+      return withDragNode()(NodeWidget);
     }
     return undefined;
   });
