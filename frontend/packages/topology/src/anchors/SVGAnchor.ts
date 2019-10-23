@@ -97,8 +97,11 @@ export default class SVGAnchor extends AbstractAnchor {
       this.svgElement instanceof SVGPolygonElement
     ) {
       const bbox = this.svgElement.getBBox();
-      return new Point(bbox.x + bbox.width / 2, bbox.y + bbox.height / 2);
+      const ref = new Point(bbox.x + bbox.width / 2, bbox.y + bbox.height / 2);
+      this.getOwner().translateToParent(ref);
+      return ref;
     }
+
     return super.getReferencePoint();
   }
 }
