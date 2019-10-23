@@ -50,15 +50,15 @@ const EntityWidget: React.FC<EntityWidgetProps> = widget(({ entity }) => {
     const { x, y } = entity.getBounds();
     return (
       <g {...commonProps} transform={`translate(${x}, ${y})`}>
-        {<EntityComponent entity={entity} />}
-        {<EntityChildren entity={entity} />}
+        <EntityComponent entity={entity} />
+        <EntityChildren entity={entity} />
       </g>
     );
   }
   return (
     <g {...commonProps}>
-      {<EntityComponent entity={entity} />}
-      {<EntityChildren entity={entity} />}
+      <EntityComponent entity={entity} />
+      <EntityChildren entity={entity} />
     </g>
   );
 });
