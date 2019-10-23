@@ -11,6 +11,7 @@ import { useBendpoint } from '@console/topology/src/behavior/useBendpoint';
 import ConnectorArrow from '@console/topology/src/arrows/ConnectorArrow';
 import * as classNames from 'classnames';
 import { boundingBoxForLine } from '../../../utils/svg-utils';
+import '../../topology/shapes/ConnectsTo.scss';
 
 type EdgeWidgetProps = {
   entity: EdgeEntity;
@@ -101,8 +102,8 @@ const EdgeWidget: React.FC<EdgeWidgetProps> = ({
           <ConnectorArrow
             dragRef={targetDragRef}
             edge={entity}
-            className={classNames('odc-connects-to', {
-              'odc-connects-to__hover-arrow': hover,
+            className={classNames('odc-connects-to__target-box', {
+              'odc-connects-to__hover-arrow': hover || dragging,
             })}
           />
         </g>

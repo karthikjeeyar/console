@@ -193,12 +193,6 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
     if (Array.isArray(model.children)) {
       const controller = this.getController();
 
-      // TODO distinguish between model based nodes and those added through other means?
-      // remove all unknown nodes
-      _.difference(this.children, model.children).forEach((id) =>
-        controller.getEntityById(id).remove(),
-      );
-
       const toadd = _.difference(model.children, this.children);
       if (this.children) {
         this.children.unshift(...toadd);

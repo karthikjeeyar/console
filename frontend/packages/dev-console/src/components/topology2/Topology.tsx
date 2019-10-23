@@ -7,7 +7,7 @@ import {
 } from '@patternfly/react-topology';
 import Visualization from '@console/topology/src/Visualization';
 import VisualizationWidget from '@console/topology/src/VisualizationWidget';
-import { ElementEntity, Model, NodeEntity } from '@console/topology/src/types';
+import {ElementEntity, isNodeEntity, Model, NodeEntity} from '@console/topology/src/types';
 import {
   SELECTION_EVENT,
   SelectionEventListener,
@@ -38,7 +38,7 @@ const graphModel: Model = {
 const findEntityForId = (id: string, visualization: Visualization): NodeEntity => {
   const entities: ElementEntity[] = visualization.getEntities();
   const foundEntity = entities.find((entity: ElementEntity) => entity.getId() === id);
-  if (foundEntity instanceof BaseNodeEntity) {
+  if (isNodeEntity(foundEntity)) {
     return foundEntity as NodeEntity;
   }
 
@@ -121,7 +121,7 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
   };
 
   const selectedItemDetails = () => {
-    if (selectedEntity instanceof BaseNodeEntity) {
+    if (isNodeEntity(selectedEntity)) {
       if ((selectedEntity as BaseNodeEntity).isGroup()) {
         return (
           <TopologyApplicationPanel

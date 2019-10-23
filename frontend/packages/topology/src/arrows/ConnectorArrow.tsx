@@ -26,7 +26,7 @@ const ConnectorArrow: React.FC<ConnectorArrowProps> = ({
   edge,
   className = '',
   isTarget = true,
-  size = 8,
+  size = 10,
   dragRef,
 }) => {
   const bendPoints = edge.getBendpoints();

@@ -85,6 +85,7 @@ export default class VisualizationController extends Stateful implements Control
     // remove all stale entities
     _.forIn(this.entities, (entity) => {
       if (!isGraphEntity(entity) && !validIds.includes(entity.getId())) {
+        entity.remove();
         this.removeEntity(entity);
       }
     });

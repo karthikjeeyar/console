@@ -3,6 +3,10 @@
 
   &__bg {
     fill: var(--pf-global--BackgroundColor--light-100);
+    &.is-highlight {
+      stroke: var(--pf-global--active-color--400);
+      stroke-width: 4;
+    }
   }
 
   &__selection {

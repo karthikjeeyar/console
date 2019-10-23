@@ -1,9 +1,8 @@
 import { action } from 'mobx';
 import { Modifiers } from '@console/topology/src/behavior/useDndDrag';
-import { EdgeEntity, ElementEntity, NodeEntity } from '@console/topology/src/types';
+import { EdgeEntity, ElementEntity, isNodeEntity, NodeEntity } from '@console/topology/src/types';
 import { DragEvent, DragSourceMonitor } from '@console/topology/src/behavior/dnd-types';
-import BaseNodeEntity from '@console/topology/src/entities/BaseNodeEntity';
-import { moveNodeToGroup } from './topology-utils';
+import { createConnection, moveNodeToGroup } from './topology-utils';
 
 type NodeEntityProps = {
   entity: NodeEntity;
@@ -20,10 +19,22 @@ const workloadDragSourceSpec = (entity: ElementEntity) => ({
   },
   end: action((dropResult: NodeEntity, monitor: DragSourceMonitor, props: NodeEntityProps) => {
     if (monitor.didDrop() && dropResult && props && props.entity.getParent() !== dropResult) {
-      moveNodeToGroup(props.entity, dropResult instanceof BaseNodeEntity ? dropResult : null);
+      moveNodeToGroup(props.entity, isNodeEntity(dropResult) ? dropResult : null);
     }
   }),
 });
+
+const workloadDropTargetSpec = {
+  accept: 'test',
+  canDrop: (item, monitor, props) => {
+    return !props || (item.getSource() !== props.entity && item.getTarget() !== props.entity);
+  },
+  collect: (monitor) => ({
+    droppable: monitor.isDragging(),
+    hover: monitor.isOver(),
+    canDrop: monitor.canDrop(),
+  }),
+};
 
 const nodeDragSourceSpec = (entity: ElementEntity) => ({
   item: { type: entity.getType() },
@@ -70,9 +81,8 @@ const edgeDragSourceSpec = {
   }),
   end: action((dropResult: NodeEntity, monitor: DragSourceMonitor, props: EdgeEntityProps) => {
     if (monitor.didDrop() && dropResult && props) {
-      props.entity.setTarget(dropResult);
+      createConnection(props.entity.getSource(), dropResult, props.entity.getTarget());
     }
-    props.entity.setEndPoint();
   }),
   collect: (monitor) => ({
     dragging: monitor.isDragging(),
@@ -81,6 +91,7 @@ const edgeDragSourceSpec = {
 
 export {
   workloadDragSourceSpec,
+  workloadDropTargetSpec,
   nodeDragSourceSpec,
   graphWorkloadDropTargetSpec,
   groupWorkoadDropTargetSpec,

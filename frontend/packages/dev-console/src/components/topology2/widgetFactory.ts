@@ -20,6 +20,7 @@ import {
   graphWorkloadDropTargetSpec,
   nodeDragSourceSpec,
   workloadDragSourceSpec,
+  workloadDropTargetSpec,
   groupWorkoadDropTargetSpec,
   edgeDragSourceSpec,
 } from './widgetUtils';
@@ -41,8 +42,15 @@ const widgetFactory: WidgetFactory = (
         withDragNode()(withSelection()(GroupHullWidget)),
       );
     case 'workload':
-      return withDragNode<any, NodeEntity, any, NodeEntityProps>(workloadDragSourceSpec(entity))(
-        withSelection()(WorkloadNodeWidget),
+      return withDndDrop<
+        any,
+        any,
+        { droppable?: boolean; hover?: boolean; canDrop?: boolean },
+        NodeEntityProps
+      >(workloadDropTargetSpec)(
+        withDragNode<any, NodeEntity, any, NodeEntityProps>(workloadDragSourceSpec(entity))(
+          withSelection()(WorkloadNodeWidget),
+        ),
       );
     default:
       switch (entity.kind) {

@@ -2,7 +2,10 @@ import * as React from 'react';
 import { Edge, Model, Node, NodeEntity } from '@console/topology/src/types';
 import { confirmModal, errorModal } from '@console/internal/components/modals';
 import { TopologyDataModel } from '../topology/topology-types';
-import { updateTopologyResourceApplication } from '../topology/topology-utils';
+import {
+  createTopologyResourceConnection,
+  updateTopologyResourceApplication,
+} from '../topology/topology-utils';
 
 const topologyModelFromDataModel = (dataModel: TopologyDataModel): Model => {
   const nodes: Node[] = dataModel.graph.nodes.map((d) => {
@@ -96,4 +99,16 @@ const moveNodeToGroup = (node: NodeEntity, targetGroup: NodeEntity) => {
     });
 };
 
-export { topologyModelFromDataModel, moveNodeToGroup };
+const createConnection = (
+  sourceNode: NodeEntity,
+  targetNode: NodeEntity,
+  replaceTargetNode: NodeEntity = null,
+): Promise<any> => {
+  return createTopologyResourceConnection(
+    sourceNode.getData(),
+    targetNode.getData(),
+    replaceTargetNode ? replaceTargetNode.getData() : null,
+  );
+};
+
+export { topologyModelFromDataModel, moveNodeToGroup, createConnection };
