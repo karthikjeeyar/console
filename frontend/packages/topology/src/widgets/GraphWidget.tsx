@@ -4,13 +4,15 @@ import { WithPanZoomProps } from '../behavior/usePanZoom';
 import LayersProvider from '../layers/LayersProvider';
 import { DEFAULT_LAYER } from '../layers/LayersContext';
 import widget from '../widget';
+import { WithDndDropProps } from '../behavior/useDndDrop';
+import useCombineRefs from '../utils/useCombineRefs';
 import EntityWidget from './EntityWidget';
 
 type EntityProps = {
   entity: GraphEntity;
 };
 
-type GraphWidgetProps = EntityProps & WithPanZoomProps;
+type GraphWidgetProps = EntityProps & WithPanZoomProps & WithDndDropProps;
 
 // This inner Component will prevent the re-rendering of all children when the transform changes
 const EntityChildren: React.FC<EntityProps> = widget(({ entity }) => {
@@ -33,8 +35,9 @@ const Inner: React.FC<EntityProps> = React.memo(({ entity }) => (
   </LayersProvider>
 ));
 
-const GraphWidget: React.FC<GraphWidgetProps> = ({ entity, panZoomRef }) => {
+const GraphWidget: React.FC<GraphWidgetProps> = ({ entity, panZoomRef, dndDropRef }) => {
   const layout = entity.getLayout();
+  const refs = useCombineRefs<SVGPathElement>(panZoomRef, dndDropRef);
   React.useEffect(() => {
     entity.layout();
     // Only re-run if the layout changes
@@ -44,7 +47,7 @@ const GraphWidget: React.FC<GraphWidgetProps> = ({ entity, panZoomRef }) => {
   const bounds = entity.getBounds();
   return (
     <g
-      ref={panZoomRef}
+      ref={refs}
       transform={`translate(${bounds.x}, ${bounds.y}) scale(${entity.getScale()})`}
       data-id={entity.getId()}
       data-kind={entity.kind}
