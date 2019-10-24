@@ -63,6 +63,8 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   dndDragRef,
   dndDropRef,
   canDrop,
+  onHideCreateConnector,
+  onShowCreateConnector,
 }) => {
   const [hover, setHover] = React.useState();
   const [hoverTimer, setHoverTimer] = React.useState();
@@ -94,13 +96,22 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   const refs = useCombineRefs<SVGEllipseElement>(dragNodeRef, dndDragRef);
   const nodeRefs = useCombineRefs<SVGCircleElement>(svgAnchorRef, dndDropRef);
 
+  const onHoverChange = (hoverStatus: boolean) => {
+    setHover(hoverStatus);
+    if (hoverStatus) {
+      onShowCreateConnector();
+    } else {
+      onHideCreateConnector();
+    }
+  };
+
   return (
     <g className="odc-base-node" ref={refs}>
       <g
         data-test-id="base-node-handler"
         onClick={onSelect}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
+        onMouseEnter={() => onHoverChange(true)}
+        onMouseLeave={() => onHoverChange(false)}
       >
         <SvgDropShadowFilter id={FILTER_ID} />
         <SvgDropShadowFilter id={FILTER_ID_HOVER} dy={3} stdDeviation={7} floodOpacity={0.24} />

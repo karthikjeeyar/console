@@ -12,6 +12,7 @@ import { withDragNode } from '@console/topology/src/behavior/useDragNode';
 import { withTargetDrag } from '@console/topology/src/behavior/useReconnect';
 import { withSelection } from '@console/topology/src/behavior/useSelection';
 import { withDndDrop } from '@console/topology/src/behavior/useDndDrop';
+import { withCreateConnector } from '@console/topology/src/behavior/withCreateConnector';
 import BaseNodeWidget from './widgets/BaseNodeWidget';
 import EdgeWidget from './widgets/EdgeWidget';
 import GroupHullWidget from './widgets/GroupHullWidget';
@@ -23,6 +24,7 @@ import {
   workloadDropTargetSpec,
   groupWorkoadDropTargetSpec,
   edgeDragSourceSpec,
+  createConnectorSpec,
 } from './widgetUtils';
 
 type NodeEntityProps = {
@@ -42,14 +44,16 @@ const widgetFactory: WidgetFactory = (
         withDragNode()(withSelection()(GroupHullWidget)),
       );
     case 'workload':
-      return withDndDrop<
-        any,
-        any,
-        { droppable?: boolean; hover?: boolean; canDrop?: boolean },
-        NodeEntityProps
-      >(workloadDropTargetSpec)(
-        withDragNode<any, NodeEntity, any, NodeEntityProps>(workloadDragSourceSpec(entity))(
-          withSelection()(WorkloadNodeWidget),
+      return withCreateConnector(createConnectorSpec)(
+        withDndDrop<
+          any,
+          any,
+          { droppable?: boolean; hover?: boolean; canDrop?: boolean },
+          NodeEntityProps
+        >(workloadDropTargetSpec)(
+          withDragNode<any, NodeEntity, any, NodeEntityProps>(workloadDragSourceSpec(entity))(
+            withSelection()(WorkloadNodeWidget),
+          ),
         ),
       );
     default:

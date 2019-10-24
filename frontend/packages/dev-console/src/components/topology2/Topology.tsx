@@ -7,7 +7,7 @@ import {
 } from '@patternfly/react-topology';
 import Visualization from '@console/topology/src/Visualization';
 import VisualizationWidget from '@console/topology/src/VisualizationWidget';
-import {ElementEntity, isNodeEntity, Model, NodeEntity} from '@console/topology/src/types';
+import { ElementEntity, isNodeEntity, Model } from '@console/topology/src/types';
 import {
   SELECTION_EVENT,
   SelectionEventListener,
@@ -17,7 +17,6 @@ import * as _ from 'lodash';
 import TopologySideBar from '../topology/TopologySideBar';
 import { TopologyDataModel, TopologyDataObject } from '../topology/topology-types';
 import TopologyResourcePanel from '../topology/TopologyResourcePanel';
-// import TopologyApplicationPanel from '../topology/TopologyApplicationPanel';
 import TopologyApplicationPanel from '../topology/TopologyApplicationPanel';
 import { topologyModelFromDataModel } from './topology-utils';
 import layoutFactory from './layoutFactory';
@@ -35,21 +34,11 @@ const graphModel: Model = {
   },
 };
 
-const findEntityForId = (id: string, visualization: Visualization): NodeEntity => {
-  const entities: ElementEntity[] = visualization.getEntities();
-  const foundEntity = entities.find((entity: ElementEntity) => entity.getId() === id);
-  if (isNodeEntity(foundEntity)) {
-    return foundEntity as NodeEntity;
-  }
-
-  return undefined;
-};
-
 const Topology: React.FC<TopologyProps> = ({ data }) => {
   const visRef = React.useRef<Visualization | null>(null);
   const [model, setModel] = React.useState<Model>();
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
-  const [selectedEntity, setSelectedEntity] = React.useState<NodeEntity | undefined>();
+  const [selectedEntity, setSelectedEntity] = React.useState<ElementEntity | undefined>();
   const { topology } = data;
 
   const onSelection = (ids: string[]) => {
@@ -78,14 +67,20 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
   }, [data]);
 
   React.useEffect(() => {
-    const selected: NodeEntity = selectedIds[0]
-      ? findEntityForId(selectedIds[0], visRef.current)
-      : undefined;
-    setSelectedEntity(selected);
+    let updatedSelection;
+    if (selectedIds[0]) {
+      try {
+        updatedSelection = visRef.current.getController().getEntityById(selectedIds[0]);
+      } catch (e) {
+        updatedSelection = undefined;
+      }
+    }
+
+    setSelectedEntity(updatedSelection);
   }, [selectedIds, topology]);
 
   React.useEffect(() => {
-    if (selectedEntity) {
+    if (selectedEntity && isNodeEntity(selectedEntity)) {
       setTimeout(() => {
         visRef.current.getRoot().makeEntityVisible(selectedEntity);
       }, 500);

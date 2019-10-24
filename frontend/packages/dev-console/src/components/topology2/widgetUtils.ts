@@ -1,7 +1,14 @@
 import { action } from 'mobx';
 import { Modifiers } from '@console/topology/src/behavior/useDndDrag';
-import { EdgeEntity, ElementEntity, isNodeEntity, NodeEntity } from '@console/topology/src/types';
+import {
+  EdgeEntity,
+  ElementEntity,
+  isEdgeEntity,
+  isNodeEntity,
+  NodeEntity,
+} from '@console/topology/src/types';
 import { DragEvent, DragSourceMonitor } from '@console/topology/src/behavior/dnd-types';
+import { CREATE_CONNECTOR_DROP_TYPE } from '@console/topology/src/behavior/withCreateConnector';
 import { createConnection, moveNodeToGroup } from './topology-utils';
 
 type NodeEntityProps = {
@@ -11,6 +18,8 @@ type NodeEntityProps = {
 type EdgeEntityProps = {
   entity: EdgeEntity;
 };
+
+const MOVE_CONNECTOR_DROP_TYPE = '#moveConnector#';
 
 const workloadDragSourceSpec = (entity: ElementEntity) => ({
   item: { type: entity.getType() },
@@ -25,9 +34,21 @@ const workloadDragSourceSpec = (entity: ElementEntity) => ({
 });
 
 const workloadDropTargetSpec = {
-  accept: 'test',
+  accept: [MOVE_CONNECTOR_DROP_TYPE, CREATE_CONNECTOR_DROP_TYPE],
   canDrop: (item, monitor, props) => {
-    return !props || (item.getSource() !== props.entity && item.getTarget() !== props.entity);
+    if (isEdgeEntity(item)) {
+      return !props || (item.getSource() !== props.entity && item.getTarget() !== props.entity);
+    }
+    if (!props || item === props.entity) {
+      return false;
+    }
+    return !item
+      .getController()
+      .getEntities()
+      .filter((entity: ElementEntity) => isEdgeEntity(entity))
+      .find((edge: EdgeEntity) => {
+        return edge.getSource() === item && edge.getTarget() === props.entity;
+      });
   },
   collect: (monitor) => ({
     droppable: monitor.isDragging(),
@@ -71,7 +92,7 @@ const groupWorkoadDropTargetSpec = {
 };
 
 const edgeDragSourceSpec = {
-  item: { type: 'test' },
+  item: { type: MOVE_CONNECTOR_DROP_TYPE },
   begin: action((monitor: DragSourceMonitor, props: EdgeEntityProps) => {
     props.entity.raise();
     return props.entity;
@@ -80,6 +101,7 @@ const edgeDragSourceSpec = {
     props.entity.setEndPoint(event.x, event.y);
   }),
   end: action((dropResult: NodeEntity, monitor: DragSourceMonitor, props: EdgeEntityProps) => {
+    props.entity.setEndPoint();
     if (monitor.didDrop() && dropResult && props) {
       createConnection(props.entity.getSource(), dropResult, props.entity.getTarget());
     }
@@ -89,6 +111,11 @@ const edgeDragSourceSpec = {
   }),
 };
 
+const createConnectorSpec = (source: NodeEntity, target: NodeEntity): any[] | null => {
+  createConnection(source, target);
+  return null;
+};
+
 export {
   workloadDragSourceSpec,
   workloadDropTargetSpec,
@@ -96,4 +123,5 @@ export {
   graphWorkloadDropTargetSpec,
   groupWorkoadDropTargetSpec,
   edgeDragSourceSpec,
+  createConnectorSpec,
 };
