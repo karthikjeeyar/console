@@ -65,6 +65,7 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   canDrop,
   onHideCreateConnector,
   onShowCreateConnector,
+  onContextMenu,
 }) => {
   const [hover, setHover] = React.useState();
   const [hoverTimer, setHoverTimer] = React.useState();
@@ -112,6 +113,7 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
         onClick={onSelect}
         onMouseEnter={() => onHoverChange(true)}
         onMouseLeave={() => onHoverChange(false)}
+        onContextMenu={onContextMenu}
       >
         <SvgDropShadowFilter id={FILTER_ID} />
         <SvgDropShadowFilter id={FILTER_ID_HOVER} dy={3} stdDeviation={7} floodOpacity={0.24} />

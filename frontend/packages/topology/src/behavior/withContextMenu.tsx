@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import { ElementEntity } from '../types';
 import EntityContext from '../utils/EntityContext';
 import ContextMenu from '../contextmenu/ContextMenu';
+import Portal from '../contextmenu/Portal';
 
 type Reference = React.ComponentProps<typeof ContextMenu>['reference'];
 
@@ -12,6 +13,8 @@ export type WithContextMenuProps = {
 
 export const withContextMenu = <E extends ElementEntity>(
   actions: (entity: E) => React.ReactElement[],
+  container?: React.ComponentProps<typeof Portal>['container'],
+  className?: string,
   atPoint: boolean = true,
 ) => <P extends WithContextMenuProps>(WrappedComponent: React.ComponentType<P>) => {
   const Component: React.FC<Omit<P, keyof WithContextMenuProps>> = (props) => {
@@ -34,7 +37,13 @@ export const withContextMenu = <E extends ElementEntity>(
       <>
         <WrappedComponent {...props as any} onContextMenu={onContextMenu} />
         {reference ? (
-          <ContextMenu reference={reference} open onRequestClose={() => setReference(null)}>
+          <ContextMenu
+            reference={reference}
+            container={container}
+            className={className}
+            open
+            onRequestClose={() => setReference(null)}
+          >
             {actions(entity as E)}
           </ContextMenu>
         ) : null}

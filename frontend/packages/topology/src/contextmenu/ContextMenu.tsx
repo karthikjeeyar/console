@@ -12,7 +12,7 @@ import './ContextMenu.scss';
 
 type ContextMenuProps = Pick<
   React.ComponentProps<typeof Popper>,
-  'container' | 'open' | 'reference' | 'onRequestClose'
+  'container' | 'className' | 'open' | 'reference' | 'onRequestClose'
 >;
 
 const ContextMenu: React.FC<ContextMenuProps> = ({

@@ -13,10 +13,12 @@ import { withTargetDrag } from '@console/topology/src/behavior/useReconnect';
 import { withSelection } from '@console/topology/src/behavior/useSelection';
 import { withDndDrop } from '@console/topology/src/behavior/useDndDrop';
 import { withCreateConnector } from '@console/topology/src/behavior/withCreateConnector';
+import { withContextMenu } from '@console/topology/src/behavior/withContextMenu';
 import BaseNodeWidget from './widgets/BaseNodeWidget';
 import EdgeWidget from './widgets/EdgeWidget';
 import GroupHullWidget from './widgets/GroupHullWidget';
 import WorkloadNodeWidget from './widgets/WorkloadNodeWidget';
+import { workloadContextMenu, groupContextMenu } from './nodeContextMenu';
 import {
   graphWorkloadDropTargetSpec,
   nodeDragSourceSpec,
@@ -26,6 +28,7 @@ import {
   edgeDragSourceSpec,
   createConnectorSpec,
 } from './widgetUtils';
+import './ContextMenu.scss';
 
 type NodeEntityProps = {
   entity: NodeEntity;
@@ -41,7 +44,15 @@ const widgetFactory: WidgetFactory = (
   switch (entity.getType()) {
     case 'group':
       return withDndDrop<any, any, any, NodeEntityProps>(groupWorkoadDropTargetSpec)(
-        withDragNode()(withSelection()(GroupHullWidget)),
+        withDragNode()(
+          withSelection()(
+            withContextMenu(
+              groupContextMenu,
+              document.getElementById('modal-container'),
+              'odc-topology-context-menu',
+            )(GroupHullWidget),
+          ),
+        ),
       );
     case 'workload':
       return withCreateConnector(createConnectorSpec)(
@@ -52,7 +63,13 @@ const widgetFactory: WidgetFactory = (
           NodeEntityProps
         >(workloadDropTargetSpec)(
           withDragNode<any, NodeEntity, any, NodeEntityProps>(workloadDragSourceSpec(entity))(
-            withSelection()(WorkloadNodeWidget),
+            withSelection()(
+              withContextMenu(
+                workloadContextMenu,
+                document.getElementById('modal-container'),
+                'odc-topology-context-menu',
+              )(WorkloadNodeWidget),
+            ),
           ),
         ),
       );

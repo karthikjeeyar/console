@@ -9,6 +9,7 @@ import { NodeEntity, PointTuple } from '@console/topology/src/types';
 import widget from '@console/topology/src/widget';
 import { WithDndDragProps } from '@console/topology/src/behavior/useDndDrag';
 import { WithDndDropProps } from '@console/topology/src/behavior/useDndDrop';
+import { WithContextMenuProps } from '@console/topology/src/behavior/withContextMenu';
 import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
 import '../../topology/shapes/DefaultGroup.scss';
 import * as classNames from 'classnames';
@@ -23,7 +24,8 @@ type GroupHullWidgetProps = {
 } & WithSelectionProps &
   WithDragNodeProps &
   WithDndDragProps &
-  WithDndDropProps;
+  WithDndDropProps &
+  WithContextMenuProps;
 
 const FILTER_ID = 'DefaultGroupShadowFilterId';
 const FILTER_ID_HOVER = 'DefaultGroupDropShadowFilterId--hover';
@@ -54,6 +56,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   dndDropRef,
   droppable,
   canDrop,
+  onContextMenu,
 }) => {
   const [groupHover, setGroupHover] = React.useState<boolean>(false);
   const [lowPoint, setLowPoint] = React.useState<[number, number]>([0, 0]);
@@ -103,6 +106,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
           onMouseEnter={() => setGroupHover(true)}
           onMouseLeave={() => setGroupHover(false)}
           filter={groupHover ? createSvgIdUrl(FILTER_ID_HOVER) : createSvgIdUrl(FILTER_ID)}
+          onContextMenu={onContextMenu}
         >
           <path
             ref={refs}

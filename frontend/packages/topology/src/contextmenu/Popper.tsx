@@ -50,6 +50,7 @@ type PopperProps = {
   closeOnEsc?: boolean;
   closeOnOutsideClick?: boolean;
   container?: React.ComponentProps<typeof Portal>['container'];
+  className?: string,
   open?: boolean;
   onRequestClose?: () => void;
   placement?:
@@ -76,6 +77,7 @@ const DEFAULT_POPPER_OPTIONS: PopperOptions = {};
 const Popper: React.FC<PopperProps> = ({
   children,
   container,
+  className,
   open,
   placement = 'bottom-start',
   reference,
@@ -195,7 +197,7 @@ const Popper: React.FC<PopperProps> = ({
 
   return isOpen ? (
     <Portal container={container}>
-      <div ref={nodeRefCallback}>{children}</div>
+      <div ref={nodeRefCallback} className={className}>{children}</div>
     </Portal>
   ) : null;
 };

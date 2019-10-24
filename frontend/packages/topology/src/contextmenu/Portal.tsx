@@ -17,8 +17,7 @@ const Portal: React.FC<PortalProps> = ({ children, container }) => {
     setContainerNode(getContainer(container) || document.body);
   }, [container]);
 
-  // TODO: Check container node
-  return ReactDOM.createPortal(children, containerNode as Element);
+  return containerNode ? ReactDOM.createPortal(children, containerNode) : null;
 };
 
 export default Portal;
