@@ -14,6 +14,11 @@ export type ConnectorChoice = {
   label: string;
 };
 
+type CreateConnectorOptions = {
+  handleAngle?: number;
+  handleLength?: number;
+};
+
 type CreateConnectorWidgetProps = {
   entity: NodeEntity;
   onKeepAlive: (isAlive: boolean) => void;
@@ -24,7 +29,7 @@ type CreateConnectorWidgetProps = {
     choice?: ConnectorChoice,
   ) => ConnectorChoice[] | void | undefined | null;
   renderConnector: ConnectorRenderer;
-};
+} & CreateConnectorOptions;
 
 type CollectProps = {
   event?: DragEvent;
@@ -40,11 +45,18 @@ type PromptData = {
 
 export const CREATE_CONNECTOR_DROP_TYPE = '#createConnector#"';
 
-const X_OFFSET = 30;
-const Y_OFFSET = -Math.tan(12) * 30;
+const DEFAULT_HANDLE_ANGLE = 12 * (Math.PI / 180);
+const DEFAULT_HANDLE_LENGTH = 32;
 
 const CreateConnectorWidget: React.FC<CreateConnectorWidgetProps> = observer((props) => {
-  const { entity, onKeepAlive, onCreate, renderConnector } = props;
+  const {
+    entity,
+    onKeepAlive,
+    onCreate,
+    renderConnector,
+    handleAngle = DEFAULT_HANDLE_ANGLE,
+    handleLength = DEFAULT_HANDLE_LENGTH,
+  } = props;
   const [prompt, setPrompt] = React.useState<PromptData | null>(null);
   const [active, setActive] = React.useState(false);
 
@@ -92,14 +104,22 @@ const CreateConnectorWidget: React.FC<CreateConnectorWidgetProps> = observer((pr
 
   const dragEvent = prompt ? prompt.event : event;
 
+  const bounds = entity.getBounds();
+  const referencePoint = new Point(
+    bounds.right(),
+    Math.tan(handleAngle) * (bounds.width / 2) + bounds.y + bounds.height / 2,
+  );
+  const startPoint = entity.getAnchor(AnchorEnd.source).getLocation(referencePoint);
+
   let endPoint: Point;
   if (dragEvent) {
     endPoint = new Point(dragEvent.x, dragEvent.y);
   } else {
-    const bounds = entity.getBounds();
-    endPoint = new Point(bounds.right() + X_OFFSET, Y_OFFSET + bounds.y + bounds.height / 2);
+    endPoint = new Point(
+      Math.cos(handleAngle) * handleLength + startPoint.x,
+      Math.sin(handleAngle) * handleLength + startPoint.y,
+    );
   }
-  const startPoint = entity.getAnchor(AnchorEnd.source).getLocation(endPoint);
 
   // bring into the coordinate space of the entity
   entity.translateFromParent(startPoint);
@@ -166,6 +186,7 @@ const defaultRenderConnector: ConnectorRenderer = (startPoint: Point, endPoint: 
 export const withCreateConnector = <P extends WithCreateConnectorProps & EntityProps>(
   onCreate: React.ComponentProps<typeof CreateConnectorWidget>['onCreate'],
   renderConnector: ConnectorRenderer = defaultRenderConnector,
+  options?: CreateConnectorOptions,
 ) => (WrappedComponent: React.ComponentType<P>) => {
   const Component: React.FC<Omit<P, keyof WithCreateConnectorProps>> = (props) => {
     const [show, setShow] = React.useState(false);
@@ -184,6 +205,7 @@ export const withCreateConnector = <P extends WithCreateConnectorProps & EntityP
         />
         {(show || alive) && (
           <CreateConnectorWidget
+            {...options}
             entity={props.entity}
             onCreate={onCreate}
             onKeepAlive={onKeepAlive}
