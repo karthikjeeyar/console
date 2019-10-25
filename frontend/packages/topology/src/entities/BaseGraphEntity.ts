@@ -169,7 +169,7 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
     );
   }
 
-  panIntoView = (nodeEntity: NodeEntity, offset: number = 0, minimumVisible: number = 0): void => {
+  panIntoView = (nodeEntity: NodeEntity, { offset = 0, minimumVisible = 0 }): void => {
     if (!nodeEntity) {
       return;
     }

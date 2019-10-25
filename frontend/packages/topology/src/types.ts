@@ -160,7 +160,7 @@ export interface GraphEntity<E extends Graph = Graph, D = any> extends ElementEn
   reset(): void;
   scaleBy(scale: number, location?: Point): void;
   fit(padding?: number): void;
-  panIntoView(entity: NodeEntity, offset?: number, minimumVisible?: number): void;
+  panIntoView(entity: NodeEntity, options: { offset?: number; minimumVisible?: number }): void;
 }
 
 export type EventListener<Args extends any[] = any[]> = (...args: Args) => void;
