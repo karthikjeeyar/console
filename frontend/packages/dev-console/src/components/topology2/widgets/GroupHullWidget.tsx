@@ -5,7 +5,7 @@ import { createSvgIdUrl, hullPath, Point } from '@console/dev-console/src/utils/
 import { WithDragNodeProps } from '@console/topology/src/behavior/useDragNode';
 import { WithSelectionProps } from '@console/topology/src/behavior/useSelection';
 import Layer from '@console/topology/src/layers/Layer';
-import { NodeEntity, PointTuple } from '@console/topology/src/types';
+import { NodeEntity, PointTuple, NodeShape, GroupStyle } from '@console/topology/src/types';
 import widget from '@console/topology/src/widget';
 import { WithDndDragProps } from '@console/topology/src/behavior/useDndDrag';
 import { WithDndDropProps } from '@console/topology/src/behavior/useDndDrop';
@@ -31,8 +31,6 @@ const FILTER_ID = 'DefaultGroupShadowFilterId';
 const FILTER_ID_HOVER = 'DefaultGroupDropShadowFilterId--hover';
 
 type PointWithSize = PointTuple | [number, number, number];
-
-const hullPadding = (point: PointWithSize) => (point[2] || 0) + 20;
 
 // Return the point whose Y is the largest value.
 function findLowestPoint<P extends Point>(points: P[]): P {
@@ -63,17 +61,30 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   const pathRef = React.useRef<string | null>(null);
   const refs = useCombineRefs<SVGPathElement>(dragNodeRef, dndDragRef, dndDropRef);
 
+  // cast to number and coerce
+  const padding = +(entity.getStyle<GroupStyle>().padding as number);
+  const hullPadding = (point: PointWithSize) => (point[2] || 0) + padding;
+
   if (!droppable || !pathRef.current) {
     const children = entity.getNodes();
     if (children.length === 0) {
       return null;
     }
-    const points: PointWithSize[] = new Array(children.length);
-    _.forEach(children, (c, i) => {
-      const { width, height } = c.getBounds();
-      const { x, y } = c.getBounds().getCenter();
-      const size = Math.max(width, height);
-      points[i] = [x, y, size / 2] as PointWithSize;
+    const points: PointWithSize[] = [];
+    _.forEach(children, (c) => {
+      if (c.getNodeShape() === NodeShape.circle) {
+        const { width, height } = c.getBounds();
+        const { x, y } = c.getBounds().getCenter();
+        const radius = Math.max(width, height) / 2;
+        points.push([x, y, radius] as PointWithSize);
+      } else {
+        // add all 4 corners
+        const { width, height, x, y } = c.getBounds();
+        points.push([x, y, 0] as PointWithSize);
+        points.push([x + width, y, 0] as PointWithSize);
+        points.push([x, y + height, 0] as PointWithSize);
+        points.push([x + width, y + height, 0] as PointWithSize);
+      }
     });
     const hullPoints: PointTuple[] | null =
       points.length > 2 ? polygonHull(points as PointTuple[]) : (points as PointTuple[]);
