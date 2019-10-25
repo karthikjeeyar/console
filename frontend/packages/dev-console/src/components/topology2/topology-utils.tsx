@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { Edge, Model, Node, NodeEntity } from '@console/topology/src/types';
+import { Edge, EdgeEntity, Model, Node, NodeEntity } from '@console/topology/src/types';
 import { confirmModal, errorModal } from '@console/internal/components/modals';
 import { TopologyDataModel } from '../topology/topology-types';
 import {
   createTopologyResourceConnection,
+  removeTopologyResourceConnection,
   updateTopologyResourceApplication,
 } from '../topology/topology-utils';
 
@@ -114,4 +115,29 @@ const createConnection = (
   );
 };
 
-export { topologyModelFromDataModel, moveNodeToGroup, createConnection };
+const removeConnection = (edge: EdgeEntity): Promise<any> => {
+  const message = (
+    <React.Fragment>
+      Are you sure you want to remove the connection from{' '}
+      <strong>{edge.getSource().getLabel()}</strong> to{' '}
+      <strong>{edge.getTarget().getLabel()}</strong>?
+    </React.Fragment>
+  );
+
+  return confirmModal({
+    title: 'Delete Connection',
+    message,
+    btnText: 'Remove',
+    executeFn: () => {
+      return removeTopologyResourceConnection(
+        edge.getSource().getData(),
+        edge.getTarget().getData(),
+      ).catch((err) => {
+        const error = err.message;
+        errorModal({ error });
+      });
+    },
+  });
+};
+
+export { topologyModelFromDataModel, moveNodeToGroup, createConnection, removeConnection };

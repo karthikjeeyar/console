@@ -2,6 +2,7 @@ import * as React from 'react';
 import Layer from '@console/topology/src/layers/Layer';
 import Point from '@console/topology/src/geom/Point';
 import { EdgeEntity } from '@console/topology/src/types';
+import { WithRemoveConnectorProps } from '@console/topology/src/behavior/withRemoveConnector';
 import widget from '@console/topology/src/widget';
 import * as classNames from 'classnames';
 import { boundingBoxForLine } from '../../../utils/svg-utils';
@@ -10,7 +11,7 @@ import './BaseEdge.scss';
 type EdgeWidgetProps = {
   entity: EdgeEntity;
   dragging?: boolean;
-};
+} & WithRemoveConnectorProps;
 
 const getBoundingPathForLine = (startPoint: Point, endPoint: Point): string => {
   const bbox = boundingBoxForLine([startPoint.x, startPoint.y], [endPoint.x, endPoint.y], 3);
@@ -19,7 +20,13 @@ const getBoundingPathForLine = (startPoint: Point, endPoint: Point): string => {
   } ${bbox[3][1]} Z`;
 };
 
-const BaseEdgeWidget: React.FC<EdgeWidgetProps> = ({ entity, dragging, children }) => {
+const BaseEdgeWidget: React.FC<EdgeWidgetProps> = ({
+  entity,
+  dragging,
+  onShowRemoveConnector,
+  onHideRemoveConnector,
+  children,
+}) => {
   const [hover, setHover] = React.useState<boolean>(false);
   const startPoint = entity.getStartPoint();
   const endPoint = entity.getEndPoint();
@@ -27,13 +34,22 @@ const BaseEdgeWidget: React.FC<EdgeWidgetProps> = ({ entity, dragging, children 
   const d = `M${startPoint.x} ${startPoint.y} L${endPoint.x} ${endPoint.y}`;
   const hoverPath = getBoundingPathForLine(startPoint, endPoint);
 
+  const onHover = (isHover: boolean) => {
+    setHover(isHover);
+    if (isHover) {
+      onShowRemoveConnector && onShowRemoveConnector();
+    } else {
+      onHideRemoveConnector && onHideRemoveConnector();
+    }
+  };
+
   return (
     <>
       <Layer id={dragging || hover ? 'top' : undefined}>
         <g
           data-test-id="edge-handler"
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
+          onMouseEnter={() => onHover(true)}
+          onMouseLeave={() => onHover(false)}
           className={classNames('odc-base-edge', {
             'is-highlight': dragging,
             'is-hover': hover,

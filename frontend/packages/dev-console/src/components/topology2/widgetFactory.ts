@@ -13,6 +13,7 @@ import { withTargetDrag } from '@console/topology/src/behavior/useReconnect';
 import { withSelection } from '@console/topology/src/behavior/useSelection';
 import { withDndDrop } from '@console/topology/src/behavior/useDndDrop';
 import { withCreateConnector } from '@console/topology/src/behavior/withCreateConnector';
+import { WithRemoveConnector } from '@console/topology/src/behavior/withRemoveConnector';
 import { withContextMenu } from '@console/topology/src/behavior/withContextMenu';
 import BaseNodeWidget from './widgets/BaseNodeWidget';
 import EdgeWidget from './widgets/BaseEdgeWidget';
@@ -28,6 +29,7 @@ import {
   groupWorkoadDropTargetSpec,
   edgeDragSourceSpec,
   createConnectorSpec,
+  removeConnectorSpec,
 } from './widgetUtils';
 import './ContextMenu.scss';
 
@@ -77,7 +79,7 @@ const widgetFactory: WidgetFactory = (
     case 'connects-to':
       return withTargetDrag<any, NodeEntity, { dragging?: boolean }, EdgeEntityProps>(
         edgeDragSourceSpec,
-      )(ConnectsToWidget);
+      )(WithRemoveConnector(removeConnectorSpec)(ConnectsToWidget));
     default:
       switch (entity.kind) {
         case ModelKind.graph:

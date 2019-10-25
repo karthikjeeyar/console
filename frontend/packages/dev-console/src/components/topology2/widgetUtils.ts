@@ -9,7 +9,7 @@ import {
 } from '@console/topology/src/types';
 import { DragEvent, DragSourceMonitor } from '@console/topology/src/behavior/dnd-types';
 import { CREATE_CONNECTOR_DROP_TYPE } from '@console/topology/src/behavior/withCreateConnector';
-import { createConnection, moveNodeToGroup } from './topology-utils';
+import { createConnection, removeConnection, moveNodeToGroup } from './topology-utils';
 
 type NodeEntityProps = {
   entity: NodeEntity;
@@ -116,6 +116,11 @@ const createConnectorSpec = (source: NodeEntity, target: NodeEntity): any[] | nu
   return null;
 };
 
+const removeConnectorSpec = (edge: EdgeEntity): void => {
+  removeConnection(edge);
+  return null;
+};
+
 export {
   workloadDragSourceSpec,
   workloadDropTargetSpec,
@@ -124,4 +129,5 @@ export {
   groupWorkoadDropTargetSpec,
   edgeDragSourceSpec,
   createConnectorSpec,
+  removeConnectorSpec,
 };

@@ -6,12 +6,14 @@ import { EdgeEntity } from '../../src/types';
 import widget from '../../src/widget';
 import { useBendpoint } from '../../src/behavior/useBendpoint';
 import ConnectorArrow from '../../src/arrows/ConnectorArrow';
+import { WithRemoveConnectorProps } from '../../src/behavior/withRemoveConnector';
 
 type EdgeWidgetProps = {
   entity: EdgeEntity;
   dragging?: boolean;
 } & WithSourceDragProps &
-  WithTargetDragProps;
+  WithTargetDragProps &
+  WithRemoveConnectorProps;
 
 type BendpointProps = {
   point: Point;
@@ -40,6 +42,8 @@ const EdgeWidget: React.FC<EdgeWidgetProps> = ({
   sourceDragRef,
   targetDragRef,
   dragging,
+  onShowRemoveConnector,
+  onHideRemoveConnector,
 }) => {
   const startPoint = entity.getStartPoint();
   const endPoint = entity.getEndPoint();
@@ -56,6 +60,8 @@ const EdgeWidget: React.FC<EdgeWidgetProps> = ({
           stroke={(entity.getData() && entity.getData().color) || 'red'}
           d={d}
           fill="none"
+          onMouseEnter={onShowRemoveConnector}
+          onMouseLeave={onHideRemoveConnector}
         />
         {sourceDragRef && (
           <circle ref={sourceDragRef} r={8} cx={startPoint.x} cy={startPoint.y} fillOpacity={0} />
