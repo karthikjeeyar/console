@@ -64,7 +64,7 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
       const selectedEntity = visRef.current.getController().getEntityById(selectedIds[0]);
       if (selectedEntity && isNodeEntity(selectedEntity)) {
         resizeTimeout = setTimeout(() => {
-          visRef.current.getRoot().panIntoView(selectedEntity, 20, 40);
+          visRef.current.getRoot().panIntoView(selectedEntity, { offset: 20, minimumVisible: 40 });
           resizeTimeout = null;
         }, 500);
       }
