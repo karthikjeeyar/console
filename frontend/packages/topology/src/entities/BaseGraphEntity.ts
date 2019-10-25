@@ -114,7 +114,7 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
     this.scale *= scale;
     x = c.x - x * this.scale;
     y = c.y - y * this.scale;
-    b.setLocation(x, y);
+    this.setBounds(b.clone().setLocation(x, y));
   }
 
   fit(padding = 0): void {
@@ -162,7 +162,11 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
 
     // TODO should scale and bound be kept in a single geom Transform object instead of separately?
     this.setScale(scale);
-    this.getBounds().setLocation(tx, ty);
+    this.setBounds(
+      this.getBounds()
+        .clone()
+        .setLocation(tx, ty),
+    );
   }
 
   panIntoView = (nodeEntity: NodeEntity, offset: number = 0, minimumVisible: number = 0): void => {
