@@ -10,8 +10,8 @@ import {
 const topologyModelFromDataModel = (dataModel: TopologyDataModel): Model => {
   const nodes: Node[] = dataModel.graph.nodes.map((d) => {
     return {
-      width: 144,
-      height: 144,
+      width: 104,
+      height: 104,
       id: d.id,
       type: d.type,
       label: dataModel.topology[d.id].name,
@@ -28,7 +28,7 @@ const topologyModelFromDataModel = (dataModel: TopologyDataModel): Model => {
       children: d.nodes,
       label: d.name,
       style: {
-        padding: 20,
+        padding: 40,
       },
     };
   });

@@ -1,7 +1,16 @@
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 import { action } from 'mobx';
-import { EdgeEntity, ElementEntity, GraphEntity, Layout, NodeEntity } from '../types';
+import {
+  EdgeEntity,
+  ElementEntity,
+  GraphEntity,
+  Layout,
+  NodeEntity,
+  GroupStyle,
+  isGraphEntity,
+  isNodeEntity,
+} from '../types';
 import { leafNodeEntities } from '../utils/leafNodeEntities';
 import { groupNodeEntities } from '../utils/groupNodeEntities';
 import BaseEdgeEntity from '../entities/BaseEdgeEntity';
@@ -10,6 +19,20 @@ import {
   DRAG_NODE_END_EVENT,
   DragNodeEventListener,
 } from '../behavior/useDragNode';
+
+function getGroupPadding(entity: ElementEntity, padding = 0): number {
+  if (isGraphEntity(entity)) {
+    return padding;
+  }
+  let newPadding = padding;
+  if (isNodeEntity(entity) && entity.isGroup()) {
+    newPadding += +(entity.getStyle<GroupStyle>().padding as number);
+  }
+  if (entity.getParent()) {
+    return getGroupPadding(entity.getParent(), newPadding);
+  }
+  return newPadding;
+}
 
 class D3Node implements d3.SimulationNodeDatum {
   private node: NodeEntity;
@@ -128,27 +151,26 @@ class D3Link implements d3.SimulationLinkDatum<D3Node> {
   }
 }
 
+type ForceLayoutOptions = {
+  linkDistance: number;
+  collideDistance: number;
+  simulationSpeed: number;
+  chargeStrength: number;
+};
+
 export default class ForceLayout implements Layout {
   private graph: GraphEntity;
 
   private simulation: d3.Simulation<D3Node, undefined>;
 
-  private groupPadding: number;
+  private options: ForceLayoutOptions;
 
-  private nodeSep: number;
-
-  private collideDist: number;
-
-  constructor(
-    graph: GraphEntity,
-    groupPadding: number = 55,
-    nodeSep: number = 80,
-    collideDist: number = 25,
-  ) {
+  constructor(graph: GraphEntity, options?: Partial<ForceLayoutOptions>) {
     this.graph = graph;
-    this.groupPadding = groupPadding;
-    this.nodeSep = nodeSep;
-    this.collideDist = collideDist;
+    this.options = {
+      ...{ linkDistance: 30, collideDistance: 10, simulationSpeed: 10, chargeStrength: -30 },
+      ...options,
+    };
 
     graph
       .getController()
@@ -256,8 +278,11 @@ export default class ForceLayout implements Layout {
     // create force simulation
     this.simulation = d3
       .forceSimulation<D3Node>()
-      .force('collide', d3.forceCollide<D3Node>().radius((d) => d.getRadius() + this.collideDist))
-      .force('charge', d3.forceManyBody())
+      .force(
+        'collide',
+        d3.forceCollide<D3Node>().radius((d) => d.getRadius() + this.options.collideDistance),
+      )
+      .force('charge', d3.forceManyBody().strength(this.options.chargeStrength))
       .force('center', d3.forceCenter(cx, cy))
       .nodes(nodes)
       .force(
@@ -265,21 +290,28 @@ export default class ForceLayout implements Layout {
         d3
           .forceLink<D3Node, D3Link>(edges)
           .id((e) => e.id)
-          .distance(
-            (d) =>
-              (d.source as D3Node).entity.getBounds().width / 2 +
-              (d.target as D3Node).entity.getBounds().width / 2 +
-              this.nodeSep +
-              ((d.source as D3Node).entity.getParent() !== (d.target as D3Node).entity.getParent()
-                ? this.groupPadding * 2
-                : 0),
-          ),
+          .distance((d) => {
+            let distance =
+              this.options.linkDistance +
+              (d.source as D3Node).getRadius() +
+              (d.target as D3Node).getRadius();
+
+            if (
+              (d.source as D3Node).entity.getParent() !== (d.target as D3Node).entity.getParent()
+            ) {
+              // find the group padding
+              distance += getGroupPadding((d.source as D3Node).entity.getParent());
+              distance += getGroupPadding((d.target as D3Node).entity.getParent());
+            }
+
+            return distance;
+          }),
       )
       .on(
         'tick',
         action(() => {
           // speed up the simulation
-          for (let i = 0; i < 10; i++) {
+          for (let i = 0; i < this.options.simulationSpeed; i++) {
             this.simulation.tick();
           }
           nodes.forEach((d) => d.update());

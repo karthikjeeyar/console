@@ -41,8 +41,6 @@ export type WorkloadNodeWidgetProps = {
   WithContextMenuProps &
   WithCreateConnectorProps;
 
-const NODE_MARGIN = 40;
-
 const WorkloadNodeWidget: React.FC<WorkloadNodeWidgetProps> = ({
   icon,
   kind,
@@ -51,13 +49,14 @@ const WorkloadNodeWidget: React.FC<WorkloadNodeWidgetProps> = ({
   attachments,
   ...rest
 }) => {
+  const { width, height } = entity.getBounds();
   const workloadData = entity.getData().data;
-  const size = entity.getBounds().width - NODE_MARGIN;
+  const size = Math.min(width, height);
   const { build, donutStatus } = workloadData;
   const { radius, decoratorRadius } = calculateRadius(size);
   const repoIcon = routeDecoratorIcon(workloadData.editUrl, decoratorRadius);
-  const cx = entity.getBounds().width / 2;
-  const cy = entity.getBounds().height / 2;
+  const cx = width / 2;
+  const cy = height / 2;
 
   return (
     <g>
