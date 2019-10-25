@@ -14,10 +14,6 @@ const getEllipseAnchorPoint = (
 
   const newLength = len - 1;
 
-  if (newLength < 0) {
-    return center;
-  }
-
   const lenProportion = newLength / len;
 
   return new Point((center.x - x) * lenProportion + x, (center.y - y) * lenProportion + y);
