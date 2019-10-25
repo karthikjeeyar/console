@@ -94,8 +94,12 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   };
 
   const contentsClasses = classNames('odc-base-node__contents');
-  const refs = useCombineRefs<SVGEllipseElement>(dragNodeRef, dndDragRef);
-  const nodeRefs = useCombineRefs<SVGCircleElement>(svgAnchorRef, dndDropRef);
+  const nodeRefs = useCombineRefs<SVGCircleElement>(
+    svgAnchorRef,
+    dndDropRef,
+    dragNodeRef,
+    dndDragRef,
+  );
 
   const onHoverChange = (hoverStatus: boolean) => {
     setHover(hoverStatus);
@@ -107,7 +111,7 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   };
 
   return (
-    <g className="odc-base-node" ref={refs}>
+    <g className="odc-base-node">
       <g
         data-test-id="base-node-handler"
         onClick={onSelect}
@@ -119,7 +123,6 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
         <SvgDropShadowFilter id={FILTER_ID_HOVER} dy={3} stdDeviation={7} floodOpacity={0.24} />
         <circle
           className={classNames('odc-base-node__bg', { 'is-highlight': canDrop })}
-          ref={nodeRefs}
           cx={cx}
           cy={cy}
           r={outerRadius}
@@ -159,6 +162,7 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
           {children}
         </g>
       </g>
+      <circle ref={nodeRefs} cx={cx} cy={cy} r={outerRadius} fillOpacity={0} />
       <g className={contentsClasses}>{attachments}</g>
     </g>
   );

@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as _ from 'lodash';
 import Point from '../geom/Point';
 import { EdgeEntity } from '../types';
+import widget from '../widget';
 import { ConnectDragSource } from '../behavior/dnd-types';
 
 type ConnectorArrowProps = {
@@ -71,9 +72,9 @@ const ConnectorArrow: React.FC<ConnectorArrowProps> = ({
       className={className}
     >
       <polygon points={pointsStringFromPoints(arrowPoints)} />
-      <polygon points={pointsStringFromPoints(boundingBox)} fillOpacity={0} />
+      <polygon points={pointsStringFromPoints(boundingBox)} fillOpacity={0} strokeWidth={0} />
     </g>
   );
 };
 
-export default ConnectorArrow;
+export default widget(ConnectorArrow);

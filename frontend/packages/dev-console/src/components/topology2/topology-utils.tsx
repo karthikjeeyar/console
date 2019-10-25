@@ -37,7 +37,7 @@ const topologyModelFromDataModel = (dataModel: TopologyDataModel): Model => {
       source: d.source,
       target: d.target,
       id: `${d.source}_${d.target}`,
-      type: 'edge',
+      type: d.type,
     }),
   );
 

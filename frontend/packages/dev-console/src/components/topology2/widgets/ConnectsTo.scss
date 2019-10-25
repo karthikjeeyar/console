@@ -1,0 +1,18 @@
+.odc-connects-to {
+  cursor: pointer;
+  stroke-width: 0;
+  fill: var(--pf-global--BackgroundColor--dark-200);
+
+  .is-hover &, .is-highlight & {
+    fill: var(--pf-global--active-color--400);
+  }
+  &__remove-bg {
+    fill: var(--pf-global--active-color--400);
+  }
+  &__remove-icon {
+    color: var(--pf-global--Color--light-100);
+  }
+  &__hover-arrow {
+    fill: var(--pf-global--active-color--400);
+  }
+}

@@ -12,7 +12,6 @@ import {
   SELECTION_EVENT,
   SelectionEventListener,
 } from '@console/topology/src/behavior/useSelection';
-import BaseNodeEntity from '@console/topology/src/entities/BaseNodeEntity';
 import * as _ from 'lodash';
 import TopologySideBar from '../topology/TopologySideBar';
 import { TopologyDataModel, TopologyDataObject } from '../topology/topology-types';
@@ -38,57 +37,47 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
   const visRef = React.useRef<Visualization | null>(null);
   const [model, setModel] = React.useState<Model>();
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
-  const [selectedEntity, setSelectedEntity] = React.useState<ElementEntity | undefined>();
-  const { topology } = data;
-
-  const onSelection = (ids: string[]) => {
-    setSelectedIds(ids);
-  };
 
   if (!visRef.current) {
     visRef.current = new Visualization();
-
     visRef.current.registerLayoutFactory(layoutFactory);
     visRef.current.registerWidgetFactory(widgetFactory);
-    visRef.current.addEventListener<SelectionEventListener>(SELECTION_EVENT, onSelection);
-  }
-
-  if (!model) {
-    const newModel = topologyModelFromDataModel(data);
+    visRef.current.addEventListener<SelectionEventListener>(SELECTION_EVENT, setSelectedIds);
     visRef.current.fromModel(graphModel);
-    visRef.current.fromModel(newModel);
-    setModel(newModel);
   }
 
   React.useEffect(() => {
     const newModel = topologyModelFromDataModel(data);
     visRef.current.fromModel(newModel);
     setModel(newModel);
+    if (selectedIds.length) {
+      if (!visRef.current.getController().getEntityById(selectedIds[0])) {
+        setSelectedIds([]);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   React.useEffect(() => {
-    let updatedSelection;
-    if (selectedIds[0]) {
-      try {
-        updatedSelection = visRef.current.getController().getEntityById(selectedIds[0]);
-      } catch (e) {
-        updatedSelection = undefined;
+    let resizeTimeout = null;
+    if (selectedIds.length > 0) {
+      const selectedEntity = visRef.current.getController().getEntityById(selectedIds[0]);
+      if (selectedEntity && isNodeEntity(selectedEntity)) {
+        resizeTimeout = setTimeout(() => {
+          visRef.current.getRoot().panIntoView(selectedEntity, 20, 40);
+          resizeTimeout = null;
+        }, 500);
       }
     }
-
-    setSelectedEntity(updatedSelection);
-  }, [selectedIds, topology]);
-
-  React.useEffect(() => {
-    if (selectedEntity && isNodeEntity(selectedEntity)) {
-      setTimeout(() => {
-        visRef.current.getRoot().makeEntityVisible(selectedEntity);
-      }, 500);
-    }
-  }, [selectedEntity]);
+    return () => {
+      if (resizeTimeout) {
+        resizeTimeout.cancel();
+      }
+    };
+  }, [selectedIds]);
 
   const onSidebarClose = () => {
-    visRef.current.getController().fireEvent(SELECTION_EVENT, []);
+    setSelectedIds([]);
   };
 
   const renderControlBar = () => {
@@ -116,8 +105,11 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
   };
 
   const selectedItemDetails = () => {
+    const selectedEntity = selectedIds[0]
+      ? visRef.current.getController().getEntityById(selectedIds[0])
+      : null;
     if (isNodeEntity(selectedEntity)) {
-      if ((selectedEntity as BaseNodeEntity).isGroup()) {
+      if (selectedEntity.isGroup()) {
         return (
           <TopologyApplicationPanel
             application={{
@@ -136,11 +128,20 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
     return null;
   };
 
-  const topologySideBar = (
-    <TopologySideBar show={!!selectedEntity} onClose={onSidebarClose}>
-      {selectedEntity && selectedItemDetails()}
-    </TopologySideBar>
-  );
+  const renderSideBar = () => {
+    if (selectedIds.length === 0) {
+      return null;
+    }
+    const selectedEntity = visRef.current.getController().getEntityById(selectedIds[0]);
+    if (!selectedEntity) {
+      return null;
+    }
+    return (
+      <TopologySideBar show={!!selectedEntity} onClose={onSidebarClose}>
+        {selectedEntity && selectedItemDetails()}
+      </TopologySideBar>
+    );
+  };
 
   if (!model) {
     return null;
@@ -149,8 +150,8 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
   return (
     <TopologyView
       controlBar={renderControlBar()}
-      sideBar={topologySideBar}
-      sideBarOpen={!!selectedEntity}
+      sideBar={renderSideBar()}
+      sideBarOpen={selectedIds.length > 0}
     >
       <VisualizationWidget visualization={visRef.current} state={{ selectedIds }} />
     </TopologyView>

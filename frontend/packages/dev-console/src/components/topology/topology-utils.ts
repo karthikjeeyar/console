@@ -239,6 +239,7 @@ export const getTopologyGroupItems = (dc: K8sResourceKind, groups: Group[]): Gro
         id: `group:${label}`,
         name: label,
         nodes: [uid],
+        type: 'group',
       });
     } else {
       const gIndex = _.findIndex(groups, { name: label });

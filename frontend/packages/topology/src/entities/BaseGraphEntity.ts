@@ -165,7 +165,7 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
     this.getBounds().setLocation(tx, ty);
   }
 
-  makeEntityVisible = (nodeEntity: NodeEntity): void => {
+  panIntoView = (nodeEntity: NodeEntity, offset: number = 0, minimumVisible: number = 0): void => {
     if (!nodeEntity) {
       return;
     }
@@ -175,8 +175,8 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
       .translate(viewX, viewY);
     const { x, y, width, height } = boundingBox;
     let move = false;
-    const panOffset = 20 * this.getScale();
-    const minVisibleSize = 40 * this.getScale();
+    const panOffset = offset * this.getScale();
+    const minVisibleSize = minimumVisible * this.getScale();
 
     const newLocation = {
       x: viewX,

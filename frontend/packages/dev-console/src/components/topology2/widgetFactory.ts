@@ -15,8 +15,9 @@ import { withDndDrop } from '@console/topology/src/behavior/useDndDrop';
 import { withCreateConnector } from '@console/topology/src/behavior/withCreateConnector';
 import { withContextMenu } from '@console/topology/src/behavior/withContextMenu';
 import BaseNodeWidget from './widgets/BaseNodeWidget';
-import EdgeWidget from './widgets/EdgeWidget';
+import EdgeWidget from './widgets/BaseEdgeWidget';
 import GroupHullWidget from './widgets/GroupHullWidget';
+import ConnectsToWidget from './widgets/ConnectsToWidget';
 import WorkloadNodeWidget from './widgets/WorkloadNodeWidget';
 import { workloadContextMenu, groupContextMenu } from './nodeContextMenu';
 import {
@@ -73,6 +74,10 @@ const widgetFactory: WidgetFactory = (
           ),
         ),
       );
+    case 'connects-to':
+      return withTargetDrag<any, NodeEntity, { dragging?: boolean }, EdgeEntityProps>(
+        edgeDragSourceSpec,
+      )(ConnectsToWidget);
     default:
       switch (entity.kind) {
         case ModelKind.graph:
@@ -84,9 +89,7 @@ const widgetFactory: WidgetFactory = (
             withSelection()(BaseNodeWidget),
           );
         case ModelKind.edge:
-          return withTargetDrag<any, NodeEntity, { dragging?: boolean }, EdgeEntityProps>(
-            edgeDragSourceSpec,
-          )(EdgeWidget);
+          return EdgeWidget;
         default:
           return undefined;
       }
