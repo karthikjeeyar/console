@@ -7,6 +7,10 @@ const getEllipseAnchorPoint = (
   reference: Point,
 ): Point => {
   const { x, y } = reference;
+  if (width === 0 || height === 0 || center.x === x || center.y === y) {
+    return new Point(center.x, center.y);
+  }
+
   const dispX = (center.x - x) / (width / 2);
   const dispY = (center.y - y) / (height / 2);
 
