@@ -16,6 +16,8 @@ export interface SvgBoxedTextProps {
   y?: number;
   cornerRadius?: number;
   kind?: string;
+  innerRef?: React.Ref<SVGGElement>;
+  // TODO remove with 2.0
   onMouseEnter?: React.MouseEventHandler<SVGGElement>;
   onMouseLeave?: React.MouseEventHandler<SVGGElement>;
 }
@@ -64,6 +66,7 @@ export default class SvgBoxedText extends React.Component<SvgBoxedTextProps, Sta
       kind,
       onMouseEnter,
       onMouseLeave,
+      innerRef,
       ...other
     } = this.props;
     const { bb } = this.state;
@@ -71,7 +74,7 @@ export default class SvgBoxedText extends React.Component<SvgBoxedTextProps, Sta
       kind && this.iconRef.current ? this.iconRef.current.getBBox().width + paddingX : 0;
 
     return (
-      <g className={className}>
+      <g ref={innerRef} className={className}>
         <SvgDropShadowFilter id={FILTER_ID} />
         {bb && (
           <rect
