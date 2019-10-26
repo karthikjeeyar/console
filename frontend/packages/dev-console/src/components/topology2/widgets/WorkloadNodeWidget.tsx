@@ -20,11 +20,6 @@ import PodSet from '../../topology/shapes/PodSet';
 import KnativeIcon from '../../topology/shapes/KnativeIcon';
 import BaseNodeWidget from './BaseNodeWidget';
 
-export interface State {
-  hover?: boolean;
-  labelHover?: boolean;
-}
-
 export type WorkloadNodeWidgetProps = {
   icon?: string;
   kind?: string;
