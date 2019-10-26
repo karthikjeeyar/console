@@ -68,11 +68,11 @@ const moveNodeToGroup = (node: NodeEntity, targetGroup: NodeEntity) => {
   if (sourceGroup) {
     const title = targetGroup ? 'Move Component Node' : 'Remove Component Node from Application';
     const message = (
-      <React.Fragment>
+      <>
         Are you sure you want to {targetGroup ? 'move' : 'remove'}{' '}
         <strong>{node.getLabel()}</strong> from {sourceGroup.getLabel()}
         {targetGroup ? ` to ${targetGroup.getLabel()}` : ''}?
-      </React.Fragment>
+      </>
     );
     const btnText = targetGroup ? 'Move' : 'Remove';
 
