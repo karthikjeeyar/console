@@ -56,11 +56,15 @@ const LayerDelegate: React.FC<LayerDelegateProps> = observer(({ id, children, or
       for (let i = 0; i < childNodes.length; i++) {
         const result = compare(nodeRef.current, childNodes[i]);
         if (result < 0) {
-          layerNode.insertBefore(nodeRef.current, childNodes[i]);
+          if (i > 0 && childNodes[i - 1] !== nodeRef.current) {
+            layerNode.insertBefore(nodeRef.current, childNodes[i]);
+          }
           return;
         }
       }
-      layerNode.appendChild(nodeRef.current);
+      if (childNodes[childNodes.length - 1] !== nodeRef.current) {
+        layerNode.appendChild(nodeRef.current);
+      }
     }
   }, [order, layerNode]);
 

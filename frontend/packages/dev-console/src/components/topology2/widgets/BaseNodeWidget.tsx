@@ -9,6 +9,7 @@ import { WithDndDragProps } from '@console/topology/src/behavior/useDndDrag';
 import { WithDndDropProps } from '@console/topology/src/behavior/useDndDrop';
 import { WithContextMenuProps } from '@console/topology/src/behavior/withContextMenu';
 import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
+import useHover from '@console/topology/src/behavior/useHover';
 import SvgBoxedText from '../../svg/SvgBoxedText';
 import { createSvgIdUrl } from '../../../utils/svg-utils';
 import SvgDropShadowFilter from '../../svg/SvgDropShadowFilter';
@@ -67,52 +68,29 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   onShowCreateConnector,
   onContextMenu,
 }) => {
-  const [hover, setHover] = React.useState();
-  const [hoverTimer, setHoverTimer] = React.useState();
-  const [labelHover, setLabelHover] = React.useState(false);
+  const [hoverRef, hover] = useHover();
+  const [labelHoverRef, labelHover] = useHover(200);
   const svgAnchorRef = useSvgAnchor();
   const cx = entity.getBounds().width / 2;
   const cy = entity.getBounds().height / 2;
 
-  const onLabelEnter = () => {
-    if (!hoverTimer) {
-      setHoverTimer(
-        setTimeout(() => {
-          setLabelHover(true);
-        }, 200),
-      );
-    }
-  };
-
-  const onLabelLeave = () => {
-    setLabelHover(false);
-
-    if (hoverTimer) {
-      clearTimeout(hoverTimer);
-      setHoverTimer(null);
-    }
-  };
-
   const contentsClasses = classNames('odc-base-node__contents');
-  const refs = useCombineRefs<SVGEllipseElement>(dragNodeRef, dndDragRef);
+  const refs = useCombineRefs<SVGEllipseElement>(hoverRef, dragNodeRef, dndDragRef);
   const nodeRefs = useCombineRefs<SVGCircleElement>(svgAnchorRef, dndDropRef);
 
-  const onHoverChange = (hoverStatus: boolean) => {
-    setHover(hoverStatus);
-    if (hoverStatus) {
+  React.useLayoutEffect(() => {
+    if (hover) {
       onShowCreateConnector();
     } else {
       onHideCreateConnector();
     }
-  };
+  }, [hover, onShowCreateConnector, onHideCreateConnector]);
 
   return (
     <g className="odc-base-node">
       <g
         data-test-id="base-node-handler"
         onClick={onSelect}
-        onMouseEnter={() => onHoverChange(true)}
-        onMouseLeave={() => onHoverChange(false)}
         onContextMenu={onContextMenu}
         ref={refs}
       >
@@ -136,14 +114,13 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
           />
           {entity.getLabel() != null && (
             <SvgBoxedText
+              innerRef={labelHoverRef}
               className="odc-base-node__label"
               x={cx}
               y={cy + outerRadius + 20}
               paddingX={8}
               paddingY={4}
               kind={kind}
-              onMouseEnter={onLabelEnter}
-              onMouseLeave={onLabelLeave}
             >
               {labelHover ? entity.getLabel() : truncateEnd(entity.getLabel())}
             </SvgBoxedText>

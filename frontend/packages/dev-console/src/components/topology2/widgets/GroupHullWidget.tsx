@@ -11,6 +11,7 @@ import { WithDndDragProps } from '@console/topology/src/behavior/useDndDrag';
 import { WithDndDropProps } from '@console/topology/src/behavior/useDndDrop';
 import { WithContextMenuProps } from '@console/topology/src/behavior/withContextMenu';
 import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
+import useHover from '@console/topology/src/behavior/useHover';
 import '../../topology/shapes/DefaultGroup.scss';
 import * as classNames from 'classnames';
 import SvgDropShadowFilter from '../../svg/SvgDropShadowFilter';
@@ -56,7 +57,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   canDrop,
   onContextMenu,
 }) => {
-  const [groupHover, setGroupHover] = React.useState<boolean>(false);
+  const [groupHoverRef, groupHover] = useHover();
   const [lowPoint, setLowPoint] = React.useState<[number, number]>([0, 0]);
   const pathRef = React.useRef<string | null>(null);
   const refs = useCombineRefs<SVGPathElement>(dragNodeRef, dndDragRef, dndDropRef);
@@ -113,30 +114,24 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
       <g>
         <SvgDropShadowFilter id={FILTER_ID} />
         <SvgDropShadowFilter id={FILTER_ID_HOVER} dy={3} stdDeviation={7} floodOpacity={0.24} />
-        <g
-          onMouseEnter={() => setGroupHover(true)}
-          onMouseLeave={() => setGroupHover(false)}
-          filter={groupHover ? createSvgIdUrl(FILTER_ID_HOVER) : createSvgIdUrl(FILTER_ID)}
-          onContextMenu={onContextMenu}
-        >
+        <g ref={groupHoverRef} onContextMenu={onContextMenu}>
           <path
             ref={refs}
+            filter={groupHover ? createSvgIdUrl(FILTER_ID_HOVER) : createSvgIdUrl(FILTER_ID)}
             className={pathClasses}
             onClick={onSelect}
             d={pathRef.current}
-            onMouseEnter={() => setGroupHover(true)}
-            onMouseLeave={() => setGroupHover(false)}
           />
+          <SvgBoxedText
+            className="odc-default-group__label"
+            x={lowPoint[0]}
+            y={lowPoint[1] + hullPadding(lowPoint) + 30}
+            paddingX={20}
+            paddingY={5}
+          >
+            {entity.getLabel()}
+          </SvgBoxedText>
         </g>
-        <SvgBoxedText
-          className="odc-default-group__label"
-          x={lowPoint[0]}
-          y={lowPoint[1] + hullPadding(lowPoint) + 30}
-          paddingX={20}
-          paddingY={5}
-        >
-          {entity.getLabel()}
-        </SvgBoxedText>
       </g>
     </Layer>
   );
