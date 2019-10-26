@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
 import { EdgeEntity } from '../types';
-import DefaultCreateConnectorWidget from '../widgets/DefaultRemoveConnectorWidget';
+import DefaultRemoveConnectorWidget from '../widgets/DefaultRemoveConnectorWidget';
 
 type EntityProps = {
   entity: EdgeEntity;
@@ -27,7 +27,7 @@ const defaultRenderRemove: RemoveRenderer = (
   };
 
   return (
-    <DefaultCreateConnectorWidget
+    <DefaultRemoveConnectorWidget
       startPoint={edge.getStartPoint()}
       endPoint={edge.getEndPoint()}
       onRemove={removeEntity}
@@ -35,7 +35,7 @@ const defaultRenderRemove: RemoveRenderer = (
   );
 };
 
-export const WithRemoveConnector = <P extends WithRemoveConnectorProps & EntityProps>(
+export const withRemoveConnector = <P extends WithRemoveConnectorProps & EntityProps>(
   onRemove: (edge: EdgeEntity) => void,
   renderRemove: RemoveRenderer = defaultRenderRemove,
 ) => (WrappedComponent: React.ComponentType<P>) => {
