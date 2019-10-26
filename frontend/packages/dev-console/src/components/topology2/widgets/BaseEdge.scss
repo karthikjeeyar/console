@@ -1,10 +1,10 @@
 .odc-base-edge {
-  stroke-width: 0;
   &__path {
     stroke: var(--pf-global--BackgroundColor--dark-200);
     stroke-width: 2px;
 
-    .is-hover &, .is-highlight & {
+    .is-hover &,
+    .is-highlight & {
       stroke: var(--pf-global--active-color--400);
     }
   }

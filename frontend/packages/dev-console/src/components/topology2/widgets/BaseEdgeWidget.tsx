@@ -54,7 +54,7 @@ const BaseEdgeWidget: React.FC<EdgeWidgetProps> = ({
           'is-hover': hover,
         })}
       >
-        <path d={hoverPath} fillOpacity={0} />
+        <path d={hoverPath} fillOpacity={0} strokeWidth={0} />
         <path className="odc-base-edge__path" d={d} fill="none" />
         {children}
       </g>
