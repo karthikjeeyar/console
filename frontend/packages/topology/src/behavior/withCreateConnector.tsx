@@ -101,17 +101,19 @@ const CreateConnectorWidget: React.FC<CreateConnectorWidgetProps> = observer((pr
 
   const dragEvent = prompt ? prompt.event : event;
 
-  const bounds = entity.getBounds();
-  const referencePoint = new Point(
-    bounds.right(),
-    Math.tan(handleAngle) * (bounds.width / 2) + bounds.y + bounds.height / 2,
-  );
-  const startPoint = entity.getAnchor(AnchorEnd.source).getLocation(referencePoint);
-
+  let startPoint: Point;
   let endPoint: Point;
+
   if (dragEvent) {
     endPoint = new Point(dragEvent.x, dragEvent.y);
+    startPoint = entity.getAnchor(AnchorEnd.source).getLocation(endPoint);
   } else {
+    const bounds = entity.getBounds();
+    const referencePoint = new Point(
+      bounds.right(),
+      Math.tan(handleAngle) * (bounds.width / 2) + bounds.y + bounds.height / 2,
+    );
+    startPoint = entity.getAnchor(AnchorEnd.source).getLocation(referencePoint);
     endPoint = new Point(
       Math.cos(handleAngle) * handleLength + startPoint.x,
       Math.sin(handleAngle) * handleLength + startPoint.y,
