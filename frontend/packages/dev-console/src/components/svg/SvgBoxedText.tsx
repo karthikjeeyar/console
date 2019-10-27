@@ -41,16 +41,20 @@ export default class SvgBoxedText extends React.Component<SvgBoxedTextProps, Sta
     this.computeBoxSize();
   }
 
-  componentDidUpdate({ className, children }: SvgBoxedTextProps) {
-    if (this.props.children !== children || this.props.className !== className) {
-      this.computeBoxSize();
-    }
+  componentDidUpdate() {
+    this.computeBoxSize();
   }
 
   private computeBoxSize() {
     const { current } = this.textRef;
     if (current && current.getBBox) {
-      this.setState({ bb: current.getBBox() });
+      const bb = current.getBBox();
+      if (
+        !this.state.bb ||
+        (bb.width !== this.state.bb.width || bb.height !== this.state.bb.height)
+      ) {
+        this.setState({ bb });
+      }
     }
   }
 
