@@ -75,11 +75,11 @@ export const ContextMenuOnNode = () => {
   };
   vis.fromModel(model);
   vis.registerWidgetFactory(defaultWidgetFactory);
-  vis.registerWidgetFactory((entity) => {
-    if (entity.kind === ModelKind.graph) {
+  vis.registerWidgetFactory((kind) => {
+    if (kind === ModelKind.graph) {
       return withPanZoom()(GraphWidget);
     }
-    if (entity.kind === ModelKind.node) {
+    if (kind === ModelKind.node) {
       return withDragNode()(withContextMenu(() => defaultMenu)(NodeWidget));
     }
     return undefined;

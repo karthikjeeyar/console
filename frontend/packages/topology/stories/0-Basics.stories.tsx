@@ -161,8 +161,8 @@ export const multiEdge = () => {
   };
   vis.fromModel(model);
   vis.registerWidgetFactory(defaultWidgetFactory);
-  vis.registerWidgetFactory((entity) => {
-    if (entity.kind === ModelKind.node) {
+  vis.registerWidgetFactory((kind) => {
+    if (kind === ModelKind.node) {
       return withDragNode()(NodeWidget);
     }
     return undefined;

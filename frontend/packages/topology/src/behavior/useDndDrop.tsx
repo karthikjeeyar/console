@@ -6,9 +6,9 @@ import { observer } from 'mobx-react';
 import { pointInSvgPath } from 'point-in-svg-path';
 import EntityContext from '../utils/EntityContext';
 import Point from '../geom/Point';
+import { ElementEntity } from '../types';
 import {
   ConnectDropTarget,
-  DragObjectWithType,
   DropTargetSpec,
   DropTargetMonitor,
   Identifier,
@@ -16,11 +16,13 @@ import {
 } from './dnd-types';
 import { useDndManager } from './useDndManager';
 
+const EMPTY_PROPS = Object.freeze({});
+
 export const useDndDrop = <
-  DragObject extends DragObjectWithType,
-  DropResult,
-  CollectedProps,
-  Props = {}
+  DragObject,
+  DropResult = ElementEntity,
+  CollectedProps extends {} = {},
+  Props extends {} = {}
 >(
   spec: DropTargetSpec<DragObject, DropResult, CollectedProps, Props>,
   props?: Props,
@@ -28,8 +30,8 @@ export const useDndDrop = <
   const specRef = React.useRef(spec);
   specRef.current = spec;
 
-  const propsRef = React.useRef(props);
-  propsRef.current = props;
+  const propsRef = React.useRef(props != null ? props : (EMPTY_PROPS as Props));
+  propsRef.current = props != null ? props : (EMPTY_PROPS as Props);
 
   const dndManager = useDndManager();
 
@@ -84,7 +86,7 @@ export const useDndDrop = <
       type: spec.accept,
       hitTest: (x: number, y: number): boolean => {
         if (specRef.current.hitTest) {
-          return specRef.current.hitTest(x, y);
+          return specRef.current.hitTest(x, y, propsRef.current);
         }
         if (nodeRef.current) {
           if (!(nodeRef.current instanceof SVGGraphicsElement)) {
@@ -158,7 +160,12 @@ export const useDndDrop = <
     return unregister;
   }, [spec.accept, dndManager, monitor]);
 
-  return [spec.collect ? spec.collect(monitor) : (({} as any) as CollectedProps), nodeRef as any];
+  return [
+    spec.collect
+      ? spec.collect(monitor, props != null ? props : (EMPTY_PROPS as Props))
+      : (({} as any) as CollectedProps),
+    nodeRef as any,
+  ];
 };
 
 export type WithDndDropProps = {
@@ -166,10 +173,10 @@ export type WithDndDropProps = {
 };
 
 export const withDndDrop = <
-  DragObject extends DragObjectWithType,
-  DropResult,
-  CollectedProps,
-  Props = {}
+  DragObject,
+  DropResult = ElementEntity,
+  CollectedProps extends {} = {},
+  Props extends {} = {}
 >(
   spec: DropTargetSpec<DragObject, DropResult, CollectedProps, Props>,
 ) => <P extends WithDndDropProps & CollectedProps & Props>(
@@ -178,7 +185,7 @@ export const withDndDrop = <
   const Component: React.FC<Omit<P, keyof WithDndDropProps & CollectedProps>> = (props) => {
     // TODO why is props giving an error but not in useDndDrag
     const [dndDropProps, dndDropRef] = useDndDrop(spec, props as any);
-    return <WrappedComponent {...props as any} dndDropRef={dndDropRef} {...dndDropProps} />;
+    return <WrappedComponent {...props as any} {...dndDropProps} dndDropRef={dndDropRef} />;
   };
   return observer(Component);
 };

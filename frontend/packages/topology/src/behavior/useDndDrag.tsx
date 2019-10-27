@@ -53,11 +53,13 @@ const getOperation = (operation: DragSpecOperation | undefined): string => {
   );
 };
 
+const EMPTY_PROPS = Object.freeze({});
+
 export const useDndDrag = <
-  DragObject extends DragObjectWithType,
-  DropResult,
-  CollectedProps,
-  Props = {}
+  DragObject extends DragObjectWithType = DragObjectWithType,
+  DropResult = any,
+  CollectedProps extends {} = {},
+  Props extends {} = {}
 >(
   spec: DragSourceSpec<DragObject, DropResult, CollectedProps>,
   props?: Props,
@@ -65,8 +67,8 @@ export const useDndDrag = <
   const specRef = React.useRef(spec);
   specRef.current = spec;
 
-  const propsRef = React.useRef(props);
-  propsRef.current = props;
+  const propsRef = React.useRef<Props>(props != null ? props : (EMPTY_PROPS as Props));
+  propsRef.current = props != null ? props : (EMPTY_PROPS as Props);
 
   const dndManager = useDndManager();
 
@@ -240,7 +242,10 @@ export const useDndDrag = <
     return unregister;
   }, [spec.item.type, dndManager, monitor]);
 
-  return [spec.collect ? spec.collect(monitor) : (({} as any) as CollectedProps), refCallback];
+  return [
+    spec.collect ? spec.collect(monitor, propsRef.current) : (({} as any) as CollectedProps),
+    refCallback,
+  ];
 };
 
 export type WithDndDragProps = {
@@ -248,10 +253,10 @@ export type WithDndDragProps = {
 };
 
 export const withDndDrag = <
-  DragObject extends DragObjectWithType,
-  DropResult,
-  CollectedProps,
-  Props = {}
+  DragObject extends DragObjectWithType = DragObjectWithType,
+  DropResult = any,
+  CollectedProps extends {} = {},
+  Props extends {} = {}
 >(
   spec: DragSourceSpec<DragObject, DropResult, CollectedProps, Props>,
 ) => <P extends WithDndDragProps & CollectedProps & Props>(
@@ -259,7 +264,7 @@ export const withDndDrag = <
 ) => {
   const Component: React.FC<Omit<P, keyof WithDndDragProps & CollectedProps>> = (props) => {
     const [dndDragProps, dndDragRef] = useDndDrag(spec, props);
-    return <WrappedComponent {...props as any} dndDragRef={dndDragRef} {...dndDragProps} />;
+    return <WrappedComponent {...props as any} {...dndDragProps} dndDragRef={dndDragRef} />;
   };
   return observer(Component);
 };

@@ -5,13 +5,7 @@ import { observer } from 'mobx-react';
 import Point from '../geom/Point';
 import EntityContext from '../utils/EntityContext';
 import { isEdgeEntity } from '../types';
-import {
-  ConnectDragSource,
-  DragSourceSpec,
-  DragEvent,
-  DragObjectWithType,
-  DragSourceMonitor,
-} from './dnd-types';
+import { ConnectDragSource, DragSourceSpec, DragObjectWithType } from './dnd-types';
 import { useDndDrag, WithDndDragProps } from './useDndDrag';
 
 export type WithBendpoint = {
@@ -36,15 +30,15 @@ export const useBendpoint = <DropResult, CollectedProps, Props = {}>(
     React.useMemo(() => {
       const sourceSpec: DragSourceSpec<any, any, any, Props> = {
         item: { type: '#useBendpoint#' },
-        begin: action((monitor: DragSourceMonitor, p: Props) => {
+        begin: (monitor, p) => {
           return spec && spec.begin ? spec.begin(monitor, p) : undefined;
-        }),
-        drag: action((event: DragEvent, monitor: DragSourceMonitor, p: Props) => {
+        },
+        drag: (event, monitor, p) => {
           // assumes the edge is in absolute coordinate space
           pointRef.current.translate(event.dx, event.dy);
           entityRef.current.raise();
           spec && spec.drag && spec.drag(event, monitor, p);
-        }),
+        },
         canDrag: spec ? spec.canDrag : undefined,
         end: spec ? spec.end : undefined,
         collect: spec ? spec.collect : undefined,

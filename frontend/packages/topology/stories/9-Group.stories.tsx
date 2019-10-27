@@ -2,7 +2,7 @@ import * as React from 'react';
 import { observer } from 'mobx-react';
 import Visualization from '../src/Visualization';
 import VisualizationWidget from '../src/VisualizationWidget';
-import { Model, NodeEntity, AnchorEnd, NodeShape, ModelKind, isNodeEntity } from '../src/types';
+import { Model, NodeEntity, AnchorEnd, NodeShape } from '../src/types';
 import { useSvgAnchor } from '../src/behavior/useSvgAnchor';
 import { withDragNode } from '../src/behavior/useDragNode';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
@@ -109,11 +109,11 @@ export const complexGroup = () => {
   };
   vis.fromModel(model);
   vis.registerWidgetFactory(defaultWidgetFactory);
-  vis.registerWidgetFactory((entity) => {
-    if (entity.getType() === 'service') {
+  vis.registerWidgetFactory((kind, type) => {
+    if (type === 'service') {
       return GroupWithDecorator;
     }
-    if (entity.kind === ModelKind.node && isNodeEntity(entity) && !entity.isGroup()) {
+    if (type === 'node') {
       return withDragNode()(NodeWidget);
     }
     return undefined;

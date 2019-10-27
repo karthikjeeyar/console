@@ -48,8 +48,8 @@ const model: Model = {
 export const panZoom: React.FC = () => {
   const vis = new Visualization();
   vis.registerWidgetFactory(defaultWidgetFactory);
-  vis.registerWidgetFactory((entity) => {
-    if (entity.kind === ModelKind.graph) {
+  vis.registerWidgetFactory((kind) => {
+    if (kind === ModelKind.graph) {
       return withPanZoom()(GraphWidget);
     }
     return undefined;

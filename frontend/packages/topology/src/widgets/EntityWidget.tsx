@@ -9,6 +9,10 @@ type EntityWidgetProps = {
 
 // in a separate widget component so that changes to interaction handlers do not re-render children
 const EntityComponent: React.FC<EntityWidgetProps> = widget(({ entity }) => {
+  const Component = React.useMemo(
+    () => entity.getController().getWidget(entity.kind, entity.getType()),
+    [entity],
+  );
   if (!entity.isVisible()) {
     return null;
   }
@@ -19,7 +23,6 @@ const EntityComponent: React.FC<EntityWidgetProps> = widget(({ entity }) => {
       return null;
     }
   }
-  const Component = entity.getController().getWidget(entity);
   return (
     <EntityContext.Provider value={entity}>
       <Component {...entity.getState()} entity={entity} />

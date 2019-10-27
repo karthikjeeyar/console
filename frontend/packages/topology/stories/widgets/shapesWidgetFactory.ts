@@ -6,9 +6,10 @@ import NodePathWidget from './NodePathWidget';
 import NodePolygonWidget from './NodePolygonWidget';
 
 const shapesWidgetFactory: WidgetFactory = (
-  entity: ElementEntity,
+  kind,
+  type,
 ): ComponentType<{ entity: ElementEntity }> | undefined => {
-  switch (entity.getType()) {
+  switch (type) {
     case 'node-rect':
       return NodeRectWidget;
     case 'node-ellipse':

@@ -110,32 +110,32 @@ export interface DragObjectWithType {
 export type DragSpecOperation = string | { [ModifierFlags: number]: string };
 
 export interface DragSourceSpec<
-  DragObject extends DragObjectWithType,
-  DropResult,
-  CollectedProps,
+  DragObject extends DragObjectWithType = DragObjectWithType,
+  DropResult = any,
+  CollectedProps extends {} = {},
   Props extends {} = {}
 > {
   item: DragObject;
   operation?: DragSpecOperation;
-  begin?: (monitor: DragSourceMonitor, props?: Props) => any;
-  drag?: (event: DragEvent, monitor: DragSourceMonitor, props?: Props) => void;
-  end?: (dropResult: DropResult | undefined, monitor: DragSourceMonitor, props?: Props) => void;
-  canDrag?: boolean | ((monitor: DragSourceMonitor, props?: Props) => boolean);
-  collect?: (monitor: DragSourceMonitor, props?: Props) => CollectedProps;
+  begin?: (monitor: DragSourceMonitor, props: Props) => any;
+  drag?: (event: DragEvent, monitor: DragSourceMonitor, props: Props) => void;
+  end?: (dropResult: DropResult | undefined, monitor: DragSourceMonitor, props: Props) => void;
+  canDrag?: boolean | ((monitor: DragSourceMonitor, props: Props) => boolean);
+  collect?: (monitor: DragSourceMonitor, props: Props) => CollectedProps;
 }
 
 export type DropTargetSpec<
-  DragObject extends DragObjectWithType,
+  DragObject,
   DropResult,
-  CollectedProps,
+  CollectedProps extends {} = {},
   Props extends {} = {}
 > = {
   accept: TargetType;
-  hitTest?(x: number, y: number, props?: Props): boolean;
-  drop?: (item: DragObject, monitor: DropTargetMonitor, props?: Props) => DropResult | undefined;
-  hover?: (item: DragObject, monitor: DropTargetMonitor, props?: Props) => void;
-  canDrop?: (item: DragObject, monitor: DropTargetMonitor, props?: Props) => boolean;
-  collect?: (monitor: DropTargetMonitor, props?: Props) => CollectedProps;
+  hitTest?(x: number, y: number, props: Props): boolean;
+  drop?: (item: DragObject, monitor: DropTargetMonitor, props: Props) => DropResult | undefined;
+  hover?: (item: DragObject, monitor: DropTargetMonitor, props: Props) => void;
+  canDrop?: (item: DragObject, monitor: DropTargetMonitor, props: Props) => boolean;
+  collect?: (monitor: DropTargetMonitor, props: Props) => CollectedProps;
 };
 
 export interface HandlerManager {

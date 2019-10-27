@@ -105,17 +105,17 @@ const getVisualization = (model: Model): Visualization => {
   vis.registerWidgetFactory(defaultWidgetFactory);
 
   // support pan zoom, drag, and selection
-  vis.registerWidgetFactory((entity) => {
-    if (entity.kind === ModelKind.graph) {
+  vis.registerWidgetFactory((kind, type) => {
+    if (kind === ModelKind.graph) {
       return withPanZoom()(GraphWidget);
     }
-    if (entity.getType() === 'group-hull') {
+    if (type === 'group-hull') {
       return withDragNode()(GroupHullWidget);
     }
-    if (entity.getType() === 'group') {
+    if (type === 'group') {
       return withDragNode()(GroupWidget);
     }
-    if (entity.kind === ModelKind.node) {
+    if (kind === ModelKind.node) {
       return withDragNode()(withSelection()(NodeWidget));
     }
     return undefined;

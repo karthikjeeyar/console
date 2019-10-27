@@ -50,9 +50,9 @@ const create2NodeModel = (): Model => ({
 
 export const uncontrolled: React.FC = () => {
   const vis = new Visualization();
-  vis.registerWidgetFactory((entity) => {
-    const widget = defaultWidgetFactory(entity);
-    if (entity.kind === ModelKind.node) {
+  vis.registerWidgetFactory((kind, type) => {
+    const widget = defaultWidgetFactory(kind, type);
+    if (kind === ModelKind.node) {
       // TODO fix any type
       return withSelection(false, false)(widget as any);
     }
@@ -67,9 +67,9 @@ export const uncontrolled: React.FC = () => {
 
 export const controlled = () => {
   const vis = new Visualization();
-  vis.registerWidgetFactory((entity) => {
-    const widget = defaultWidgetFactory(entity);
-    if (entity.kind === ModelKind.node) {
+  vis.registerWidgetFactory((kind, type) => {
+    const widget = defaultWidgetFactory(kind, type);
+    if (kind === ModelKind.node) {
       // TODO fix any type
       return withSelection(false, false)(widget as any);
     }
@@ -91,9 +91,9 @@ export const controlled = () => {
 
 export const multiSelect: React.FC = () => {
   const vis = new Visualization();
-  vis.registerWidgetFactory((entity) => {
-    const widget = defaultWidgetFactory(entity);
-    if (entity.kind === ModelKind.node) {
+  vis.registerWidgetFactory((kind, type) => {
+    const widget = defaultWidgetFactory(kind, type);
+    if (kind === ModelKind.node) {
       // TODO fix any type
       return withSelection(true, false)(widget as any);
     }
@@ -108,9 +108,9 @@ export const multiSelect: React.FC = () => {
 
 export const performance = () => {
   const vis = new Visualization();
-  vis.registerWidgetFactory((entity) => {
-    const widget = defaultWidgetFactory(entity);
-    if (entity.kind === ModelKind.node) {
+  vis.registerWidgetFactory((kind, type) => {
+    const widget = defaultWidgetFactory(kind, type);
+    if (kind === ModelKind.node) {
       // TODO fix any type
       return withSelection(true, false)(widget as any);
     }

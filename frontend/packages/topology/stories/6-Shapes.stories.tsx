@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Visualization from '../src/Visualization';
 import VisualizationWidget from '../src/VisualizationWidget';
-import { Model, isNodeEntity, ModelKind } from '../src/types';
+import { Model, ModelKind } from '../src/types';
 import GraphWidget from '../src/widgets/GraphWidget';
 import { withPanZoom } from '../src/behavior/usePanZoom';
 import { withDragNode } from '../src/behavior/useDragNode';
@@ -127,11 +127,11 @@ export const shapes = () => {
   vis.registerWidgetFactory(defaultWidgetFactory);
   vis.registerWidgetFactory(shapesWidgetFactory);
   // support pan zoom and drag
-  vis.registerWidgetFactory((entity) => {
-    if (entity.kind === ModelKind.graph) {
+  vis.registerWidgetFactory((kind, type) => {
+    if (kind === ModelKind.graph) {
       return withPanZoom()(GraphWidget);
     }
-    if (isNodeEntity(entity) && entity.getType() === 'node-drag') {
+    if (type === 'node-drag') {
       return withDragNode()(NodeWidget);
     }
     return undefined;

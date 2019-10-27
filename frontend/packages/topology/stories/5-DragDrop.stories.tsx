@@ -1,13 +1,12 @@
 import * as React from 'react';
-import { action } from 'mobx';
 import Visualization from '../src/Visualization';
 import VisualizationWidget from '../src/VisualizationWidget';
-import { Model, isNodeEntity, NodeEntity, ModelKind } from '../src/types';
+import { Model, NodeEntity, ModelKind } from '../src/types';
 import { withDndDrag, Modifiers } from '../src/behavior/useDndDrag';
 import { withDndDrop } from '../src/behavior/useDndDrop';
 import GraphWidget from '../src/widgets/GraphWidget';
 import { withPanZoom } from '../src/behavior/usePanZoom';
-import { DragSourceMonitor, DragEvent } from '../src/behavior/dnd-types';
+import { DragObjectWithType } from '../src/behavior/dnd-types';
 import { withDragNode } from '../src/behavior/useDragNode';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 import NodeWidget from './widgets/NodeWidget';
@@ -92,12 +91,17 @@ export const dnd = () => {
   vis.fromModel(model);
   vis.registerWidgetFactory(defaultWidgetFactory);
   // support pan zoom and drag
-  vis.registerWidgetFactory((entity) => {
-    if (entity.kind === ModelKind.graph) {
+  vis.registerWidgetFactory((kind, type) => {
+    if (kind === ModelKind.graph) {
       return withPanZoom()(GraphWidget);
     }
-    if (isNodeEntity(entity) && entity.getType() === 'group-drop') {
-      return withDndDrop<any, any, any, EntityProps>({
+    if (type === 'group-drop') {
+      return withDndDrop<
+        NodeEntity,
+        any,
+        { droppable?: boolean; hover?: boolean; canDrop?: boolean },
+        EntityProps
+      >({
         accept: 'test',
         canDrop: (item, monitor, props) => {
           return !!props && item.getParent() !== props.entity;
@@ -109,26 +113,26 @@ export const dnd = () => {
         }),
       })(GroupHullWidget);
     }
-    if (isNodeEntity(entity) && entity.getType() === 'node-drag') {
-      return withDndDrag<any, NodeEntity, any, EntityProps>({
+    if (type === 'node-drag') {
+      return withDndDrag<DragObjectWithType, NodeEntity, {}, EntityProps>({
         item: { type: 'test' },
-        begin: action((monitor: DragSourceMonitor, props: EntityProps) => {
+        begin: (monitor, props) => {
           props.entity.raise();
           return props.entity;
-        }),
-        drag: action((event: DragEvent, monitor: DragSourceMonitor, props: EntityProps) => {
+        },
+        drag: (event, monitor, props) => {
           props.entity.setBounds(
             props.entity
               .getBounds()
               .clone()
               .translate(event.dx, event.dy),
           );
-        }),
-        end: action((dropResult: NodeEntity, monitor: DragSourceMonitor, props: EntityProps) => {
+        },
+        end: (dropResult, monitor, props) => {
           if (monitor.didDrop() && dropResult && props) {
             dropResult.appendChild(props.entity);
           }
-        }),
+        },
       })(NodeWidget);
     }
     return undefined;
@@ -207,12 +211,17 @@ export const dndShiftRegroup = () => {
   vis.fromModel(model);
   vis.registerWidgetFactory(defaultWidgetFactory);
   // support pan zoom and drag
-  vis.registerWidgetFactory((entity) => {
-    if (entity.kind === ModelKind.graph) {
+  vis.registerWidgetFactory((kind, type) => {
+    if (kind === ModelKind.graph) {
       return withPanZoom()(GraphWidget);
     }
-    if (isNodeEntity(entity) && entity.getType() === 'group-drop') {
-      return withDndDrop<any, any, any, EntityProps>({
+    if (type === 'group-drop') {
+      return withDndDrop<
+        NodeEntity,
+        any,
+        { droppable?: boolean; hover?: boolean; canDrop?: boolean },
+        EntityProps
+      >({
         accept: 'test',
         canDrop: (item, monitor, props) => {
           return (
@@ -226,17 +235,17 @@ export const dndShiftRegroup = () => {
         }),
       })(GroupHullWidget);
     }
-    if (isNodeEntity(entity) && entity.getType() === 'node-drag') {
-      return withDragNode<any, NodeEntity, any, EntityProps>({
+    if (type === 'node-drag') {
+      return withDragNode<DragObjectWithType, NodeEntity, {}, EntityProps>({
         item: { type: 'test' },
         operation: {
           [Modifiers.SHIFT]: 'regroup',
         },
-        end: action((dropResult: NodeEntity, monitor: DragSourceMonitor, props: EntityProps) => {
+        end: (dropResult, monitor, props) => {
           if (monitor.didDrop() && dropResult && props) {
             dropResult.appendChild(props.entity);
           }
-        }),
+        },
       })(NodeWidget);
     }
     return undefined;

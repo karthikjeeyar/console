@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
-import { action } from 'mobx';
 import { hullPath } from '@console/dev-console/src/utils/svg-utils';
 import DefaultCreateConnectorWidget from '../widgets/DefaultCreateConnectorWidget';
 import Point from '../geom/Point';
@@ -63,15 +62,13 @@ const CreateConnectorWidget: React.FC<CreateConnectorWidgetProps> = observer((pr
   const spec = React.useMemo(() => {
     const dragSourceSpec: DragSourceSpec<any, any, CollectProps> = {
       item: { type: CREATE_CONNECTOR_DROP_TYPE },
-      begin: action((monitor: DragSourceMonitor, dragProps: CreateConnectorWidgetProps) => {
+      begin: (monitor: DragSourceMonitor, dragProps: CreateConnectorWidgetProps) => {
         setActive(true);
         return dragProps.entity;
-      }),
-      drag: action(
-        (event: DragEvent, monitor: DragSourceMonitor, p: CreateConnectorWidgetProps) => {
-          p.entity.raise();
-        },
-      ),
+      },
+      drag: (event: DragEvent, monitor: DragSourceMonitor, p: CreateConnectorWidgetProps) => {
+        p.entity.raise();
+      },
       end: (
         dropResult: NodeEntity,
         monitor: DragSourceMonitor,

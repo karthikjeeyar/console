@@ -151,14 +151,14 @@ export default class VisualizationController extends Stateful implements Control
     return edge;
   }
 
-  getWidget(entity: ElementEntity): ComponentType<{ entity: ElementEntity }> {
+  getWidget(kind: ModelKind, type: string): ComponentType<{ entity: ElementEntity }> {
     for (const factory of this.widgetFactories) {
-      const widget = factory(entity);
+      const widget = factory(kind, type);
       if (widget) {
         return widget;
       }
     }
-    throw new Error(`Could not find widget for ${entity.kind}): ${entity.getId()}`);
+    throw new Error(`Could not find widget for: Kind '${kind}', Type '${type}'`);
   }
 
   registerLayoutFactory(factory: LayoutFactory) {

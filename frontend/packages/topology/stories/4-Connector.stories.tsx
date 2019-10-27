@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { action } from 'mobx';
 import Visualization from '../src/Visualization';
 import VisualizationWidget from '../src/VisualizationWidget';
 import { Model, ModelKind, EdgeEntity, NodeEntity, AnchorEnd } from '../src/types';
 import { withTargetDrag, withSourceDrag } from '../src/behavior/useReconnect';
-import { DragSourceMonitor, DragEvent } from '../src/behavior/dnd-types';
+import { DragEvent, DragObjectWithType } from '../src/behavior/dnd-types';
 import { withDndDrop } from '../src/behavior/useDndDrop';
 import { withPanZoom } from '../src/behavior/usePanZoom';
 import GraphWidget from '../src/widgets/GraphWidget';
@@ -36,13 +35,13 @@ type EdgeEntityProps = {
 export const reconnect = () => {
   const vis = new Visualization();
   vis.registerWidgetFactory(defaultWidgetFactory);
-  vis.registerWidgetFactory((entity) => {
-    if (entity.kind === ModelKind.graph) {
+  vis.registerWidgetFactory((kind) => {
+    if (kind === ModelKind.graph) {
       return withPanZoom()(GraphWidget);
     }
-    if (entity.kind === ModelKind.node) {
+    if (kind === ModelKind.node) {
       return withDndDrop<
-        any,
+        EdgeEntity,
         any,
         { droppable?: boolean; hover?: boolean; canDrop?: boolean },
         NodeEntityProps
@@ -58,42 +57,38 @@ export const reconnect = () => {
         }),
       })(NodeWidget);
     }
-    if (entity.kind === ModelKind.edge) {
-      return withSourceDrag<any, NodeEntity, any, EdgeEntityProps>({
+    if (kind === ModelKind.edge) {
+      return withSourceDrag<DragObjectWithType, NodeEntity, any, EdgeEntityProps>({
         item: { type: 'test' },
-        begin: action((monitor: DragSourceMonitor, props: EdgeEntityProps) => {
+        begin: (monitor, props) => {
           props.entity.raise();
           return props.entity;
-        }),
-        drag: action((event: DragEvent, monitor: DragSourceMonitor, props: EdgeEntityProps) => {
+        },
+        drag: (event, monitor, props) => {
           props.entity.setStartPoint(event.x, event.y);
-        }),
-        end: action(
-          (dropResult: NodeEntity, monitor: DragSourceMonitor, props: EdgeEntityProps) => {
-            if (monitor.didDrop() && dropResult && props) {
-              props.entity.setSource(dropResult);
-            }
-            props.entity.setStartPoint();
-          },
-        ),
+        },
+        end: (dropResult, monitor, props) => {
+          if (monitor.didDrop() && dropResult && props) {
+            props.entity.setSource(dropResult);
+          }
+          props.entity.setStartPoint();
+        },
       })(
-        withTargetDrag<any, NodeEntity, { dragging?: boolean }, EdgeEntityProps>({
+        withTargetDrag<DragObjectWithType, NodeEntity, { dragging?: boolean }, EdgeEntityProps>({
           item: { type: 'test' },
-          begin: action((monitor: DragSourceMonitor, props: EdgeEntityProps) => {
+          begin: (monitor, props) => {
             props.entity.raise();
             return props.entity;
-          }),
-          drag: action((event: DragEvent, monitor: DragSourceMonitor, props: EdgeEntityProps) => {
+          },
+          drag: (event, monitor, props) => {
             props.entity.setEndPoint(event.x, event.y);
-          }),
-          end: action(
-            (dropResult: NodeEntity, monitor: DragSourceMonitor, props: EdgeEntityProps) => {
-              if (monitor.didDrop() && dropResult && props) {
-                props.entity.setTarget(dropResult);
-              }
-              props.entity.setEndPoint();
-            },
-          ),
+          },
+          end: (dropResult, monitor, props) => {
+            if (monitor.didDrop() && dropResult && props) {
+              props.entity.setTarget(dropResult);
+            }
+            props.entity.setEndPoint();
+          },
           collect: (monitor) => ({
             dragging: monitor.isDragging(),
           }),
@@ -193,11 +188,11 @@ export const createConnector = () => {
 
   const vis = new Visualization();
   vis.registerWidgetFactory(defaultWidgetFactory);
-  vis.registerWidgetFactory((entity) => {
-    if (entity.kind === ModelKind.graph) {
+  vis.registerWidgetFactory((kind) => {
+    if (kind === ModelKind.graph) {
       return withPanZoom()(GraphWidget);
     }
-    if (entity.kind === ModelKind.node) {
+    if (kind === ModelKind.node) {
       return withCreateConnector(
         (
           source: NodeEntity,
@@ -233,7 +228,7 @@ export const createConnector = () => {
         },
       )(
         withDndDrop<
-          any,
+          NodeEntity,
           any,
           { droppable?: boolean; hover?: boolean; canDrop?: boolean },
           NodeEntityProps
@@ -332,8 +327,8 @@ export const anchors = () => {
 
   const vis = new Visualization();
   vis.registerWidgetFactory(defaultWidgetFactory);
-  vis.registerWidgetFactory((entity) => {
-    if (entity.kind === ModelKind.node) {
+  vis.registerWidgetFactory((kind) => {
+    if (kind === ModelKind.node) {
       return withDragNode()(NodeWithPointAnchor);
     }
     return undefined;

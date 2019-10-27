@@ -184,7 +184,7 @@ export interface Controller extends WithState {
   getEdgeById(id: string): EdgeEntity;
   addEntity(entity: ElementEntity): void;
   removeEntity(entity: ElementEntity): void;
-  getWidget(entity: ElementEntity): ComponentType<{ entity: ElementEntity }>;
+  getWidget(kind: ModelKind, type: string): ComponentType<{ entity: ElementEntity }>;
   registerLayoutFactory(factory: LayoutFactory): void;
   registerWidgetFactory(factory: WidgetFactory): void;
   registerEntityFactory(factory: EntityFactory): void;
@@ -197,7 +197,8 @@ export interface Controller extends WithState {
 export type LayoutFactory = (type: string, graph: GraphEntity) => Layout | undefined;
 
 export type WidgetFactory = (
-  entity: ElementEntity,
+  kind: ModelKind,
+  type: string,
 ) => ComponentType<{ entity: ElementEntity }> | undefined;
 
 export type EntityFactory = (kind: ModelKind, type: string) => ElementEntity | undefined;

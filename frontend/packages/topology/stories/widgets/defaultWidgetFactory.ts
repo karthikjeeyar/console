@@ -8,9 +8,10 @@ import GroupWidget from './GroupWidget';
 import GroupHullWidget from './GroupHullWidget';
 
 const defaultWidgetFactory: WidgetFactory = (
-  entity: ElementEntity,
+  kind: ModelKind,
+  type: string,
 ): ComponentType<{ entity: ElementEntity }> | undefined => {
-  switch (entity.getType()) {
+  switch (type) {
     case 'multi-edge':
       return MultiEdgeWidget;
     case 'group':
@@ -18,7 +19,7 @@ const defaultWidgetFactory: WidgetFactory = (
     case 'group-hull':
       return GroupHullWidget;
     default:
-      switch (entity.kind) {
+      switch (kind) {
         case ModelKind.graph:
           return GraphWidget;
         case ModelKind.node:
