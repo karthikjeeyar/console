@@ -86,7 +86,7 @@ const widgetFactory: WidgetFactory = (
       switch (kind) {
         case ModelKind.graph:
           return withDndDrop<any, any, any, NodeEntityProps>(graphWorkloadDropTargetSpec)(
-            withPanZoom()(GraphWidget),
+            withPanZoom()(withSelection(false, true)(GraphWidget)),
           );
         case ModelKind.node:
           return withDragNode<any, NodeEntity, any, NodeEntityProps>(nodeDragSourceSpec(type))(

@@ -42,7 +42,14 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
     visRef.current = new Visualization();
     visRef.current.registerLayoutFactory(layoutFactory);
     visRef.current.registerWidgetFactory(widgetFactory);
-    visRef.current.addEventListener<SelectionEventListener>(SELECTION_EVENT, setSelectedIds);
+    visRef.current.addEventListener<SelectionEventListener>(SELECTION_EVENT, (ids: string[]) => {
+      // set empty selection when selecting the graph
+      if (ids.length > 0 && ids[0] === graphModel.graph.id) {
+        setSelectedIds([]);
+      } else {
+        setSelectedIds(ids);
+      }
+    });
     visRef.current.fromModel(graphModel);
   }
 
