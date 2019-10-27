@@ -41,14 +41,18 @@ const EntityChildren: React.FC<EntityWidgetProps> = widget(({ entity }) => {
 });
 
 const EntityWidget: React.FC<EntityWidgetProps> = widget(({ entity }) => {
-  if (isGraphEntity(entity)) {
-    return <EntityComponent entity={entity} />;
-  }
   const commonProps = {
     [`data-id`]: entity.getId(),
     [`data-kind`]: entity.kind,
     [`data-type`]: entity.getType(),
   };
+  if (isGraphEntity(entity)) {
+    return (
+      <g {...commonProps}>
+        <EntityComponent entity={entity} />
+      </g>
+    );
+  }
   if (isNodeEntity(entity) && !entity.isGroup()) {
     const { x, y } = entity.getBounds();
     return (

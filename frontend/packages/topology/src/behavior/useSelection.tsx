@@ -31,6 +31,7 @@ export const useSelection = (
   const onSelect = React.useCallback(
     action(
       (e: React.MouseEvent): void => {
+        e.stopPropagation();
         const id = entityRef.current.getId();
         const state = entityRef.current.getController().getState<SelectionHandlerState>();
         const idx = state.selectedIds ? state.selectedIds.indexOf(id) : -1;
