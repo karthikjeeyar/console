@@ -28,10 +28,11 @@ import {
   workloadDropTargetSpec,
   groupWorkoadDropTargetSpec,
   edgeDragSourceSpec,
-  createConnectorSpec,
-  removeConnectorSpec,
+  createConnectorCallback,
+  removeConnectorCallback,
 } from './widgetUtils';
 import './ContextMenu.scss';
+import { TYPE_WORKLOAD, TYPE_CONNECTS_TO, TYPE_APPLICATION_GROUP } from './consts';
 
 type NodeEntityProps = {
   entity: NodeEntity;
@@ -42,13 +43,14 @@ type EdgeEntityProps = {
 };
 
 const widgetFactory: WidgetFactory = (
-  entity: ElementEntity,
+  kind,
+  type,
 ): ComponentType<{ entity: ElementEntity }> | undefined => {
-  switch (entity.getType()) {
-    case 'group':
+  switch (type) {
+    case TYPE_APPLICATION_GROUP:
       return withDndDrop<any, any, any, NodeEntityProps>(groupWorkoadDropTargetSpec)(
         withDragNode()(
-          withSelection()(
+          withSelection(false, true)(
             withContextMenu(
               groupContextMenu,
               document.getElementById('modal-container'),
@@ -57,16 +59,16 @@ const widgetFactory: WidgetFactory = (
           ),
         ),
       );
-    case 'workload':
-      return withCreateConnector(createConnectorSpec)(
+    case TYPE_WORKLOAD:
+      return withCreateConnector(createConnectorCallback)(
         withDndDrop<
           any,
           any,
           { droppable?: boolean; hover?: boolean; canDrop?: boolean },
           NodeEntityProps
         >(workloadDropTargetSpec)(
-          withDragNode<any, NodeEntity, any, NodeEntityProps>(workloadDragSourceSpec(entity))(
-            withSelection()(
+          withDragNode<any, NodeEntity, any, NodeEntityProps>(workloadDragSourceSpec(type))(
+            withSelection(false, true)(
               withContextMenu(
                 workloadContextMenu,
                 document.getElementById('modal-container'),
@@ -76,19 +78,19 @@ const widgetFactory: WidgetFactory = (
           ),
         ),
       );
-    case 'connects-to':
+    case TYPE_CONNECTS_TO:
       return withTargetDrag<any, NodeEntity, { dragging?: boolean }, EdgeEntityProps>(
         edgeDragSourceSpec,
-      )(withRemoveConnector(removeConnectorSpec)(ConnectsToWidget));
+      )(withRemoveConnector(removeConnectorCallback)(ConnectsToWidget));
     default:
-      switch (entity.kind) {
+      switch (kind) {
         case ModelKind.graph:
           return withDndDrop<any, any, any, NodeEntityProps>(graphWorkloadDropTargetSpec)(
             withPanZoom()(GraphWidget),
           );
         case ModelKind.node:
-          return withDragNode<any, NodeEntity, any, NodeEntityProps>(nodeDragSourceSpec(entity))(
-            withSelection()(BaseNodeWidget),
+          return withDragNode<any, NodeEntity, any, NodeEntityProps>(nodeDragSourceSpec(type))(
+            withSelection(false, true)(BaseNodeWidget),
           );
         case ModelKind.edge:
           return EdgeWidget;

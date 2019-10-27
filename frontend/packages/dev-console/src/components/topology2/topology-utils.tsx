@@ -7,6 +7,7 @@ import {
   removeTopologyResourceConnection,
   updateTopologyResourceApplication,
 } from '../topology/topology-utils';
+import { TYPE_APPLICATION_GROUP } from './consts';
 
 const topologyModelFromDataModel = (dataModel: TopologyDataModel): Model => {
   const nodes: Node[] = dataModel.graph.nodes.map((d) => {
@@ -24,7 +25,7 @@ const topologyModelFromDataModel = (dataModel: TopologyDataModel): Model => {
     return {
       id: d.id,
       group: true,
-      type: 'group',
+      type: TYPE_APPLICATION_GROUP,
       data: dataModel.topology[d.id],
       children: d.nodes,
       label: d.name,

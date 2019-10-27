@@ -50,10 +50,8 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
     const newModel = topologyModelFromDataModel(data);
     visRef.current.fromModel(newModel);
     setModel(newModel);
-    if (selectedIds.length) {
-      if (!visRef.current.getController().getEntityById(selectedIds[0])) {
-        setSelectedIds([]);
-      }
+    if (selectedIds.length && !visRef.current.getController().getEntityById(selectedIds[0])) {
+      setSelectedIds([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);

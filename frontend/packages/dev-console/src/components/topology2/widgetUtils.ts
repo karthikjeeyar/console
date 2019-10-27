@@ -1,4 +1,3 @@
-import { action } from 'mobx';
 import { Modifiers } from '@console/topology/src/behavior/useDndDrag';
 import {
   EdgeEntity,
@@ -7,9 +6,14 @@ import {
   isNodeEntity,
   NodeEntity,
 } from '@console/topology/src/types';
-import { DragEvent, DragSourceMonitor } from '@console/topology/src/behavior/dnd-types';
+import {
+  DragSourceSpec,
+  DragObjectWithType,
+  DropTargetSpec,
+} from '@console/topology/src/behavior/dnd-types';
 import { CREATE_CONNECTOR_DROP_TYPE } from '@console/topology/src/behavior/withCreateConnector';
 import { createConnection, removeConnection, moveNodeToGroup } from './topology-utils';
+import { TYPE_WORKLOAD } from './consts';
 
 type NodeEntityProps = {
   entity: NodeEntity;
@@ -21,19 +25,28 @@ type EdgeEntityProps = {
 
 const MOVE_CONNECTOR_DROP_TYPE = '#moveConnector#';
 
-const workloadDragSourceSpec = (entity: ElementEntity) => ({
-  item: { type: entity.getType() },
+const REGROUP_OPERATION = 'regroup';
+
+const workloadDragSourceSpec = (
+  type: string,
+): DragSourceSpec<DragObjectWithType, NodeEntity, {}, NodeEntityProps> => ({
+  item: { type },
   operation: {
-    [Modifiers.SHIFT]: 'regroup',
+    [Modifiers.SHIFT]: REGROUP_OPERATION,
   },
-  end: action((dropResult: NodeEntity, monitor: DragSourceMonitor, props: NodeEntityProps) => {
+  end: (dropResult, monitor, props) => {
     if (monitor.didDrop() && dropResult && props && props.entity.getParent() !== dropResult) {
       moveNodeToGroup(props.entity, isNodeEntity(dropResult) ? dropResult : null);
     }
-  }),
+  },
 });
 
-const workloadDropTargetSpec = {
+const workloadDropTargetSpec: DropTargetSpec<
+  ElementEntity,
+  any,
+  { droppable: boolean; hover: boolean; canDrop: boolean },
+  NodeEntityProps
+> = {
   accept: [MOVE_CONNECTOR_DROP_TYPE, CREATE_CONNECTOR_DROP_TYPE],
   canDrop: (item, monitor, props) => {
     if (isEdgeEntity(item)) {
@@ -57,66 +70,85 @@ const workloadDropTargetSpec = {
   }),
 };
 
-const nodeDragSourceSpec = (entity: ElementEntity) => ({
-  item: { type: entity.getType() },
+const nodeDragSourceSpec = (
+  type: string,
+): DragSourceSpec<DragObjectWithType, NodeEntity, {}, NodeEntityProps> => ({
+  item: { type },
   operation: {
-    [Modifiers.SHIFT]: 'regroup',
+    [Modifiers.SHIFT]: REGROUP_OPERATION,
   },
-  end: action((dropResult: NodeEntity, monitor: DragSourceMonitor, props: NodeEntityProps) => {
+  end: (dropResult, monitor, props) => {
     if (monitor.didDrop() && dropResult && props) {
       dropResult.appendChild(props.entity);
     }
-  }),
+  },
 });
 
-const graphWorkloadDropTargetSpec = {
-  accept: 'workload',
+const graphWorkloadDropTargetSpec: DropTargetSpec<
+  NodeEntity,
+  any,
+  { droppable: boolean; hover: boolean; canDrop: boolean },
+  NodeEntityProps
+> = {
+  accept: TYPE_WORKLOAD,
   canDrop: (item, monitor, props) => {
-    return monitor.getOperation() === 'regroup' && !!props && item.getParent() !== props.entity;
+    return (
+      monitor.getOperation() === REGROUP_OPERATION && !!props && item.getParent() !== props.entity
+    );
   },
   collect: (monitor) => ({
-    droppable: monitor.isDragging() && monitor.getOperation() === 'regroup',
+    droppable: monitor.isDragging() && monitor.getOperation() === REGROUP_OPERATION,
     hover: monitor.isOver({ shallow: true }),
     canDrop: monitor.canDrop(),
   }),
 };
 
-const groupWorkoadDropTargetSpec = {
-  accept: 'workload',
-  canDrop: (item, monitor) => monitor.getOperation() === 'regroup',
+const groupWorkoadDropTargetSpec: DropTargetSpec<
+  any,
+  any,
+  { droppable: boolean; hover: boolean; canDrop: boolean },
+  NodeEntityProps
+> = {
+  accept: TYPE_WORKLOAD,
+  canDrop: (item, monitor) => monitor.getOperation() === REGROUP_OPERATION,
   collect: (monitor) => ({
-    droppable: monitor.isDragging() && monitor.getOperation() === 'regroup',
+    droppable: monitor.isDragging() && monitor.getOperation() === REGROUP_OPERATION,
     hover: monitor.isOver(),
     canDrop: monitor.canDrop(),
   }),
 };
 
-const edgeDragSourceSpec = {
+const edgeDragSourceSpec: DragSourceSpec<
+  DragObjectWithType,
+  NodeEntity,
+  { dragging: boolean },
+  EdgeEntityProps
+> = {
   item: { type: MOVE_CONNECTOR_DROP_TYPE },
-  begin: action((monitor: DragSourceMonitor, props: EdgeEntityProps) => {
+  begin: (monitor, props) => {
     props.entity.raise();
     return props.entity;
-  }),
-  drag: action((event: DragEvent, monitor: DragSourceMonitor, props: EdgeEntityProps) => {
+  },
+  drag: (event, monitor, props) => {
     props.entity.setEndPoint(event.x, event.y);
-  }),
-  end: action((dropResult: NodeEntity, monitor: DragSourceMonitor, props: EdgeEntityProps) => {
+  },
+  end: (dropResult, monitor, props) => {
     props.entity.setEndPoint();
     if (monitor.didDrop() && dropResult && props) {
       createConnection(props.entity.getSource(), dropResult, props.entity.getTarget());
     }
-  }),
+  },
   collect: (monitor) => ({
     dragging: monitor.isDragging(),
   }),
 };
 
-const createConnectorSpec = (source: NodeEntity, target: NodeEntity): any[] | null => {
+const createConnectorCallback = (source: NodeEntity, target: NodeEntity): any[] | null => {
   createConnection(source, target);
   return null;
 };
 
-const removeConnectorSpec = (edge: EdgeEntity): void => {
+const removeConnectorCallback = (edge: EdgeEntity): void => {
   removeConnection(edge);
   return null;
 };
@@ -128,6 +160,6 @@ export {
   graphWorkloadDropTargetSpec,
   groupWorkoadDropTargetSpec,
   edgeDragSourceSpec,
-  createConnectorSpec,
-  removeConnectorSpec,
+  createConnectorCallback,
+  removeConnectorCallback,
 };
