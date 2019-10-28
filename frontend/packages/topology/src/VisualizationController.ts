@@ -44,14 +44,6 @@ export default class VisualizationController extends Stateful implements Control
     return this.store as S;
   }
 
-  private parentOrphansToGraph(graph: GraphEntity): void {
-    this.getEntities().forEach((entity: ElementEntity) => {
-      if (entity !== this.graph && !entity.hasParent()) {
-        graph.appendChild(entity);
-      }
-    });
-  }
-
   fromModel(model: Model): void {
     // create entities
     if (model.graph) {
@@ -103,11 +95,14 @@ export default class VisualizationController extends Stateful implements Control
   }
 
   setGraph(graph: GraphEntity) {
-    if (this.graph) {
-      this.graph.setController(undefined);
+    if (this.graph !== graph) {
+      if (this.graph) {
+        this.graph.setController(undefined);
+      }
+      this.graph = graph;
+      graph.setController(this);
+      // TODO clean up and populate registries
     }
-    this.graph = graph;
-    graph.setController(this);
   }
 
   getEntities(): ElementEntity[] {
@@ -127,28 +122,24 @@ export default class VisualizationController extends Stateful implements Control
     delete this.entities[entity.getId()];
   }
 
-  getEntityById(id: string): ElementEntity {
-    const entity = this.entities[id];
-    if (!entity) {
-      throw new Error(`No entity found with ID '${id}'.`);
-    }
-    return entity;
+  getEntityById(id: string): ElementEntity | undefined {
+    return this.entities[id];
   }
 
-  getNodeById(id: string): NodeEntity {
+  getNodeById(id: string): NodeEntity | undefined {
     const node = this.entities[id];
-    if (!node || !isNodeEntity(node)) {
-      throw new Error(`No node found with ID '${id}'.`);
+    if (node && isNodeEntity(node)) {
+      return node;
     }
-    return node;
+    return undefined;
   }
 
-  getEdgeById(id: string): EdgeEntity {
+  getEdgeById(id: string): EdgeEntity | undefined {
     const edge = this.entities[id];
-    if (!edge || !isEdgeEntity(edge)) {
-      throw new Error(`No edge found with ID '${id}'.`);
+    if (edge && isEdgeEntity(edge)) {
+      return edge;
     }
-    return edge;
+    return undefined;
   }
 
   getWidget(kind: ModelKind, type: string): ComponentType<{ entity: ElementEntity }> {
@@ -242,5 +233,13 @@ export default class VisualizationController extends Stateful implements Control
     entity.setType(model.type);
     entity.setController(this);
     this.addEntity(entity);
+  }
+
+  private parentOrphansToGraph(graph: GraphEntity): void {
+    this.getEntities().forEach((entity: ElementEntity) => {
+      if (entity !== this.graph && !entity.hasParent()) {
+        graph.appendChild(entity);
+      }
+    });
   }
 }

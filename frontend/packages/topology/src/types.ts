@@ -180,10 +180,9 @@ export interface Controller extends WithState {
   getGraph(): GraphEntity;
   setGraph(Graph: GraphEntity): void;
   getLayout(type: string | undefined): Layout | undefined;
-  getEntityById(id: string): ElementEntity;
-  // TODO | undefined ?
-  getNodeById(id: string): NodeEntity;
-  getEdgeById(id: string): EdgeEntity;
+  getEntityById(id: string): ElementEntity | undefined;
+  getNodeById(id: string): NodeEntity | undefined;
+  getEdgeById(id: string): EdgeEntity | undefined;
   addEntity(entity: ElementEntity): void;
   removeEntity(entity: ElementEntity): void;
   getWidget(kind: ModelKind, type: string): ComponentType<{ entity: ElementEntity }>;

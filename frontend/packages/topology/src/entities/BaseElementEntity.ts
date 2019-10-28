@@ -28,7 +28,7 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   private visible: boolean = true;
 
   @observable.shallow
-  private children: string[];
+  private children: ElementEntity[] = [];
 
   @observable.ref
   private controller: Controller;
@@ -49,15 +49,6 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
     const idx = this.parent.getChildren().indexOf(this);
     const result = [...this.parent.getOrderKey(), idx];
     return result;
-  }
-
-  @computed
-  private get childElements(): ElementEntity[] {
-    if (this.children) {
-      const controller = this.getGraph().getController();
-      return this.children.map((id) => controller.getEntityById(id));
-    }
-    return [];
   }
 
   getLabel(): string {
@@ -154,27 +145,26 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   }
 
   getChildren(): ElementEntity[] {
-    return this.childElements;
+    return this.children;
   }
 
   appendChild(child: ElementEntity) {
-    if (!this.children) {
-      this.children = [child.getId()];
-      child.setParent(this);
-    } else if (this.children[this.children.length - 1] !== child.getId()) {
-      const idx = this.children.indexOf(child.getId());
-      this.children.push(child.getId());
+    if (this.children[this.children.length - 1] !== child) {
+      const idx = this.children.indexOf(child);
+      this.children.push(child);
       if (idx !== -1) {
         this.children.splice(idx, 1);
       } else {
         child.setParent(this);
       }
     }
+    // ensure controller is defined
+    child.setController(this.controller);
   }
 
   removeChild(child: ElementEntity) {
     if (this.children) {
-      const idx = this.children.indexOf(child.getId());
+      const idx = this.children.indexOf(child);
       if (idx !== -1) {
         this.children.splice(idx, 1);
         child.setParent(undefined);
@@ -193,7 +183,14 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
     if (Array.isArray(model.children)) {
       const controller = this.getController();
 
-      const toadd = _.difference(model.children, this.children);
+      const childElements = model.children.map((id) => {
+        const entity = controller.getEntityById(id);
+        if (!entity) {
+          throw new Error(`No element found with ID '${id}'.`);
+        }
+        return entity;
+      });
+      const toadd = _.difference(childElements, this.children);
       if (this.children) {
         this.children.unshift(...toadd);
       } else {
@@ -201,7 +198,7 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
       }
 
       // ensure parent references are set
-      toadd.forEach((id) => controller.getEntityById(id).setParent(this));
+      toadd.forEach((child) => child.setParent(this));
     }
     if ('data' in model) {
       this.data = model.data;

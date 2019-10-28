@@ -1,4 +1,3 @@
-// import { computed } from 'mobx';
 import { observable, computed } from 'mobx';
 import Point from '../geom/Point';
 import { EdgeEntity, NodeEntity, Edge, ModelKind, AnchorEnd, Anchor } from '../types';
@@ -6,11 +5,11 @@ import BaseElementEntity from './BaseElementEntity';
 
 export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends BaseElementEntity<E, D>
   implements EdgeEntity<E, D> {
-  @observable
-  private sourceId: string;
+  @observable.ref
+  private source: NodeEntity;
 
-  @observable
-  private targetId: string;
+  @observable.ref
+  private target: NodeEntity;
 
   @observable.shallow
   private bendpoints: Point[];
@@ -20,16 +19,6 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
 
   @observable.ref
   private endPoint?: Point;
-
-  @computed
-  private get source(): NodeEntity {
-    return this.getController().getNodeById(this.sourceId);
-  }
-
-  @computed
-  private get target(): NodeEntity {
-    return this.getController().getNodeById(this.targetId);
-  }
 
   @computed
   private get sourceAnchor(): Anchor {
@@ -58,7 +47,7 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
   }
 
   setSource(source: NodeEntity) {
-    this.sourceId = source.getId();
+    this.source = source;
   }
 
   getTarget(): NodeEntity {
@@ -66,7 +55,7 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
   }
 
   setTarget(target: NodeEntity) {
-    this.targetId = target.getId();
+    this.target = target;
   }
 
   getBendpoints(): Point[] {
@@ -136,10 +125,18 @@ export default class BaseEdgeEntity<E extends Edge = Edge, D = any> extends Base
   setModel(model: E): void {
     super.setModel(model);
     if (model.source) {
-      this.sourceId = model.source;
+      const node = this.getController().getNodeById(model.source);
+      if (!node) {
+        throw new Error(`No source node found with ID '${model.source}'.`);
+      }
+      this.source = node;
     }
     if (model.target) {
-      this.targetId = model.target;
+      const node = this.getController().getNodeById(model.target);
+      if (!node) {
+        throw new Error(`No target node found with ID '${model.target}'.`);
+      }
+      this.target = node;
     }
     if ('bendpoints' in model) {
       this.bendpoints = model.bendpoints ? model.bendpoints.map((b) => new Point(b[0], b[1])) : [];
