@@ -28,7 +28,7 @@ const BaseEdgeWidget: React.FC<EdgeWidgetProps> = ({
   onHideRemoveConnector,
   children,
 }) => {
-  const [hoverRef, hover] = useHover();
+  const [hover, hoverRef] = useHover();
   const startPoint = entity.getStartPoint();
   const endPoint = entity.getEndPoint();
 

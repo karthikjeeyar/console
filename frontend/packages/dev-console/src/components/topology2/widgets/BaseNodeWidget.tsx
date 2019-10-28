@@ -68,8 +68,8 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   onShowCreateConnector,
   onContextMenu,
 }) => {
-  const [hoverRef, hover] = useHover();
-  const [labelHoverRef, labelHover] = useHover(200);
+  const [hover, hoverRef] = useHover();
+  const [labelHover, labelHoverRef] = useHover(200);
   const svgAnchorRef = useSvgAnchor();
   const cx = entity.getBounds().width / 2;
   const cy = entity.getBounds().height / 2;

@@ -15,10 +15,10 @@
   }
 
   &__label {
-    cursor: default;
     fill: var(--pf-global--Color--light-100);
     font-size: var(--pf-global--FontSize--md);
     text {
+      pointer-events: none;
       fill: var(--pf-global--Color--300);
     }
   }
@@ -32,4 +32,3 @@
     }
   }
 }
-

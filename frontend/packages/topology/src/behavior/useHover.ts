@@ -3,7 +3,7 @@ import useCallbackRef from '../utils/useCallbackRef';
 
 const useHover = <T extends Element>(
   delay?: number,
-): [(node: T) => (() => void) | undefined, boolean] => {
+): [boolean, (node: T) => (() => void) | undefined] => {
   const [hover, setHover] = React.useState<boolean>(false);
 
   // The unset handle needs to be referred by listeners in different closures.
@@ -53,7 +53,7 @@ const useHover = <T extends Element>(
     ),
   );
 
-  return [callbackRef, hover];
+  return [hover, callbackRef];
 };
 
 export default useHover;

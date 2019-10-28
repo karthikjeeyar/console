@@ -57,10 +57,13 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   canDrop,
   onContextMenu,
 }) => {
-  const [groupHoverRef, groupHover] = useHover();
+  const [groupHover, groupHoverRef] = useHover();
+  const [groupLabelHover, groupLabelHoverRef] = useHover();
   const [lowPoint, setLowPoint] = React.useState<[number, number]>([0, 0]);
   const pathRef = React.useRef<string | null>(null);
   const refs = useCombineRefs<SVGPathElement>(dragNodeRef, dndDragRef, dndDropRef);
+
+  const hover = groupHover || groupLabelHover;
 
   // cast to number and coerce
   const padding = +(entity.getStyle<GroupStyle>().padding as number);
@@ -106,34 +109,35 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   const pathClasses = classNames('odc-default-group', {
     'is-highlight': canDrop,
     'is-selected': selected,
-    'is-hover': groupHover,
+    'is-hover': hover,
   });
 
   return (
-    <Layer id="groups">
-      <g>
-        <SvgDropShadowFilter id={FILTER_ID} />
-        <SvgDropShadowFilter id={FILTER_ID_HOVER} dy={3} stdDeviation={7} floodOpacity={0.24} />
-        <g ref={groupHoverRef} onContextMenu={onContextMenu}>
+    <>
+      <SvgDropShadowFilter id={FILTER_ID} />
+      <SvgDropShadowFilter id={FILTER_ID_HOVER} dy={3} stdDeviation={7} floodOpacity={0.24} />
+      <Layer id="groups">
+        <g ref={groupHoverRef} onContextMenu={onContextMenu} onClick={onSelect}>
           <path
             ref={refs}
-            filter={groupHover ? createSvgIdUrl(FILTER_ID_HOVER) : createSvgIdUrl(FILTER_ID)}
+            filter={hover ? createSvgIdUrl(FILTER_ID_HOVER) : createSvgIdUrl(FILTER_ID)}
             className={pathClasses}
-            onClick={onSelect}
             d={pathRef.current}
           />
-          <SvgBoxedText
-            className="odc-default-group__label"
-            x={lowPoint[0]}
-            y={lowPoint[1] + hullPadding(lowPoint) + 30}
-            paddingX={20}
-            paddingY={5}
-          >
-            {entity.getLabel()}
-          </SvgBoxedText>
         </g>
+      </Layer>
+      <g ref={groupLabelHoverRef} onContextMenu={onContextMenu} onClick={onSelect}>
+        <SvgBoxedText
+          className="odc-default-group__label"
+          x={lowPoint[0]}
+          y={lowPoint[1] + hullPadding(lowPoint) + 30}
+          paddingX={20}
+          paddingY={5}
+        >
+          {entity.getLabel()}
+        </SvgBoxedText>
       </g>
-    </Layer>
+    </>
   );
 };
 
