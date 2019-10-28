@@ -49,7 +49,7 @@ const VisualizationWidget: React.FC<VisualizationWidgetProps> = ({ visualization
   React.useEffect(() => () => onMeasure.cancel(), [onMeasure]);
 
   return (
-    <ControllerContext.Provider value={visualization.getController()}>
+    <ControllerContext.Provider value={visualization}>
       <ReactMeasure client onResize={onMeasure}>
         {({ measureRef }: { measureRef: React.LegacyRef<any> }) => (
           // render an outer div because react-measure doesn't seem to fire events properly on svg resize

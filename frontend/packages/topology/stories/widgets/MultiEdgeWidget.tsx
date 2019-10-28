@@ -13,7 +13,6 @@ const MultiEdgeWidget: React.FC<MultiEdgeWidgetProps> = ({ entity }) => {
   let idx = 0;
   let sum = 0;
   entity
-    .getController()
     .getGraph()
     .getEdges()
     .forEach((e) => {

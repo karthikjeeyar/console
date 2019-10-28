@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { action } from 'mobx';
 import {
   TopologyView,
   TopologyControlBar,
@@ -57,7 +58,7 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
     const newModel = topologyModelFromDataModel(data);
     visRef.current.fromModel(newModel);
     setModel(newModel);
-    if (selectedIds.length && !visRef.current.getController().getEntityById(selectedIds[0])) {
+    if (selectedIds.length && !visRef.current.getEntityById(selectedIds[0])) {
       setSelectedIds([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -66,12 +67,17 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
   React.useEffect(() => {
     let resizeTimeout = null;
     if (selectedIds.length > 0) {
-      const selectedEntity = visRef.current.getController().getEntityById(selectedIds[0]);
+      const selectedEntity = visRef.current.getEntityById(selectedIds[0]);
       if (selectedEntity && isNodeEntity(selectedEntity)) {
-        resizeTimeout = setTimeout(() => {
-          visRef.current.getGraph().panIntoView(selectedEntity, { offset: 20, minimumVisible: 40 });
-          resizeTimeout = null;
-        }, 500);
+        resizeTimeout = setTimeout(
+          action(() => {
+            visRef.current
+              .getGraph()
+              .panIntoView(selectedEntity, { offset: 20, minimumVisible: 40 });
+            resizeTimeout = null;
+          }),
+          500,
+        );
       }
     }
     return () => {
@@ -90,19 +96,19 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
       <TopologyControlBar
         controlButtons={createTopologyControlButtons({
           ...defaultControlButtonsOptions,
-          zoomInCallback: () => {
+          zoomInCallback: action(() => {
             visRef.current.getGraph().scaleBy(4 / 3);
-          },
-          zoomOutCallback: () => {
+          }),
+          zoomOutCallback: action(() => {
             visRef.current.getGraph().scaleBy(0.75);
-          },
-          fitToScreenCallback: () => {
+          }),
+          fitToScreenCallback: action(() => {
             visRef.current.getGraph().fit(80);
-          },
-          resetViewCallback: () => {
+          }),
+          resetViewCallback: action(() => {
             visRef.current.getGraph().reset();
             visRef.current.getGraph().layout();
-          },
+          }),
           legend: false,
         })}
       />
@@ -110,9 +116,7 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
   };
 
   const selectedItemDetails = () => {
-    const selectedEntity = selectedIds[0]
-      ? visRef.current.getController().getEntityById(selectedIds[0])
-      : null;
+    const selectedEntity = selectedIds[0] ? visRef.current.getEntityById(selectedIds[0]) : null;
     if (isNodeEntity(selectedEntity)) {
       if (selectedEntity.isGroup()) {
         return (
@@ -137,7 +141,7 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
     if (selectedIds.length === 0) {
       return null;
     }
-    const selectedEntity = visRef.current.getController().getEntityById(selectedIds[0]);
+    const selectedEntity = visRef.current.getEntityById(selectedIds[0]);
     if (!selectedEntity) {
       return null;
     }

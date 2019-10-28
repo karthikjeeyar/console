@@ -207,10 +207,7 @@ export const createConnector = () => {
             ];
           }
 
-          const id = `e${vis
-            .getController()
-            .getGraph()
-            .getEdges().length + 1}`;
+          const id = `e${vis.getGraph().getEdges().length + 1}`;
           if (!model.edges) {
             model.edges = [];
           }
