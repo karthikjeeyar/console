@@ -56,6 +56,10 @@ const getOperation = (operation: DragSpecOperation | undefined): string => {
   );
 };
 
+const hasOperation = (operation: DragSpecOperation | undefined): boolean => {
+  return !!(operation && (typeof operation === 'string' || Object.keys(operation).length > 0));
+};
+
 const EMPTY_PROPS = Object.freeze({});
 
 export const useDndDrag = <
@@ -205,7 +209,7 @@ export const useDndDrag = <
                     operationChangeEvents.drag = [x, y, pageX, pageY];
                   } else {
                     const op = getOperation(specRef.current.operation);
-                    if (op) {
+                    if (op || !hasOperation(specRef.current.operation)) {
                       if (idRef.current) {
                         dndManager.beginDrag(idRef.current, op, x, y, pageX, pageY);
                       }
