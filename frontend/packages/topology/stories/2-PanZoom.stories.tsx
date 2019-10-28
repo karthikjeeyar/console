@@ -57,9 +57,9 @@ export const panZoom: React.FC = () => {
   vis.fromModel(model);
   reaction(
     () => ({
-      x: vis.getRoot().getBounds().x,
-      y: vis.getRoot().getBounds().y,
-      k: vis.getRoot().getScale(),
+      x: vis.getGraph().getBounds().x,
+      y: vis.getGraph().getBounds().y,
+      k: vis.getGraph().getScale(),
     }),
     (transform) => {
       // logging to action panel is too laggy therefore log to console

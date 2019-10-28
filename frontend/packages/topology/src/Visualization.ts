@@ -32,7 +32,7 @@ export default class Visualization {
     this.controller.fromModel(model);
   }
 
-  getRoot(): GraphEntity {
+  getGraph(): GraphEntity {
     return this.controller.getGraph();
   }
 

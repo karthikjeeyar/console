@@ -31,9 +31,9 @@ const VisualizationWidget: React.FC<VisualizationWidgetProps> = ({ visualization
     () =>
       _.debounce<any>(
         action((contentRect: { client: { width: number; height: number } }) => {
-          visualization.getRoot().setBounds(
+          visualization.getGraph().setBounds(
             visualization
-              .getRoot()
+              .getGraph()
               .getBounds()
               .clone()
               .setSize(contentRect.client.width, contentRect.client.height),
@@ -72,7 +72,7 @@ const VisualizationWidget: React.FC<VisualizationWidgetProps> = ({ visualization
               onContextMenu={stopEvent}
             >
               <SvgDefsProvider>
-                <EntityWidget entity={visualization.getRoot()} />
+                <EntityWidget entity={visualization.getGraph()} />
               </SvgDefsProvider>
             </svg>
           </div>

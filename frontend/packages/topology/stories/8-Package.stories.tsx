@@ -148,8 +148,8 @@ const TopologyViewComponent: React.FC<TopologyViewComponentProps> = ({ vis, useS
 
   const updateLayout = (newLayout: string) => {
     // FIXME reset followed by layout causes a flash of the reset prior to the layout
-    vis.getRoot().reset();
-    vis.getRoot().setLayout(newLayout);
+    vis.getGraph().reset();
+    vis.getGraph().setLayout(newLayout);
     setLayout(newLayout);
     setLayoutDropdownOpen(false);
   };
@@ -198,17 +198,17 @@ const TopologyViewComponent: React.FC<TopologyViewComponentProps> = ({ vis, useS
           controlButtons={createTopologyControlButtons({
             ...defaultControlButtonsOptions,
             zoomInCallback: () => {
-              vis.getRoot().scaleBy(4 / 3);
+              vis.getGraph().scaleBy(4 / 3);
             },
             zoomOutCallback: () => {
-              vis.getRoot().scaleBy(0.75);
+              vis.getGraph().scaleBy(0.75);
             },
             fitToScreenCallback: () => {
-              vis.getRoot().fit(80);
+              vis.getGraph().fit(80);
             },
             resetViewCallback: () => {
-              vis.getRoot().reset();
-              vis.getRoot().layout();
+              vis.getGraph().reset();
+              vis.getGraph().layout();
             },
             legend: false,
           })}
