@@ -148,18 +148,34 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
     return this.children;
   }
 
-  appendChild(child: ElementEntity) {
-    if (this.children[this.children.length - 1] !== child) {
+  insertChild(child: ElementEntity, index: number) {
+    if (this.children[index] !== child) {
       const idx = this.children.indexOf(child);
-      this.children.push(child);
       if (idx !== -1) {
         this.children.splice(idx, 1);
       } else {
+        // remove from old parent
+        child.remove();
         child.setParent(this);
+        child.setController(this.controller);
       }
+      this.children.splice(index, 0, child);
     }
-    // ensure controller is defined
-    child.setController(this.controller);
+  }
+
+  appendChild(child: ElementEntity) {
+    if (this.children[this.children.length - 1] !== child) {
+      const idx = this.children.indexOf(child);
+      if (idx !== -1) {
+        this.children.splice(idx, 1);
+      } else {
+        // remove from old parent
+        child.remove();
+        child.setParent(this);
+        child.setController(this.controller);
+      }
+      this.children.push(child);
+    }
   }
 
   removeChild(child: ElementEntity) {
@@ -173,7 +189,9 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   }
 
   remove(): void {
-    this.getParent().removeChild(this);
+    if (this.parent) {
+      this.parent.removeChild(this);
+    }
   }
 
   setModel(model: E): void {
@@ -190,15 +208,13 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
         }
         return entity;
       });
-      const toadd = _.difference(childElements, this.children);
-      if (this.children) {
-        this.children.unshift(...toadd);
-      } else {
-        this.children = toadd;
-      }
 
-      // ensure parent references are set
-      toadd.forEach((child) => child.setParent(this));
+      // remove children
+      _.difference(this.children, childElements).forEach((child) => this.removeChild(child));
+
+      // add children
+      const toAdd = _.difference(childElements, this.children);
+      toAdd.reverse().forEach((child) => this.insertChild(child, 0));
     }
     if ('data' in model) {
       this.data = model.data;

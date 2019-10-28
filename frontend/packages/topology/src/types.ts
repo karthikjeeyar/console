@@ -107,6 +107,7 @@ export interface ElementEntity<E extends Element = Element, D = any> extends Wit
   getData(): D | undefined;
   setData(data: D | undefined): void;
   getChildren(): ElementEntity[];
+  insertChild(child: ElementEntity, index: number): void;
   appendChild(child: ElementEntity): void;
   removeChild(child: ElementEntity): void;
   remove(): void;
