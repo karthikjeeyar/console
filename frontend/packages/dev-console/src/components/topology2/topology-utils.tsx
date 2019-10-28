@@ -62,10 +62,6 @@ const moveNodeToGroup = (node: NodeEntity, targetGroup: NodeEntity) => {
     return;
   }
 
-  const onComplete = () => {
-    node.getGraph().layout();
-  };
-
   if (sourceGroup) {
     const title = targetGroup ? 'Move Component Node' : 'Remove Component Node from Application';
     const message = (
@@ -85,23 +81,19 @@ const moveNodeToGroup = (node: NodeEntity, targetGroup: NodeEntity) => {
         return updateTopologyResourceApplication(
           node.getData(),
           targetGroup ? targetGroup.getLabel() : null,
-        )
-          .then(onComplete)
-          .catch((err) => {
-            const error = err.message;
-            errorModal({ error });
-          });
+        ).catch((err) => {
+          const error = err.message;
+          errorModal({ error });
+        });
       },
     });
     return;
   }
 
-  updateTopologyResourceApplication(node.getData(), targetGroup.getLabel())
-    .then(onComplete)
-    .catch((err) => {
-      const error = err.message;
-      errorModal({ error });
-    });
+  updateTopologyResourceApplication(node.getData(), targetGroup.getLabel()).catch((err) => {
+    const error = err.message;
+    errorModal({ error });
+  });
 };
 
 const createConnection = (
