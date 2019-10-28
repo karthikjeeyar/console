@@ -47,24 +47,8 @@ export type DndStateContainer = {
   dragDrop: DndState;
 };
 
-export interface DndActions {
-  beginDrag(
-    sourceIds: string | string[],
-    operation: string,
-    x: number,
-    y: number,
-    pageX: number,
-    pageY: number,
-  ): void;
-  hover(targetIds: string[]): void;
-  endDrag(): void;
-  drag(x: number, y: number, pageX: number, pageY: number): void;
-  drop(): void;
-  cancel(): boolean;
-}
-
 export type Unregister = () => void;
-export interface DndManager extends DndActions {
+export interface DndManager {
   registerSource(source: DragSource): [string, Unregister];
   registerTarget(target: DropTarget): [string, Unregister];
   canDragSource(sourceId: string | undefined): boolean;
@@ -86,6 +70,19 @@ export interface DndManager extends DndActions {
   didDrop(): boolean;
   getDragEvent(): DragEvent | undefined;
   getOperation(): string;
+  beginDrag(
+    sourceIds: string | string[],
+    operation: string,
+    x: number,
+    y: number,
+    pageX: number,
+    pageY: number,
+  ): void;
+  hover(targetIds: string[]): void;
+  endDrag(): void;
+  drag(x: number, y: number, pageX: number, pageY: number): void;
+  drop(): void;
+  cancel(): boolean;
 }
 
 export type DndStore = {
