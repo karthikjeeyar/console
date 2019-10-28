@@ -51,18 +51,12 @@ const workloadDropTargetSpec: DropTargetSpec<
   accept: [MOVE_CONNECTOR_DROP_TYPE, CREATE_CONNECTOR_DROP_TYPE],
   canDrop: (item, monitor, props) => {
     if (isEdgeEntity(item)) {
-      return !props || (item.getSource() !== props.entity && item.getTarget() !== props.entity);
+      return item.getSource() !== props.entity && item.getTarget() !== props.entity;
     }
-    if (!props || item === props.entity) {
+    if (item === props.entity) {
       return false;
     }
-    return !item
-      .getController()
-      .getEntities()
-      .filter((entity: ElementEntity) => isEdgeEntity(entity))
-      .find((edge: EdgeEntity) => {
-        return edge.getSource() === item && edge.getTarget() === props.entity;
-      });
+    return !props.entity.getTargetEdges().find((e) => e.getSource() === item);
   },
   collect: (monitor) => ({
     droppable: monitor.isDragging(),
@@ -93,9 +87,7 @@ const graphWorkloadDropTargetSpec: DropTargetSpec<
 > = {
   accept: TYPE_WORKLOAD,
   canDrop: (item, monitor, props) => {
-    return (
-      monitor.getOperation() === REGROUP_OPERATION && !!props && item.getParent() !== props.entity
-    );
+    return monitor.getOperation() === REGROUP_OPERATION && item.getParent() !== props.entity;
   },
   collect: (monitor) => ({
     droppable: monitor.isDragging() && monitor.getOperation() === REGROUP_OPERATION,
@@ -135,7 +127,7 @@ const edgeDragSourceSpec: DragSourceSpec<
   },
   end: (dropResult, monitor, props) => {
     props.entity.setEndPoint();
-    if (monitor.didDrop() && dropResult && props) {
+    if (monitor.didDrop() && dropResult) {
       createConnection(props.entity.getSource(), dropResult, props.entity.getTarget());
     }
   },

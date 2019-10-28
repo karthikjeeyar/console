@@ -8,6 +8,7 @@ import {
   AnchorEnd,
   GroupStyle,
   NodeShape,
+  EdgeEntity,
 } from '../types';
 import CenterAnchor from '../anchors/CenterAnchor';
 import Rect from '../geom/Rect';
@@ -58,6 +59,20 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
 
     const { padding } = this.getStyle<GroupStyle>();
     return padding ? rect.expand(padding, padding) : rect;
+  }
+
+  @computed
+  get sourceEdges(): EdgeEntity[] {
+    return this.getGraph()
+      .getEdges()
+      .filter((e) => e.getSource() === this);
+  }
+
+  @computed
+  get targetEdges(): EdgeEntity[] {
+    return this.getGraph()
+      .getEdges()
+      .filter((e) => e.getTarget() === this);
   }
 
   get kind(): ModelKind {
@@ -111,6 +126,14 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
 
   setNodeShape(shape: NodeShape): void {
     this.shape = shape;
+  }
+
+  getSourceEdges(): EdgeEntity[] {
+    return this.sourceEdges;
+  }
+
+  getTargetEdges(): EdgeEntity[] {
+    return this.targetEdges;
   }
 
   setModel(model: E): void {

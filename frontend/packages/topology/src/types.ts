@@ -129,6 +129,8 @@ export interface NodeEntity<E extends Node = Node, D = any> extends ElementEntit
   isGroup(): boolean;
   getNodeShape(): NodeShape;
   setNodeShape(shape: NodeShape): void;
+  getSourceEdges(): EdgeEntity[];
+  getTargetEdges(): EdgeEntity[];
 }
 
 export interface EdgeEntity<E extends Edge = Edge, D = any> extends ElementEntity<E, D> {
