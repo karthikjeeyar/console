@@ -158,6 +158,7 @@ type ForceLayoutOptions = {
   collideDistance: number;
   simulationSpeed: number;
   chargeStrength: number;
+  layoutOnDrag: boolean;
 };
 
 export default class ForceLayout implements Layout {
@@ -170,21 +171,31 @@ export default class ForceLayout implements Layout {
   constructor(graph: GraphEntity, options?: Partial<ForceLayoutOptions>) {
     this.graph = graph;
     this.options = {
-      ...{ linkDistance: 30, collideDistance: 10, simulationSpeed: 10, chargeStrength: -30 },
+      ...{
+        linkDistance: 30,
+        collideDistance: 10,
+        simulationSpeed: 10,
+        chargeStrength: -30,
+        layoutOnDrag: true,
+      },
       ...options,
     };
 
-    graph
-      .getController()
-      .addEventListener<DragNodeEventListener>(DRAG_NODE_START_EVENT, this.handleDragStart)
-      .addEventListener<DragNodeEventListener>(DRAG_NODE_END_EVENT, this.handleDragEnd);
+    if (this.options.layoutOnDrag) {
+      graph
+        .getController()
+        .addEventListener<DragNodeEventListener>(DRAG_NODE_START_EVENT, this.handleDragStart)
+        .addEventListener<DragNodeEventListener>(DRAG_NODE_END_EVENT, this.handleDragEnd);
+    }
   }
 
   destroy(): void {
-    this.graph
-      .getController()
-      .removeEventListener(DRAG_NODE_START_EVENT, this.handleDragStart)
-      .removeEventListener(DRAG_NODE_END_EVENT, this.handleDragEnd);
+    if (this.options.layoutOnDrag) {
+      this.graph
+        .getController()
+        .removeEventListener(DRAG_NODE_START_EVENT, this.handleDragStart)
+        .removeEventListener(DRAG_NODE_END_EVENT, this.handleDragEnd);
+    }
   }
 
   getGroupNodes = (group: NodeEntity): D3Node[] => {
