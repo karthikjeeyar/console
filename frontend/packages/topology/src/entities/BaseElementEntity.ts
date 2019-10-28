@@ -18,7 +18,7 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
 
   private type: string;
 
-  @observable
+  @observable.ref
   private data: D | undefined;
 
   @observable.ref
