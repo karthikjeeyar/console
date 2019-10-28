@@ -1,11 +1,8 @@
 import * as React from 'react';
+import { useSize } from '@console/topology/src/utils/useSize';
 import { createSvgIdUrl } from '../../utils/svg-utils';
 import SvgResourceIcon from '../topology/shapes/ResourceIcon';
 import SvgDropShadowFilter from './SvgDropShadowFilter';
-
-export interface State {
-  bb?: { width: number; height: number };
-}
 
 export interface SvgBoxedTextProps {
   children?: string;
@@ -27,39 +24,7 @@ const FILTER_ID = 'SvgBoxedTextDropShadowFilterId';
 /**
  * Renders a `<text>` component with a `<rect>` box behind.
  */
-export default class SvgBoxedText extends React.Component<SvgBoxedTextProps, State> {
-  private readonly textRef = React.createRef<SVGTextElement>();
-
-  private iconRef = React.createRef<any>();
-
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  componentDidMount() {
-    this.computeBoxSize();
-  }
-
-  componentDidUpdate() {
-    this.computeBoxSize();
-  }
-
-  private computeBoxSize() {
-    const { current } = this.textRef;
-    if (current && current.getBBox) {
-      const bb = current.getBBox();
-      if (
-        !this.state.bb ||
-        (bb.width !== this.state.bb.width || bb.height !== this.state.bb.height)
-      ) {
-        this.setState({ bb });
-      }
-    }
-  }
-
-  render() {
-    const {
+const SvgBoxedText: React.FC<SvgBoxedTextProps> = ({
       children,
       className,
       paddingX = 0,
@@ -72,35 +37,35 @@ export default class SvgBoxedText extends React.Component<SvgBoxedTextProps, Sta
       onMouseLeave,
       innerRef,
       ...other
-    } = this.props;
-    const { bb } = this.state;
-    const iconSpace: number =
-      kind && this.iconRef.current ? this.iconRef.current.getBBox().width + paddingX : 0;
+    }) => {
+    const [textSize, textRef] = useSize([children, className]);
+    const [iconSize, iconRef] = useSize([kind]);
+    const iconSpace = kind && iconSize ? iconSize.width + paddingX : 0;
 
     return (
       <g ref={innerRef} className={className}>
         <SvgDropShadowFilter id={FILTER_ID} />
-        {bb && (
+        {textSize && (
           <rect
             filter={createSvgIdUrl(FILTER_ID)}
-            x={x - paddingX - bb.width / 2 - iconSpace / 2}
-            width={bb.width + paddingX * 2 + iconSpace}
-            y={y - paddingY - bb.height / 2}
-            height={bb.height + paddingY * 2}
+            x={x - paddingX - textSize.width / 2 - iconSpace / 2}
+            width={textSize.width + paddingX * 2 + iconSpace}
+            y={y - paddingY - textSize.height / 2}
+            height={textSize.height + paddingY * 2}
             rx={cornerRadius}
             ry={cornerRadius}
           />
         )}
-        {bb && kind && (
+        {textSize && kind && (
           <SvgResourceIcon
-            ref={this.iconRef}
-            x={x - bb.width / 2 - paddingX / 2}
+            ref={iconRef}
+            x={x - textSize.width / 2 - paddingX / 2}
             y={y}
             kind={kind}
           />
         )}
         <text
-          ref={this.textRef}
+          ref={textRef}
           {...other}
           x={x + iconSpace / 2}
           y={y}
@@ -115,3 +80,5 @@ export default class SvgBoxedText extends React.Component<SvgBoxedTextProps, Sta
     );
   }
 }
+
+export default SvgBoxedText;
