@@ -141,12 +141,7 @@ export const useDndDrag = <
                 () =>
                   d3
                     .select(node.ownerSVGElement)
-                    .select(
-                      `[data-id="${entityRef.current
-                        .getController()
-                        .getGraph()
-                        .getId()}"]`,
-                    )
+                    .select('[data-surface="true"]')
                     .node() as any,
               )
               .on('start', function() {

@@ -56,7 +56,11 @@ const GraphWidget: React.FC<GraphWidgetProps> = ({ entity, panZoomRef, dndDropRe
         fillOpacity={0}
         onClick={onSelect}
       />
-      <g ref={refs} transform={`translate(${bounds.x}, ${bounds.y}) scale(${entity.getScale()})`}>
+      <g
+        data-surface="true"
+        ref={refs}
+        transform={`translate(${bounds.x}, ${bounds.y}) scale(${entity.getScale()})`}
+      >
         <Inner entity={entity} />
       </g>
     </>
