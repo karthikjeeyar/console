@@ -4,7 +4,7 @@ import Point from '@console/topology/src/geom/Point';
 import { EdgeEntity } from '@console/topology/src/types';
 import { WithRemoveConnectorProps } from '@console/topology/src/behavior/withRemoveConnector';
 import widget from '@console/topology/src/widget';
-import useHover from '@console/topology/src/behavior/useHover';
+import useHover from '@console/topology/src/utils/useHover';
 import * as classNames from 'classnames';
 import { boundingBoxForLine } from '../../../utils/svg-utils';
 import './BaseEdge.scss';

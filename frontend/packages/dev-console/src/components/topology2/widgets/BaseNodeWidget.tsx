@@ -9,7 +9,7 @@ import { WithDndDragProps } from '@console/topology/src/behavior/useDndDrag';
 import { WithDndDropProps } from '@console/topology/src/behavior/useDndDrop';
 import { WithContextMenuProps } from '@console/topology/src/behavior/withContextMenu';
 import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
-import useHover from '@console/topology/src/behavior/useHover';
+import useHover from '@console/topology/src/utils/useHover';
 import SvgBoxedText from '../../svg/SvgBoxedText';
 import { createSvgIdUrl } from '../../../utils/svg-utils';
 import SvgDropShadowFilter from '../../svg/SvgDropShadowFilter';
