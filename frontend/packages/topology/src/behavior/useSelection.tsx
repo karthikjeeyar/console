@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { action } from 'mobx';
+import { action, computed } from 'mobx';
 import { observer } from 'mobx-react';
-import { useComputed } from 'mobx-react-lite';
 import { EventListener } from '../types';
 import EntityContext from '../utils/EntityContext';
 
@@ -23,10 +22,14 @@ export const useSelection = (
   const entityRef = React.useRef(entity);
   entityRef.current = entity;
 
-  const selected = useComputed(() => {
-    const { selectedIds } = entity.getController().getState<SelectionHandlerState>();
-    return !!selectedIds && selectedIds.includes(entity.getId());
-  }, [entity]);
+  const selected = React.useMemo(
+    () =>
+      computed(() => {
+        const { selectedIds } = entity.getController().getState<SelectionHandlerState>();
+        return !!selectedIds && selectedIds.includes(entity.getId());
+      }),
+    [entity],
+  );
 
   const onSelect = React.useCallback(
     action(
@@ -67,7 +70,7 @@ export const useSelection = (
     ),
     [],
   );
-  return [selected, onSelect];
+  return [selected.get(), onSelect];
 };
 
 export type WithSelectionProps = {

@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 import { pointInSvgPath } from 'point-in-svg-path';
+import { comparer, computed } from 'mobx';
 import EntityContext from '../utils/EntityContext';
 import Point from '../geom/Point';
 import { ElementEntity } from '../types';
@@ -72,6 +73,9 @@ export const useDndDrop = <
       },
       getOperation: (): string => {
         return dndManager.getOperation();
+      },
+      isCancelled: (): boolean => {
+        return dndManager.isCancelled();
       },
     };
     return targetMonitor;
@@ -160,12 +164,17 @@ export const useDndDrop = <
     return unregister;
   }, [spec.accept, dndManager, monitor]);
 
-  return [
-    spec.collect
-      ? spec.collect(monitor, props != null ? props : (EMPTY_PROPS as Props))
-      : (({} as any) as CollectedProps),
-    nodeRef as any,
-  ];
+  const collected = React.useMemo(
+    () =>
+      computed(
+        () =>
+          spec.collect ? spec.collect(monitor, propsRef.current) : (({} as any) as CollectedProps),
+        { equals: comparer.shallow },
+      ),
+    [monitor, spec],
+  );
+
+  return [collected.get(), nodeRef as any];
 };
 
 export type WithDndDropProps = {
@@ -183,7 +192,7 @@ export const withDndDrop = <
   WrappedComponent: React.ComponentType<P>,
 ) => {
   const Component: React.FC<Omit<P, keyof WithDndDropProps & CollectedProps>> = (props) => {
-    // TODO why is props giving an error but not in useDndDrag
+    // TODO fix cast to any
     const [dndDropProps, dndDropRef] = useDndDrop(spec, props as any);
     return <WrappedComponent {...props as any} {...dndDropProps} dndDropRef={dndDropRef} />;
   };

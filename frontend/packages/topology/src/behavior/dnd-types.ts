@@ -19,6 +19,7 @@ export type DragSource = {
   beginDrag(dndManager: DndManager): any;
   drag(dndManager: DndManager): void;
   endDrag(dndManager: DndManager): void;
+  canCancel(dndManager: DndManager): boolean;
 };
 
 export type DropTarget = {
@@ -39,6 +40,7 @@ export interface DndState {
   didDrop?: boolean;
   event?: DragEvent;
   operation?: string;
+  cancelled?: boolean;
 }
 
 export type DndStateContainer = {
@@ -58,7 +60,7 @@ export interface DndActions {
   endDrag(): void;
   drag(x: number, y: number, pageX: number, pageY: number): void;
   drop(): void;
-  cancel(): void;
+  cancel(): boolean;
 }
 
 export type Unregister = () => void;
@@ -75,6 +77,7 @@ export interface DndManager extends DndActions {
       shallow?: boolean;
     },
   ): boolean;
+  isCancelled(): boolean;
   getItemType(): Identifier | undefined;
   getItem(): any;
   getSourceId(): string | undefined;
@@ -122,6 +125,7 @@ export interface DragSourceSpec<
   end?: (dropResult: DropResult | undefined, monitor: DragSourceMonitor, props: Props) => void;
   canDrag?: boolean | ((monitor: DragSourceMonitor, props: Props) => boolean);
   collect?: (monitor: DragSourceMonitor, props: Props) => CollectedProps;
+  canCancel?: boolean | ((monitor: DragSourceMonitor, props: Props) => boolean);
 }
 
 export type DropTargetSpec<
@@ -131,7 +135,7 @@ export type DropTargetSpec<
   Props extends {} = {}
 > = {
   accept: TargetType;
-  hitTest?(x: number, y: number, props: Props): boolean;
+  hitTest?: (x: number, y: number, props: Props) => boolean;
   drop?: (item: DragObject, monitor: DropTargetMonitor, props: Props) => DropResult | undefined;
   hover?: (item: DragObject, monitor: DropTargetMonitor, props: Props) => void;
   canDrop?: (item: DragObject, monitor: DropTargetMonitor, props: Props) => boolean;
@@ -145,6 +149,7 @@ export interface HandlerManager {
 
 export interface DragSourceMonitor extends HandlerManager {
   canDrag(): boolean;
+  isCancelled(): boolean;
   isDragging(): boolean;
   getItemType(): Identifier | undefined;
   getItem(): any;
@@ -156,6 +161,7 @@ export interface DragSourceMonitor extends HandlerManager {
 
 export interface DropTargetMonitor extends HandlerManager {
   canDrop(): boolean;
+  isCancelled(): boolean;
   isDragging(): boolean;
   isOver(options?: { shallow?: boolean }): boolean;
   getItemType(): Identifier | undefined;

@@ -18,7 +18,9 @@ import {
   DRAG_NODE_START_EVENT,
   DRAG_NODE_END_EVENT,
   DragNodeEventListener,
+  DRAG_MOVE_OPERATION,
 } from '../behavior/useDragNode';
+import { DragEvent } from '../behavior/dnd-types';
 
 function getGroupPadding(entity: ElementEntity, padding = 0): number {
   if (isGraphEntity(entity)) {
@@ -195,7 +197,11 @@ export default class ForceLayout implements Layout {
     }, []);
   };
 
-  handleDragStart = (entity: NodeEntity) => {
+  handleDragStart = (entity: NodeEntity, event: DragEvent, operation: string) => {
+    if (operation !== DRAG_MOVE_OPERATION) {
+      this.simulation.stop();
+      return;
+    }
     const id = entity.getId();
     let found = false;
     const dragNode: D3Node | undefined = this.simulation
@@ -222,7 +228,11 @@ export default class ForceLayout implements Layout {
     }
   };
 
-  handleDragEnd = (entity: NodeEntity) => {
+  handleDragEnd = (entity: NodeEntity, event: DragEvent, operation: string) => {
+    if (operation !== DRAG_MOVE_OPERATION) {
+      this.simulation.restart();
+      return;
+    }
     const id = entity.getId();
     this.simulation.alphaTarget(0);
     const dragNode: D3Node | undefined = this.simulation

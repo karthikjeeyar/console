@@ -110,13 +110,13 @@ const getVisualization = (model: Model): Visualization => {
       return withPanZoom()(GraphWidget);
     }
     if (type === 'group-hull') {
-      return withDragNode()(GroupHullWidget);
+      return withDragNode({ canCancel: false })(GroupHullWidget);
     }
     if (type === 'group') {
-      return withDragNode()(GroupWidget);
+      return withDragNode({ canCancel: false })(GroupWidget);
     }
     if (kind === ModelKind.node) {
-      return withDragNode()(withSelection()(NodeWidget));
+      return withDragNode({ canCancel: false })(withSelection()(NodeWidget));
     }
     return undefined;
   });

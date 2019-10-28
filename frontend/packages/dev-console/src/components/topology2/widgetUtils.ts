@@ -34,6 +34,7 @@ const workloadDragSourceSpec = (
   operation: {
     [Modifiers.SHIFT]: REGROUP_OPERATION,
   },
+  canCancel: false,
   end: (dropResult, monitor, props) => {
     if (monitor.didDrop() && dropResult && props && props.entity.getParent() !== dropResult) {
       moveNodeToGroup(props.entity, isNodeEntity(dropResult) ? dropResult : null);

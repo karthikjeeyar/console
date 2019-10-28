@@ -9,12 +9,12 @@ export const DRAG_NODE_EVENT = 'drag_node';
 export const DRAG_NODE_START_EVENT = `${DRAG_NODE_EVENT}_start`;
 export const DRAG_NODE_END_EVENT = `${DRAG_NODE_EVENT}_end`;
 
-export type DragNodeEventListener = EventListener<[NodeEntity, DragEvent]>;
+export type DragNodeEventListener = EventListener<[NodeEntity, DragEvent, string]>;
 
 export const DRAG_MOVE_OPERATION = 'move.useDragNode';
 
 const defaultOperation = {
-  [Modifiers.NONE]: DRAG_MOVE_OPERATION,
+  [Modifiers.DEFAULT]: DRAG_MOVE_OPERATION,
 };
 
 export const useDragNode = <
@@ -23,7 +23,9 @@ export const useDragNode = <
   CollectedProps extends {} = {},
   Props extends {} = {}
 >(
-  spec?: DragSourceSpec<DragObject, DropResult, CollectedProps>,
+  spec?: Omit<DragSourceSpec<DragObject, DropResult, CollectedProps, Props>, 'item'> & {
+    item?: DragObject;
+  },
   props?: Props,
 ): [CollectedProps, ConnectDragSource] => {
   const entity = React.useContext(EntityContext);
@@ -38,7 +40,11 @@ export const useDragNode = <
       const sourceSpec: DragSourceSpec<any, any, any, Props> = {
         item: (spec && spec.item) || { type: '#useDragNode#' },
         operation: (() => {
-          if (spec && typeof spec.operation === 'object') {
+          if (
+            spec &&
+            typeof spec.operation === 'object' &&
+            Object.keys(spec.operation).length > 0
+          ) {
             return {
               ...defaultOperation,
               ...spec.operation,
@@ -56,11 +62,14 @@ export const useDragNode = <
 
           const result = spec && spec.begin && spec.begin(monitor, p);
 
-          if (monitor.getOperation() === DRAG_MOVE_OPERATION) {
-            entityRef.current
-              .getController()
-              .fireEvent(DRAG_NODE_START_EVENT, entityRef.current, monitor.getDragEvent());
-          }
+          entityRef.current
+            .getController()
+            .fireEvent(
+              DRAG_NODE_START_EVENT,
+              entityRef.current,
+              monitor.getDragEvent(),
+              monitor.getOperation(),
+            );
 
           return result || entityRef.current;
         },
@@ -88,22 +97,24 @@ export const useDragNode = <
 
           spec && spec.drag && spec.drag(event, monitor, p);
 
-          if (monitor.getOperation() === DRAG_MOVE_OPERATION) {
-            entityRef.current
-              .getController()
-              .fireEvent(DRAG_NODE_START_EVENT, entityRef.current, event);
-          }
+          entityRef.current
+            .getController()
+            .fireEvent(DRAG_NODE_EVENT, entityRef.current, event, monitor.getOperation());
         },
         canDrag: spec ? spec.canDrag : undefined,
         end: (dropResult, monitor, p) => {
-          if (monitor.getOperation() === DRAG_MOVE_OPERATION) {
-            entityRef.current
-              .getController()
-              .fireEvent(DRAG_NODE_END_EVENT, entityRef.current, monitor.getDragEvent());
-          }
+          entityRef.current
+            .getController()
+            .fireEvent(
+              DRAG_NODE_END_EVENT,
+              entityRef.current,
+              monitor.getDragEvent(),
+              monitor.getOperation(),
+            );
           spec && spec.end && spec.end(dropResult, monitor, p);
         },
         collect: spec ? spec.collect : undefined,
+        canCancel: spec ? spec.canCancel : undefined,
       };
       return sourceSpec;
     }, [spec]),
@@ -121,12 +132,15 @@ export const withDragNode = <
   CollectedProps extends {} = {},
   Props extends {} = {}
 >(
-  spec?: DragSourceSpec<DragObject, DropResult, CollectedProps, Props>,
+  spec?: Omit<DragSourceSpec<DragObject, DropResult, CollectedProps, Props>, 'item'> & {
+    item?: DragObject;
+  },
 ) => <P extends WithDragNodeProps & CollectedProps & Props>(
   WrappedComponent: React.ComponentType<P>,
 ) => {
   const Component: React.FC<Omit<P, keyof WithDragNodeProps>> = (props) => {
-    const [dragNodeProps, dragNodeRef] = useDragNode(spec, props);
+    // TODO fix cast to any
+    const [dragNodeProps, dragNodeRef] = useDragNode(spec, props as any);
     return <WrappedComponent {...props as any} dragNodeRef={dragNodeRef} {...dragNodeProps} />;
   };
   return observer(Component);

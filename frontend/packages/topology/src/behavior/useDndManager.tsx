@@ -152,6 +152,10 @@ export class DndManagerImpl implements DndManager {
     return this.state.operation || '';
   }
 
+  isCancelled(): boolean {
+    return !!this.state.cancelled;
+  }
+
   beginDrag(
     sourceIds: string | string[],
     operation: string,
@@ -220,6 +224,7 @@ export class DndManagerImpl implements DndManager {
     delete this.state.sourceId;
     delete this.state.targetIds;
     delete this.state.operation;
+    delete this.state.cancelled;
   }
 
   drop(): void {
@@ -257,16 +262,22 @@ export class DndManagerImpl implements DndManager {
     this.performHitTests();
   }
 
-  cancel(): void {
+  cancel(): boolean {
     if (!this.state.event) {
       throw new Error('Drag event not initialized');
     }
-    this.drag(
-      this.state.event.initialX,
-      this.state.event.initialY,
-      this.state.event.pageX,
-      this.state.event.pageY,
-    );
+    const source = this.getSource(this.getSourceId());
+    if (source && source.canCancel(this)) {
+      this.state.cancelled = true;
+      this.drag(
+        this.state.event.initialX,
+        this.state.event.initialY,
+        this.state.event.pageX,
+        this.state.event.pageY,
+      );
+      return true;
+    }
+    return false;
   }
 
   private performHitTests(): void {
