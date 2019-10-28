@@ -10,7 +10,7 @@ export interface ResourceIconProps {
   kind: string;
 }
 
-export function getKindStringAndAtextSizerivation(kind: string) {
+export function getKindStringAndAbbrivation(kind: string) {
   const kindObj = modelFor(kind);
   const kindStr = get(kindObj, 'kind', kind);
   const kindAbbr = (kindObj && kindObj.abbr) || kindToAbbr(kindStr);
@@ -18,7 +18,7 @@ export function getKindStringAndAtextSizerivation(kind: string) {
 }
 
 export const ResourceIcon: React.FC<ResourceIconProps> = ({ kind, x, y }, iconRef) => {
-  const { kindAbbr, kindStr } = getKindStringAndAtextSizerivation(kind);
+  const { kindAbbr, kindStr } = getKindStringAndAbbrivation(kind);
   const [textSize, textRef] = useSize([]);
 
   let rect = null;
