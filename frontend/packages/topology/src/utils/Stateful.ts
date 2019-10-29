@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { action, observable } from 'mobx';
 import { WithState, State } from '../types';
 
 export default class Stateful implements WithState {
@@ -9,6 +9,7 @@ export default class Stateful implements WithState {
     return this.state as S;
   }
 
+  @action
   setState(state: State): void {
     if (state) {
       Object.assign(this.state, state);

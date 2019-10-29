@@ -149,7 +149,11 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   }
 
   insertChild(child: ElementEntity, index: number) {
-    if (this.children[index] !== child) {
+    if (
+      this.children.length === 0 ||
+      index >= this.children.length ||
+      this.children[index] !== child
+    ) {
       const idx = this.children.indexOf(child);
       if (idx !== -1) {
         this.children.splice(idx, 1);
@@ -164,7 +168,7 @@ export default abstract class BaseElementEntity<E extends Element = Element, D =
   }
 
   appendChild(child: ElementEntity) {
-    if (this.children[this.children.length - 1] !== child) {
+    if (this.children.length === 0 || this.children[this.children.length - 1] !== child) {
       const idx = this.children.indexOf(child);
       if (idx !== -1) {
         this.children.splice(idx, 1);

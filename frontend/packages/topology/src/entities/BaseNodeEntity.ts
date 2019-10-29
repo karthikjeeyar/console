@@ -62,14 +62,14 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
   }
 
   @computed
-  get sourceEdges(): EdgeEntity[] {
+  private get sourceEdges(): EdgeEntity[] {
     return this.getGraph()
       .getEdges()
       .filter((e) => e.getSource() === this);
   }
 
   @computed
-  get targetEdges(): EdgeEntity[] {
+  private get targetEdges(): EdgeEntity[] {
     return this.getGraph()
       .getEdges()
       .filter((e) => e.getTarget() === this);

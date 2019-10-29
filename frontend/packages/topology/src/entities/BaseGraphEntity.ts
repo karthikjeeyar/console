@@ -32,11 +32,6 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
   }
 
   @computed
-  private get graphLayout(): Layout | undefined {
-    return this.currentLayout;
-  }
-
-  @computed
   private get edges(): EdgeEntity[] {
     return this.getChildren().filter(isEdgeEntity);
   }
@@ -82,13 +77,12 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
     }
 
     this.layoutType = layout;
-    this.currentLayout = this.getController().getLayout(layout);
+    this.currentLayout = layout ? this.getController().getLayout(layout) : undefined;
   }
 
   layout(): void {
-    const layout = this.graphLayout;
-    if (layout) {
-      layout.layout();
+    if (this.currentLayout) {
+      this.currentLayout.layout();
     }
   }
 
@@ -174,13 +168,15 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
       return;
     }
     const { x: viewX, y: viewY, width: viewWidth, height: viewHeight } = this.getBounds();
-    const boundingBox = Rect.fromRect(nodeEntity.getBounds())
-      .scale(this.getScale())
+    const boundingBox = nodeEntity
+      .getBounds()
+      .clone()
+      .scale(this.scale)
       .translate(viewX, viewY);
     const { x, y, width, height } = boundingBox;
     let move = false;
-    const panOffset = offset * this.getScale();
-    const minVisibleSize = minimumVisible * this.getScale();
+    const panOffset = offset * this.scale;
+    const minVisibleSize = minimumVisible * this.scale;
 
     const newLocation = {
       x: viewX,
