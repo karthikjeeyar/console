@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as _ from 'lodash';
 import { observable } from 'mobx';
 import ControllerContext from '../utils/ControllerContext';
 import {
@@ -38,6 +39,7 @@ export class DndManagerImpl implements DndManager {
     this.state = state;
   }
 
+  // TODO are these really required to be observable?
   @observable.shallow
   private sources: { [key: string]: DragSource } = {};
 
@@ -200,7 +202,7 @@ export class DndManagerImpl implements DndManager {
   }
 
   hover(targetIds: string[]): void {
-    const ids: string[] = targetIds.filter((id) => this.targets[id]);
+    const ids: string[] = targetIds.filter((id) => this.getTarget(id));
     this.state.targetIds = ids;
     ids.forEach((id) => {
       const target = this.getTarget(id);
@@ -281,15 +283,22 @@ export class DndManagerImpl implements DndManager {
   }
 
   private performHitTests(): void {
+    const draggedItemType = this.getItemType();
     const event = this.getDragEvent();
-    if (event) {
-      // consider using a quad tree if performance becomes an issue with many targets
-      this.hover(
-        Object.keys(this.targets).filter((id) => {
-          const target = this.getTarget(id);
-          return target && target.hitTest(event.x, event.y);
-        }),
-      );
+    if (event && draggedItemType) {
+      const targetIds: string[] = [];
+      Object.keys(this.targets).forEach((targetId) => {
+        const target = this.getTarget(targetId);
+        if (
+          target &&
+          matchesType(target.type, draggedItemType) &&
+          target.hitTest(event.x, event.y)
+        ) {
+          targetIds.push(targetId);
+        }
+      });
+
+      this.hover(targetIds);
     }
   }
 
@@ -310,7 +319,7 @@ export const useDndManager = () => {
     const state = controller.getState<DndStateContainer>();
     let { dragDrop } = state;
     if (!dragDrop) {
-      dragDrop = observable<DndState>({});
+      dragDrop = observable.object<DndState>({});
       state.dragDrop = dragDrop;
     }
     dndManager = new DndManagerImpl(dragDrop);
