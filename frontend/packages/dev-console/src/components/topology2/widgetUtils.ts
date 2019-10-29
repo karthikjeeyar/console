@@ -159,7 +159,7 @@ const groupWorkoadDropTargetSpec: DropTargetSpec<
   any,
   any,
   { droppable: boolean; hover: boolean; canDrop: boolean },
-  NodeEntityProps
+  any
 > = {
   accept: TYPE_WORKLOAD,
   canDrop: (item, monitor) => monitor.getOperation() === REGROUP_OPERATION,

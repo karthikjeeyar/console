@@ -4,15 +4,16 @@ import { NodeEntity } from '@console/topology/src/types';
 import { WithCreateConnectorProps } from '@console/topology/src/behavior/withCreateConnector';
 import { WithDragNodeProps } from '@console/topology/src/behavior/useDragNode';
 import { WithSelectionProps } from '@console/topology/src/behavior/useSelection';
-import { useSvgAnchor } from '@console/topology/src/behavior/useSvgAnchor';
+import { useAnchor } from '@console/topology/src/behavior/useAnchor';
+import EllipseAnchor from '@console/topology/src/anchors/EllipseAnchor';
 import { WithDndDragProps } from '@console/topology/src/behavior/useDndDrag';
 import { WithDndDropProps } from '@console/topology/src/behavior/useDndDrop';
 import { WithContextMenuProps } from '@console/topology/src/behavior/withContextMenu';
 import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
 import useHover from '@console/topology/src/utils/useHover';
 import SvgBoxedText from '../../svg/SvgBoxedText';
-import { createSvgIdUrl } from '../../../utils/svg-utils';
-import SvgDropShadowFilter from '../../svg/SvgDropShadowFilter';
+import NodeShadows, { NODE_SHADOW_FILTER_HOVER_URL, NODE_SHADOW_FILTER_URL } from './NodeShadows';
+
 import './BaseNodeWidget.scss';
 
 export interface State {
@@ -31,7 +32,6 @@ export type BaseNodeProps = {
   droppable?: boolean;
   dragging?: boolean;
   highlight?: boolean;
-  hover?: boolean;
   canDrop?: boolean;
 } & WithSelectionProps &
   WithDragNodeProps &
@@ -39,9 +39,6 @@ export type BaseNodeProps = {
   WithDndDropProps &
   WithContextMenuProps &
   WithCreateConnectorProps;
-
-const FILTER_ID = 'BaseNodeDropShadowFilterId';
-const FILTER_ID_HOVER = 'BaseNodeDropShadowFilterId--hover';
 
 const MAX_LABEL_LENGTH = 16;
 
@@ -74,7 +71,7 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
 }) => {
   const [hover, hoverRef] = useHover();
   const [labelHover, labelHoverRef] = useHover(200);
-  const svgAnchorRef = useSvgAnchor();
+  useAnchor(EllipseAnchor);
   const cx = entity.getBounds().width / 2;
   const cy = entity.getBounds().height / 2;
 
@@ -83,7 +80,6 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
     'is-dragging': dragging,
   });
   const refs = useCombineRefs<SVGEllipseElement>(hoverRef, dragNodeRef, dndDragRef);
-  const nodeRefs = useCombineRefs<SVGCircleElement>(svgAnchorRef, dndDropRef);
 
   React.useLayoutEffect(() => {
     if (hover) {
@@ -95,21 +91,20 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
 
   return (
     <g className="odc-base-node">
+      <NodeShadows />
       <g
         data-test-id="base-node-handler"
         onClick={onSelect}
         onContextMenu={onContextMenu}
         ref={refs}
       >
-        <SvgDropShadowFilter id={FILTER_ID} />
-        <SvgDropShadowFilter id={FILTER_ID_HOVER} dy={3} stdDeviation={7} floodOpacity={0.24} />
         <circle
           className={classNames('odc-base-node__bg', { 'is-highlight': canDrop })}
-          ref={nodeRefs}
+          ref={dndDropRef}
           cx={cx}
           cy={cy}
           r={outerRadius}
-          filter={hover || dragging ? createSvgIdUrl(FILTER_ID_HOVER) : createSvgIdUrl(FILTER_ID)}
+          filter={hover || dragging ? NODE_SHADOW_FILTER_HOVER_URL : NODE_SHADOW_FILTER_URL}
         />
         <g className={contentsClasses}>
           <image
@@ -133,13 +128,7 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
             </SvgBoxedText>
           )}
           {selected && (
-            <circle
-              className="odc-base-node__selection"
-              cx={cx}
-              cy={cy}
-              r={outerRadius + 1}
-              strokeWidth={2}
-            />
+            <circle className="odc-base-node__selection" cx={cx} cy={cy} r={outerRadius + 1} />
           )}
           {children}
         </g>

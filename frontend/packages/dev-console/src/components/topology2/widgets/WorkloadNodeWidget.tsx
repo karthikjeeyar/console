@@ -21,10 +21,6 @@ import KnativeIcon from '../../topology/shapes/KnativeIcon';
 import BaseNodeWidget from './BaseNodeWidget';
 
 export type WorkloadNodeWidgetProps = {
-  icon?: string;
-  kind?: string;
-  children?: React.ReactNode;
-  attachments?: React.ReactNode;
   entity: NodeEntity;
   droppable?: boolean;
   hover?: boolean;
@@ -36,14 +32,7 @@ export type WorkloadNodeWidgetProps = {
   WithContextMenuProps &
   WithCreateConnectorProps;
 
-const WorkloadNodeWidget: React.FC<WorkloadNodeWidgetProps> = ({
-  icon,
-  kind,
-  entity,
-  children,
-  attachments,
-  ...rest
-}) => {
+const WorkloadNodeWidget: React.FC<WorkloadNodeWidgetProps> = ({ entity, ...rest }) => {
   const { width, height } = entity.getBounds();
   const workloadData = entity.getData().data;
   const size = Math.min(width, height);

@@ -19,6 +19,8 @@ import BaseNodeWidget from './widgets/BaseNodeWidget';
 import EdgeWidget from './widgets/BaseEdgeWidget';
 import GroupHullWidget from './widgets/GroupHullWidget';
 import ConnectsToWidget from './widgets/ConnectsToWidget';
+import EventSourceWidget from './widgets/EventSourceWidget';
+import EventSourceLinkWidget from './widgets/EventSourceLinkWidget';
 import WorkloadNodeWidget from './widgets/WorkloadNodeWidget';
 import { workloadContextMenu, groupContextMenu } from './nodeContextMenu';
 import {
@@ -32,7 +34,13 @@ import {
   removeConnectorCallback,
 } from './widgetUtils';
 import './ContextMenu.scss';
-import { TYPE_WORKLOAD, TYPE_CONNECTS_TO, TYPE_APPLICATION_GROUP } from './consts';
+import {
+  TYPE_EVENT_SOURCE,
+  TYPE_WORKLOAD,
+  TYPE_CONNECTS_TO,
+  TYPE_APPLICATION_GROUP,
+  TYPE_EVENT_SOURCE_LINK,
+} from './consts';
 
 type NodeEntityProps = {
   entity: NodeEntity;
@@ -48,7 +56,7 @@ const widgetFactory: WidgetFactory = (
 ): ComponentType<{ entity: ElementEntity }> | undefined => {
   switch (type) {
     case TYPE_APPLICATION_GROUP:
-      return withDndDrop<any, any, any, NodeEntityProps>(groupWorkoadDropTargetSpec)(
+      return withDndDrop(groupWorkoadDropTargetSpec)(
         withDragNode()(
           withSelection(false, true)(
             withContextMenu(
@@ -58,6 +66,14 @@ const widgetFactory: WidgetFactory = (
             )(GroupHullWidget),
           ),
         ),
+      );
+    case TYPE_EVENT_SOURCE:
+      return withSelection(false, true)(
+        withContextMenu(
+          workloadContextMenu,
+          document.getElementById('modal-container'),
+          'odc-topology-context-menu',
+        )(EventSourceWidget),
       );
     case TYPE_WORKLOAD:
       return withCreateConnector(createConnectorCallback)(
@@ -80,6 +96,8 @@ const widgetFactory: WidgetFactory = (
           ),
         ),
       );
+    case TYPE_EVENT_SOURCE_LINK:
+      return EventSourceLinkWidget;
     case TYPE_CONNECTS_TO:
       return withTargetDrag<any, NodeEntity, { dragging?: boolean }, EdgeEntityProps>(
         edgeDragSourceSpec,

@@ -1,25 +1,17 @@
 import * as React from 'react';
 import Layer from '@console/topology/src/layers/Layer';
-import Point from '@console/topology/src/geom/Point';
 import { EdgeEntity } from '@console/topology/src/types';
 import { WithRemoveConnectorProps } from '@console/topology/src/behavior/withRemoveConnector';
 import widget from '@console/topology/src/widget';
 import useHover from '@console/topology/src/utils/useHover';
 import * as classNames from 'classnames';
-import { boundingBoxForLine } from '../../../utils/svg-utils';
 import './BaseEdgeWidget.scss';
 
 type EdgeWidgetProps = {
   entity: EdgeEntity;
   dragging?: boolean;
+  className?: string;
 } & WithRemoveConnectorProps;
-
-const getBoundingPathForLine = (startPoint: Point, endPoint: Point): string => {
-  const bbox = boundingBoxForLine([startPoint.x, startPoint.y], [endPoint.x, endPoint.y], 3);
-  return `M${bbox[0][0]} ${bbox[0][1]} L${bbox[1][0]} ${bbox[1][1]} L${bbox[2][0]} ${bbox[2][1]} L${
-    bbox[3][0]
-  } ${bbox[3][1]} Z`;
-};
 
 const BaseEdgeWidget: React.FC<EdgeWidgetProps> = ({
   entity,
@@ -27,15 +19,13 @@ const BaseEdgeWidget: React.FC<EdgeWidgetProps> = ({
   onShowRemoveConnector,
   onHideRemoveConnector,
   children,
+  className,
 }) => {
   const [hover, hoverRef] = useHover();
   const startPoint = entity.getStartPoint();
   const endPoint = entity.getEndPoint();
 
-  const d = `M${startPoint.x} ${startPoint.y} L${endPoint.x} ${endPoint.y}`;
-  const hoverPath = getBoundingPathForLine(startPoint, endPoint);
-
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     if (hover && !dragging) {
       onShowRemoveConnector && onShowRemoveConnector();
     } else {
@@ -44,22 +34,33 @@ const BaseEdgeWidget: React.FC<EdgeWidgetProps> = ({
   }, [hover, dragging, onShowRemoveConnector, onHideRemoveConnector]);
 
   return (
-    // <g onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
     <Layer id={dragging || hover ? 'top' : undefined}>
       <g
         ref={hoverRef}
         data-test-id="edge-handler"
-        className={classNames('odc-base-edge', {
+        className={classNames(className, 'odc-base-edge', {
           'is-highlight': dragging,
           'is-hover': hover,
         })}
       >
-        <path d={hoverPath} fillOpacity={0} strokeWidth={0} />
-        <path className="odc-base-edge__path" d={d} fill="none" />
+        <line
+          x1={startPoint.x}
+          y1={startPoint.y}
+          x2={endPoint.x}
+          y2={endPoint.y}
+          strokeWidth={10}
+          strokeOpacity={0}
+        />
+        <line
+          className="odc-base-edge__link"
+          x1={startPoint.x}
+          y1={startPoint.y}
+          x2={endPoint.x}
+          y2={endPoint.y}
+        />
         {children}
       </g>
     </Layer>
-    // </g>
   );
 };
 

@@ -7,7 +7,7 @@ import { WithRemoveConnectorProps } from '@console/topology/src/behavior/withRem
 import { EdgeEntity } from '@console/topology/src/types';
 import widget from '@console/topology/src/widget';
 import ConnectorArrow from '@console/topology/src/arrows/ConnectorArrow';
-import EdgeWidget from './BaseEdgeWidget';
+import BaseEdgeWidget from './BaseEdgeWidget';
 import './ConnectsToWidget.scss';
 
 type ConnectsToWidgetProps = {
@@ -23,10 +23,10 @@ const ConnectsToWidget: React.FC<ConnectsToWidgetProps> = ({
   children,
   ...others
 }) => (
-  <EdgeWidget entity={entity} {...others}>
+  <BaseEdgeWidget entity={entity} {...others}>
     <ConnectorArrow dragRef={targetDragRef} edge={entity} className="odc-connects-to" />
     {children}
-  </EdgeWidget>
+  </BaseEdgeWidget>
 );
 
 export default widget(ConnectsToWidget);

@@ -8,7 +8,6 @@ import {
   updateTopologyResourceApplication,
 } from '../topology/topology-utils';
 import { TYPE_APPLICATION_GROUP } from './consts';
-import * as _ from "lodash";
 
 const topologyModelFromDataModel = (dataModel: TopologyDataModel): Model => {
   const nodes: Node[] = dataModel.graph.nodes.map((d) => {
