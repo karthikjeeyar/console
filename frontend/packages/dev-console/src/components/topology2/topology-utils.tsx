@@ -8,6 +8,7 @@ import {
   updateTopologyResourceApplication,
 } from '../topology/topology-utils';
 import { TYPE_APPLICATION_GROUP } from './consts';
+import * as _ from "lodash";
 
 const topologyModelFromDataModel = (dataModel: TopologyDataModel): Model => {
   const nodes: Node[] = dataModel.graph.nodes.map((d) => {
@@ -105,6 +106,7 @@ const createConnection = (
     sourceNode.getData(),
     targetNode.getData(),
     replaceTargetNode ? replaceTargetNode.getData() : null,
+    false,
   );
 };
 
@@ -125,6 +127,8 @@ const removeConnection = (edge: EdgeEntity): Promise<any> => {
       return removeTopologyResourceConnection(
         edge.getSource().getData(),
         edge.getTarget().getData(),
+        edge.getData().sbr,
+        edge.getType(),
       ).catch((err) => {
         const error = err.message;
         errorModal({ error });
