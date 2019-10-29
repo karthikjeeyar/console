@@ -55,7 +55,7 @@ const getRouteData = (ksroute: K8sResourceKind[]): string => {
 /**
  * get routes url
  */
-const getRoutesUrl = (routes: RouteKind[], ksroute?: K8sResourceKind[]): string => {
+export const getRoutesUrl = (routes: RouteKind[], ksroute?: K8sResourceKind[]): string => {
   if (routes.length > 0 && !_.isEmpty(routes[0].spec)) {
     return getRouteWebURL(routes[0]);
   }
@@ -182,7 +182,7 @@ const getTopologyEdgeItems = (dc: K8sResourceKind, resources: K8sResourceKind[])
  * @param dc
  * @param groups
  */
-const getTopologyGroupItems = (dc: K8sResourceKind, groups: Group[]): Group[] => {
+export const getTopologyGroupItems = (dc: K8sResourceKind, groups: Group[]): Group[] => {
   const labels = _.get(dc, ['metadata', 'labels']);
   const uid = _.get(dc, ['metadata', 'uid']);
   _.forEach(labels, (label, key) => {
