@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as _ from 'lodash';
 import { observable } from 'mobx';
 import ControllerContext from '../utils/ControllerContext';
 import {
