@@ -5,6 +5,7 @@ import {
   isEdgeEntity,
   isNodeEntity,
   NodeEntity,
+  GraphEntity,
 } from '@console/topology/src/types';
 import {
   DragSourceSpec,
@@ -20,8 +21,8 @@ import { createConnection, removeConnection, moveNodeToGroup } from './topology-
 import { TYPE_CONNECTS_TO, TYPE_WORKLOAD } from './consts';
 import './widgets/GraphWidget.scss';
 
-type ElementEntityProps = {
-  entity: ElementEntity;
+type GraphEntityProps = {
+  entity: GraphEntity;
 };
 
 type NodeEntityProps = {
@@ -123,35 +124,18 @@ const nodeDragSourceSpec = (
   },
 });
 
-const updateGraphDrag = (monitor: DropTargetMonitor): boolean => {
-  const operation = monitor.getOperation();
-  const isDragging = monitor.isDragging();
-  if (isDragging && editOperations.includes(operation)) {
-    if (!document.body.className.includes('odc-m-drag-active')) {
-      document.body.className += ' odc-m-drag-active';
-    }
-  } else {
-    document.body.className = document.body.className.replace('odc-m-drag-active', '');
-  }
-
-  return isDragging;
-};
-
 const graphWorkloadDropTargetSpec: DropTargetSpec<
   ElementEntity,
   any,
-  { droppable: boolean; hover: boolean; canDrop: boolean },
-  ElementEntityProps
+  { dragEditInProgress: boolean },
+  GraphEntityProps
 > = {
   accept: [TYPE_WORKLOAD, TYPE_CONNECTS_TO],
   canDrop: (item, monitor, props) => {
     return monitor.getOperation() === REGROUP_OPERATION && item.getParent() !== props.entity;
   },
   collect: (monitor) => ({
-    droppable: monitor.isDragging() && monitor.getOperation() === REGROUP_OPERATION,
-    hover: monitor.isOver({ shallow: true }),
-    isDragging: updateGraphDrag(monitor),
-    canDrop: monitor.canDrop(),
+    dragEditInProgress: monitor.isDragging() && editOperations.includes(monitor.getOperation()),
   }),
 };
 
