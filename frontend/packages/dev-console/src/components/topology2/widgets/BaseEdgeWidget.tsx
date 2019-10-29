@@ -7,7 +7,7 @@ import widget from '@console/topology/src/widget';
 import useHover from '@console/topology/src/utils/useHover';
 import * as classNames from 'classnames';
 import { boundingBoxForLine } from '../../../utils/svg-utils';
-import './BaseEdge.scss';
+import './BaseEdgeWidget.scss';
 
 type EdgeWidgetProps = {
   entity: EdgeEntity;

@@ -9,6 +9,8 @@ import { NodeEntity, isNodeEntity, AnchorEnd } from '../types';
 import { DragSourceSpec, DragSourceMonitor, DragEvent } from './dnd-types';
 import { useDndDrag } from './useDndDrag';
 
+export const CREATE_CONNECTOR_OPERATION = 'createconnector';
+
 export type ConnectorChoice = {
   label: string;
 };
@@ -62,6 +64,7 @@ const CreateConnectorWidget: React.FC<CreateConnectorWidgetProps> = observer((pr
   const spec = React.useMemo(() => {
     const dragSourceSpec: DragSourceSpec<any, any, CollectProps> = {
       item: { type: CREATE_CONNECTOR_DROP_TYPE },
+      operation: CREATE_CONNECTOR_OPERATION,
       begin: (monitor: DragSourceMonitor, dragProps: CreateConnectorWidgetProps) => {
         setActive(true);
         return dragProps.entity;

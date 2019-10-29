@@ -12,10 +12,10 @@ import { WithDndDropProps } from '@console/topology/src/behavior/useDndDrop';
 import { WithContextMenuProps } from '@console/topology/src/behavior/withContextMenu';
 import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
 import useHover from '@console/topology/src/utils/useHover';
-import '../../topology/shapes/DefaultGroup.scss';
 import * as classNames from 'classnames';
 import SvgDropShadowFilter from '../../svg/SvgDropShadowFilter';
 import SvgBoxedText from '../../svg/SvgBoxedText';
+import './GroupHullWidget.scss';
 
 type GroupHullWidgetProps = {
   entity: NodeEntity;

@@ -1,0 +1,38 @@
+.odc-base-node {
+  cursor: pointer;
+
+  .odc-m-drag-active & {
+    cursor: grab;
+  }
+
+  &__bg {
+    fill: var(--pf-global--BackgroundColor--light-100);
+    &.is-highlight, &.is-dragging {
+      stroke: var(--pf-global--active-color--400);
+      stroke-width: 4;
+    }
+  }
+
+  &__selection {
+    fill: none;
+    stroke: var(--pf-global--active-color--300);
+  }
+
+  &__label {
+    fill: var(--pf-global--Color--light-100);
+    font-size: var(--pf-global--FontSize--md);
+    text {
+      pointer-events: none;
+      fill: var(--pf-global--Color--300);
+    }
+  }
+}
+
+.odc-m-drag-active {
+  .odc-base-node__contents {
+    opacity: 0.3;
+    &.is-highlight, &.is-dragging {
+      opacity: 1;
+    }
+  }
+}

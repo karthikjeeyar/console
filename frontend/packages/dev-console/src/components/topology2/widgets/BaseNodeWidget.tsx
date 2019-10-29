@@ -13,7 +13,7 @@ import useHover from '@console/topology/src/utils/useHover';
 import SvgBoxedText from '../../svg/SvgBoxedText';
 import { createSvgIdUrl } from '../../../utils/svg-utils';
 import SvgDropShadowFilter from '../../svg/SvgDropShadowFilter';
-import '../../topology/shapes/BaseNode.scss';
+import './BaseNodeWidget.scss';
 
 export interface State {
   hover?: boolean;
@@ -29,6 +29,8 @@ export type BaseNodeProps = {
   attachments?: React.ReactNode;
   entity: NodeEntity;
   droppable?: boolean;
+  dragging?: boolean;
+  highlight?: boolean;
   hover?: boolean;
   canDrop?: boolean;
 } & WithSelectionProps &
@@ -64,6 +66,8 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   dndDragRef,
   dndDropRef,
   canDrop,
+  dragging,
+  highlight,
   onHideCreateConnector,
   onShowCreateConnector,
   onContextMenu,
@@ -74,7 +78,10 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   const cx = entity.getBounds().width / 2;
   const cy = entity.getBounds().height / 2;
 
-  const contentsClasses = classNames('odc-base-node__contents');
+  const contentsClasses = classNames('odc-base-node__contents', {
+    'is-highlight': canDrop || highlight,
+    'is-dragging': dragging,
+  });
   const refs = useCombineRefs<SVGEllipseElement>(hoverRef, dragNodeRef, dndDragRef);
   const nodeRefs = useCombineRefs<SVGCircleElement>(svgAnchorRef, dndDropRef);
 
@@ -102,7 +109,7 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
           cx={cx}
           cy={cy}
           r={outerRadius}
-          filter={hover ? createSvgIdUrl(FILTER_ID_HOVER) : createSvgIdUrl(FILTER_ID)}
+          filter={hover || dragging ? createSvgIdUrl(FILTER_ID_HOVER) : createSvgIdUrl(FILTER_ID)}
         />
         <g className={contentsClasses}>
           <image

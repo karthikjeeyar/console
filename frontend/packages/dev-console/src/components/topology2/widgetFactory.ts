@@ -67,7 +67,9 @@ const widgetFactory: WidgetFactory = (
           { droppable?: boolean; hover?: boolean; canDrop?: boolean },
           NodeEntityProps
         >(workloadDropTargetSpec)(
-          withDragNode<any, NodeEntity, any, NodeEntityProps>(workloadDragSourceSpec(type))(
+          withDragNode<any, NodeEntity, { isDragging?: boolean }, NodeEntityProps>(
+            workloadDragSourceSpec(type),
+          )(
             withSelection(false, true)(
               withContextMenu(
                 workloadContextMenu,

@@ -8,7 +8,7 @@ import { EdgeEntity } from '@console/topology/src/types';
 import widget from '@console/topology/src/widget';
 import ConnectorArrow from '@console/topology/src/arrows/ConnectorArrow';
 import EdgeWidget from './BaseEdgeWidget';
-import './ConnectsTo.scss';
+import './ConnectsToWidget.scss';
 
 type ConnectsToWidgetProps = {
   entity: EdgeEntity;
