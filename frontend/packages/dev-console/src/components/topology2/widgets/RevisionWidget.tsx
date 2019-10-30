@@ -3,6 +3,7 @@ import { useAnchor } from '@console/topology/src/behavior/useAnchor';
 import { AnchorEnd, Anchor } from '@console/topology/src/types';
 import SVGAnchor from '@console/topology/src/anchors/SVGAnchor';
 import EllipseAnchor from '@console/topology/src/anchors/EllipseAnchor';
+import widget from '@console/topology/src/widget';
 import WorkloadNodeWidget from './WorkloadNodeWidget';
 
 const RevisionWidget: React.FC<React.ComponentProps<typeof WorkloadNodeWidget>> = (props) => {
@@ -27,4 +28,4 @@ const RevisionWidget: React.FC<React.ComponentProps<typeof WorkloadNodeWidget>> 
   return <WorkloadNodeWidget {...props} urlAnchorRef={urlAnchorRefCallback} />;
 };
 
-export default RevisionWidget;
+export default widget(RevisionWidget);

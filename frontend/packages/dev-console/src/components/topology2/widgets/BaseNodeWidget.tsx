@@ -10,6 +10,7 @@ import { WithDndDropProps } from '@console/topology/src/behavior/useDndDrop';
 import { WithContextMenuProps } from '@console/topology/src/behavior/withContextMenu';
 import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
 import useHover from '@console/topology/src/utils/useHover';
+import widget from '@console/topology/src/widget';
 import { createSvgIdUrl } from '../../../utils/svg-utils';
 import SvgBoxedText from '../../svg/SvgBoxedText';
 import NodeShadows, { NODE_SHADOW_FILTER_ID_HOVER, NODE_SHADOW_FILTER_ID } from './NodeShadows';
@@ -129,4 +130,4 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   );
 };
 
-export default BaseNodeWidget;
+export default widget(BaseNodeWidget);

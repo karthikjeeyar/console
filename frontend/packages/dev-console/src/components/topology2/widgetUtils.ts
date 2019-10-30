@@ -158,12 +158,9 @@ const groupWorkoadDropTargetSpec: DropTargetSpec<
   }),
 };
 
-const edgeDragSourceSpec = (serviceBinding: boolean): DragSourceSpec<
-  DragObjectWithType,
-  NodeEntity,
-  { dragging: boolean },
-  EdgeEntityProps
-> => ({
+const edgeDragSourceSpec = (
+  serviceBinding: boolean,
+): DragSourceSpec<DragObjectWithType, NodeEntity, { dragging: boolean }, EdgeEntityProps> => ({
   item: { type: MOVE_CONNECTOR_DROP_TYPE },
   operation: MOVE_CONNECTOR_OPERATION,
   begin: (monitor, props) => {
