@@ -1,10 +1,10 @@
 import * as React from 'react';
+import * as classNames from 'classnames';
 import Layer from '@console/topology/src/layers/Layer';
 import { EdgeEntity } from '@console/topology/src/types';
 import { WithRemoveConnectorProps } from '@console/topology/src/behavior/withRemoveConnector';
 import widget from '@console/topology/src/widget';
 import useHover from '@console/topology/src/utils/useHover';
-import * as classNames from 'classnames';
 import './BaseEdgeWidget.scss';
 
 type EdgeWidgetProps = {
@@ -49,7 +49,7 @@ const BaseEdgeWidget: React.FC<EdgeWidgetProps> = ({
           x2={endPoint.x}
           y2={endPoint.y}
           strokeWidth={10}
-          strokeOpacity={0}
+          stroke="transparent"
         />
         <line
           className="odc2-base-edge__link"

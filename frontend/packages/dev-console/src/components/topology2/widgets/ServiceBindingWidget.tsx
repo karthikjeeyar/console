@@ -8,25 +8,25 @@ import { EdgeEntity } from '@console/topology/src/types';
 import widget from '@console/topology/src/widget';
 import ConnectorArrow from '@console/topology/src/arrows/ConnectorArrow';
 import BaseEdgeWidget from './BaseEdgeWidget';
-import './ConnectsToWidget.scss';
+import './ServiceBindingWidget.scss';
 
-type ConnectsToWidgetProps = {
+type ServiceBindingWidgetProps = {
   entity: EdgeEntity;
   dragging?: boolean;
 } & WithSourceDragProps &
   WithTargetDragProps &
   WithRemoveConnectorProps;
 
-const ConnectsToWidget: React.FC<ConnectsToWidgetProps> = ({
+const ServiceBindingWidget: React.FC<ServiceBindingWidgetProps> = ({
   entity,
   targetDragRef,
   children,
   ...others
 }) => (
-  <BaseEdgeWidget className="odc2-connects-to" entity={entity} {...others}>
+  <BaseEdgeWidget entity={entity} {...others} className="odc2-service-binding">
     <ConnectorArrow dragRef={targetDragRef} edge={entity} />
     {children}
   </BaseEdgeWidget>
 );
 
-export default widget(ConnectsToWidget);
+export default widget(ServiceBindingWidget);

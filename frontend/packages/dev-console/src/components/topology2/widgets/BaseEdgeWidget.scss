@@ -1,11 +1,32 @@
 .odc2-base-edge {
-  &__link {
-    stroke: var(--pf-global--BackgroundColor--dark-200);
-    stroke-width: 2px;
+  --edge--cursor: pointer;
+  --edge--drag-active--cursor: grab;
+  --edge--stroke-width: 1px;
+  --edge--stroke: var(--pf-global--BackgroundColor--dark-200);
+  --edge--fill: var(--pf-global--BackgroundColor--dark-200);
+  --edge--active--fill: var(--pf-global--active-color--400);
+  --edge--active--stroke: var(--pf-global--active-color--400);
+  --edge__link--stroke: var(--pf-global--BackgroundColor--dark-200);
+  --edge__link--active--stroke: var(--pf-global--active-color--400);
 
-    .is-hover &,
-    .is-highlight & {
-      stroke: var(--pf-global--active-color--400);
+  cursor: var(--edge--cursor);
+  stroke: var(--edge--stroke);
+  fill: var(--edge--fill);
+
+  .odc2-m-drag-active & {
+    cursor: var(--edge--drag-active--cursor);
+  }
+
+  .odc2-base-edge__link {
+    stroke: var(--edge__link--stroke);
+    stroke-width: 2px;
+  }
+
+  &.is-hover, &.is-highlight {
+    fill: var(--edge--active--fill);
+    stroke: var(--edge--active--stroke);
+    .odc2-base-edge__link {
+      stroke: var(--edge__link--active--stroke);
     }
   }
 }

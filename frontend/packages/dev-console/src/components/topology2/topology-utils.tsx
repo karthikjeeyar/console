@@ -111,11 +111,11 @@ const createConnection = (
 
 const removeConnection = (edge: EdgeEntity): Promise<any> => {
   const message = (
-    <React.Fragment>
+    <>
       Are you sure you want to remove the connection from{' '}
       <strong>{edge.getSource().getLabel()}</strong> to{' '}
       <strong>{edge.getTarget().getLabel()}</strong>?
-    </React.Fragment>
+    </>
   );
 
   return confirmModal({

@@ -1,25 +1,6 @@
-.odc2-connects-to {
-  cursor: pointer;
-  stroke-width: 0;
-  fill: var(--pf-global--BackgroundColor--dark-200);
-
-  .odc2-m-drag-active & {
-    cursor: grab;
-  }
-
-  .is-hover &, .is-highlight & {
-    fill: var(--pf-global--active-color--400);
-  }
-
-  &__hover-arrow {
-    fill: var(--pf-global--active-color--400);
-  }
-}
-
-.topology-connector__remove-bg {
-  fill: var(--pf-global--active-color--400);
-}
-
-.topology-connector__remove-icon {
-  color: var(--pf-global--Color--light-100);
+.odc2-base-edge.odc2-connects-to {
+  --edge--stroke-width: 1px;
+  --edge--stroke: var(--pf-global--BackgroundColor--dark-transparent-200);
+  --edge--fill: var(--pf-global--BackgroundColor--light-300);
+  --edge__link--stroke: var(--pf-global--BackgroundColor--dark-transparent-200);
 }

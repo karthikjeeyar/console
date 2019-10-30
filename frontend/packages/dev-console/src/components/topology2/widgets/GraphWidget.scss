@@ -1,3 +1,11 @@
 .odc2-m-drag-active {
   cursor: grab !important;
 }
+
+.topology-connector__remove-bg {
+  fill: var(--pf-global--active-color--400);
+}
+
+.topology-connector__remove-icon {
+  color: var(--pf-global--Color--light-100);
+}

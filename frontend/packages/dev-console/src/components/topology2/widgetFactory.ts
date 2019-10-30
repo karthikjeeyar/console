@@ -33,9 +33,11 @@ import {
   TYPE_EVENT_SOURCE_LINK,
   TYPE_KNATIVE_SERVICE,
   TYPE_REVISION_TRAFFIC,
+  TYPE_SERVICE_BINDING,
 } from './consts';
 import KnativeServiceWidget from './widgets/KnativeServiceWidget';
 import TrafficLinkWidget from './widgets/TrafficLinkWidget';
+import ServiceBindingWidget from './widgets/ServiceBindingWidget';
 
 type NodeEntityProps = {
   entity: NodeEntity;
@@ -102,6 +104,10 @@ const widgetFactory: WidgetFactory = (
     case TYPE_CONNECTS_TO:
       return withTargetDrag(edgeDragSourceSpec)(
         withRemoveConnector(removeConnectorCallback)(ConnectsToWidget),
+      );
+    case TYPE_SERVICE_BINDING:
+      return withTargetDrag(edgeDragSourceSpec)(
+        withRemoveConnector(removeConnectorCallback)(ServiceBindingWidget),
       );
     default:
       switch (kind) {
