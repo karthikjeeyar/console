@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Edge, EdgeEntity, Model, Node, NodeEntity } from '@console/topology/src/types';
+import { Edge, EdgeEntity, Model, Node, NodeEntity, NodeShape } from '@console/topology/src/types';
 import { confirmModal, errorModal } from '@console/internal/components/modals';
 import { TopologyDataModel } from '../topology/topology-types';
 import {
@@ -19,7 +19,7 @@ const topologyModelFromDataModel = (dataModel: TopologyDataModel): Model => {
         type: d.type,
         label: dataModel.topology[d.id].name,
         data: dataModel.topology[d.id],
-        children: d.children,
+        children: (d as any).children,
         group: true,
         shape: NodeShape.rect,
         style: {
