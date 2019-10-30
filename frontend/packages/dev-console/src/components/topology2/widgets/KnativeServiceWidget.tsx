@@ -33,7 +33,7 @@ const KnativeServiceWidget: React.FC<EventSourceWidgetProps> = ({
   dragging,
   regrouping,
 }) => {
-  const trafficAnchor = useSvgAnchor(AnchorEnd.source);
+  const trafficAnchor = useSvgAnchor(AnchorEnd.target, 'revision-traffic');
   useAnchor(RectAnchor);
   const { width, height } = entity.getBounds();
   const { data } = entity.getData();
