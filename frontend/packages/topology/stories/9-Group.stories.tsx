@@ -4,32 +4,35 @@ import Visualization from '../src/Visualization';
 import VisualizationWidget from '../src/VisualizationWidget';
 import { Model, NodeEntity, AnchorEnd, NodeShape } from '../src/types';
 import { useSvgAnchor } from '../src/behavior/useSvgAnchor';
-import { withDragNode } from '../src/behavior/useDragNode';
+import { withDragNode, WithDragNodeProps } from '../src/behavior/useDragNode';
 import defaultWidgetFactory from './widgets/defaultWidgetFactory';
 import GroupWidget from './widgets/GroupWidget';
 import NodeWidget from './widgets/NodeWidget';
+import defaultLayoutFactory from './layouts/defaultLayoutFactory';
 
 export default {
   title: 'Complex Group',
 };
 
-const GroupWithDecorator: React.FC<{ entity: NodeEntity }> = observer((props) => {
-  const trafficSourceRef = useSvgAnchor(AnchorEnd.source, 'traffic');
-  const b = props.entity.getBounds();
-  return (
-    <GroupWidget {...props as any}>
-      <circle
-        ref={trafficSourceRef}
-        cx={b.x + b.width}
-        cy={b.y}
-        r="12.5"
-        fill="lightblue"
-        strokeWidth={1}
-        stroke="#333333"
-      />
-    </GroupWidget>
-  );
-});
+const GroupWithDecorator: React.FC<{ entity: NodeEntity } & WithDragNodeProps> = observer(
+  (props) => {
+    const trafficSourceRef = useSvgAnchor(AnchorEnd.source, 'traffic');
+    const b = props.entity.getBounds();
+    return (
+      <GroupWidget {...props as any}>
+        <circle
+          ref={trafficSourceRef}
+          cx={b.x + b.width}
+          cy={b.y}
+          r="12.5"
+          fill="lightblue"
+          strokeWidth={1}
+          stroke="#333333"
+        />
+      </GroupWidget>
+    );
+  },
+);
 
 export const complexGroup = () => {
   const vis = new Visualization();
@@ -37,6 +40,7 @@ export const complexGroup = () => {
     graph: {
       id: 'g1',
       type: 'graph',
+      layout: 'Force',
     },
     nodes: [
       {
@@ -55,6 +59,17 @@ export const complexGroup = () => {
         group: true,
         children: ['r1', 'r2'],
         shape: NodeShape.rect,
+        style: {
+          padding: 25,
+        },
+      },
+      {
+        id: 's2',
+        type: 'service',
+        group: true,
+        shape: NodeShape.rect,
+        width: 100,
+        height: 100,
         style: {
           padding: 25,
         },
@@ -107,16 +122,17 @@ export const complexGroup = () => {
       },
     ],
   };
-  vis.fromModel(model);
+  vis.registerLayoutFactory(defaultLayoutFactory);
   vis.registerWidgetFactory(defaultWidgetFactory);
   vis.registerWidgetFactory((kind, type) => {
     if (type === 'service') {
-      return GroupWithDecorator;
+      return withDragNode()(GroupWithDecorator);
     }
     if (type === 'node') {
       return withDragNode()(NodeWidget);
     }
     return undefined;
   });
+  vis.fromModel(model);
   return <VisualizationWidget visualization={vis} />;
 };

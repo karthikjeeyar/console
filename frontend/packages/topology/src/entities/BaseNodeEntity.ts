@@ -41,8 +41,13 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
 
   @computed
   private get groupBounds(): Rect {
+    const children = this.getChildren().filter(isNodeEntity);
+    if (!children.length) {
+      return this.bounds;
+    }
+
     let rect: Rect | undefined;
-    this.getChildren().forEach((c) => {
+    children.forEach((c) => {
       if (isNodeEntity(c)) {
         const b = c.getBounds();
         if (!rect) {
@@ -58,7 +63,7 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
     }
 
     const { padding } = this.getStyle<GroupStyle>();
-    const result = padding ? rect.expand(padding, padding) : rect;
+    const result = rect.padding(padding);
 
     // ensure size is at least the size of the set bounds
     result.setSize(

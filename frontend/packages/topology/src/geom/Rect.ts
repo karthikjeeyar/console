@@ -1,4 +1,4 @@
-import { Translatable } from './types';
+import { Padding, Translatable } from './types';
 import Point from './Point';
 
 export default class Rect implements Translatable {
@@ -112,7 +112,29 @@ export default class Rect implements Translatable {
     return this;
   }
 
-  setBounds(x: number, y: number, width: number, height: number) {
+  padding(padding?: Padding): Rect {
+    if (padding) {
+      if (typeof padding === 'number') {
+        this.expand(padding, padding);
+      } else if (padding.length === 1) {
+        this.expand(padding[0], padding[0]);
+      } else if (padding.length === 2) {
+        this.expand(padding[0], padding[1]);
+      } else if (padding.length === 3) {
+        this.x -= padding[0];
+        this.width += padding[0] + padding[2];
+        this.height += padding[1];
+      } else if (padding.length === 4) {
+        this.x -= padding[0];
+        this.width += padding[0] + padding[2];
+        this.y -= padding[3];
+        this.height += padding[1] + padding[3];
+      }
+    }
+    return this;
+  }
+
+  setBounds(x: number, y: number, width: number, height: number): Rect {
     this.x = x;
     this.y = y;
     this.width = width;

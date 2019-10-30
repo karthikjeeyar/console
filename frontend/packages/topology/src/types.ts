@@ -1,7 +1,7 @@
 import { ComponentType } from 'react';
 import Point from './geom/Point';
 import Rect from './geom/Rect';
-import { Translatable } from './geom/types';
+import { Padding, Translatable } from './geom/types';
 
 // x, y
 export type PointTuple = [number, number];
@@ -24,7 +24,7 @@ export enum AnchorEnd {
 }
 
 export type GroupStyle = {
-  padding?: number;
+  padding?: Padding;
 };
 
 export enum NodeShape {

@@ -10,6 +10,7 @@ import widget from '../../src/widget';
 import { WithDndDragProps } from '../../src/behavior/useDndDrag';
 import { WithDndDropProps } from '../../src/behavior/useDndDrop';
 import useCombineRefs from '../../src/utils/useCombineRefs';
+import { maxPadding } from '../../src/utils/geom-utils';
 
 type GroupHullWidgetProps = {
   entity: NodeEntity;
@@ -66,7 +67,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
     }
 
     // cast to number and coerce
-    const padding = +(entity.getStyle<GroupStyle>().padding as number);
+    const padding = maxPadding(entity.getStyle<GroupStyle>().padding);
     const hullPadding = (point: PointWithSize) => (point[2] || 0) + padding;
     // change the box only when not dragging
     pathRef.current = hullPath(hullPoints, hullPadding);
