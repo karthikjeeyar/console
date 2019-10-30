@@ -60,10 +60,13 @@ const highlightNode = (monitor: DropTargetMonitor, props: NodeEntityProps): bool
   }
 
   if (monitor.getOperation() === CREATE_CONNECTOR_OPERATION) {
-    return !monitor
-      .getItem()
-      .getSourceEdges()
-      .find((e) => e.getTarget() === props.entity);
+    return (
+      monitor.getItem() !== props.entity &&
+      !monitor
+        .getItem()
+        .getSourceEdges()
+        .find((e) => e.getTarget() === props.entity)
+    );
   }
 
   return canDropEdgeOnNode(monitor.getOperation(), monitor.getItem(), props.entity);
@@ -88,10 +91,23 @@ const nodeDragSourceSpec = (
   }),
 });
 
+const nodesEdgeIsDragging = (monitor, props) => {
+  if (!monitor.isDragging()) {
+    return false;
+  }
+  if (monitor.getOperation() === MOVE_CONNECTOR_OPERATION) {
+    return monitor.getItem().getSource() === props.entity;
+  }
+  if (monitor.getOperation() === CREATE_CONNECTOR_OPERATION) {
+    return monitor.getItem() === props.entity;
+  }
+  return false;
+};
+
 const nodeDropTargetSpec: DropTargetSpec<
   ElementEntity,
   any,
-  { droppable: boolean; hover: boolean; canDrop: boolean },
+  { droppable: boolean; canDrop: boolean; dropTarget: boolean; edgeDragging: boolean },
   NodeEntityProps
 > = {
   accept: [MOVE_CONNECTOR_DROP_TYPE, CREATE_CONNECTOR_DROP_TYPE],
@@ -106,8 +122,9 @@ const nodeDropTargetSpec: DropTargetSpec<
   },
   collect: (monitor, props) => ({
     droppable: monitor.isDragging(),
-    hover: monitor.isOver(),
     canDrop: highlightNode(monitor, props),
+    dropTarget: monitor.isOver(),
+    edgeDragging: nodesEdgeIsDragging(monitor, props),
   }),
 };
 
@@ -129,14 +146,14 @@ const graphWorkloadDropTargetSpec: DropTargetSpec<
 const groupWorkoadDropTargetSpec: DropTargetSpec<
   any,
   any,
-  { droppable: boolean; hover: boolean; canDrop: boolean },
+  { droppable: boolean; dropTarget: boolean; canDrop: boolean },
   any
 > = {
   accept: [TYPE_WORKLOAD, TYPE_KNATIVE_SERVICE],
   canDrop: (item, monitor) => monitor.getOperation() === REGROUP_OPERATION,
   collect: (monitor) => ({
     droppable: monitor.isDragging() && monitor.getOperation() === REGROUP_OPERATION,
-    hover: monitor.isOver(),
+    dropTarget: monitor.isOver(),
     canDrop: monitor.canDrop(),
   }),
 };

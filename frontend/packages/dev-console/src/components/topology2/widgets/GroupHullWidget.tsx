@@ -19,8 +19,8 @@ import './GroupHullWidget.scss';
 type GroupHullWidgetProps = {
   entity: NodeEntity;
   droppable?: boolean;
-  hover?: boolean;
   canDrop?: boolean;
+  dropTarget?: boolean;
 } & WithSelectionProps &
   WithDragNodeProps &
   WithDndDropProps &
@@ -52,6 +52,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   dndDropRef,
   droppable,
   canDrop,
+  dropTarget,
   onContextMenu,
 }) => {
   const [groupHover, groupHoverRef] = useHover();
@@ -103,10 +104,10 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
     }
   }
 
-  const pathClasses = classNames('odc-default-group', {
+  const pathClasses = classNames('odc2-default-group', {
     'is-highlight': canDrop,
     'is-selected': selected,
-    'is-hover': hover,
+    'is-hover': hover || (canDrop && dropTarget),
   });
 
   return (
@@ -125,7 +126,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
       </Layer>
       <g ref={groupLabelHoverRef} onContextMenu={onContextMenu} onClick={onSelect}>
         <SvgBoxedText
-          className="odc-default-group__label"
+          className="odc2-default-group__label"
           x={lowPoint[0]}
           y={lowPoint[1] + hullPadding(lowPoint) + 30}
           paddingX={20}

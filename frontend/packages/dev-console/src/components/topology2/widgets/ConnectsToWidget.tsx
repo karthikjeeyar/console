@@ -24,7 +24,7 @@ const ConnectsToWidget: React.FC<ConnectsToWidgetProps> = ({
   ...others
 }) => (
   <BaseEdgeWidget entity={entity} {...others}>
-    <ConnectorArrow dragRef={targetDragRef} edge={entity} className="odc-connects-to" />
+    <ConnectorArrow dragRef={targetDragRef} edge={entity} className="odc2-connects-to" />
     {children}
   </BaseEdgeWidget>
 );

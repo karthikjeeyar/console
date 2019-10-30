@@ -25,7 +25,8 @@ export type BaseNodeProps = {
   entity: NodeEntity;
   droppable?: boolean;
   dragging?: boolean;
-  highlight?: boolean;
+  edgeDragging?: boolean;
+  dropTarget?: boolean;
   canDrop?: boolean;
 } & WithSelectionProps &
   WithDragNodeProps &
@@ -45,9 +46,11 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   attachments,
   dragNodeRef,
   dndDropRef,
+  droppable,
   canDrop,
   dragging,
-  highlight,
+  edgeDragging,
+  dropTarget,
   onHideCreateConnector,
   onShowCreateConnector,
   onContextMenu,
@@ -57,9 +60,10 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   const cx = entity.getBounds().width / 2;
   const cy = entity.getBounds().height / 2;
 
-  const contentsClasses = classNames('odc-base-node__contents', {
-    'is-highlight': canDrop || highlight,
-    'is-dragging': dragging,
+  const contentsClasses = classNames('odc2-base-node__contents', {
+    'is-highlight': canDrop,
+    'is-dragging': dragging || edgeDragging,
+    'is-hover': (hover && !droppable) || (dropTarget && canDrop),
   });
   const refs = useCombineRefs<SVGEllipseElement>(hoverRef, dragNodeRef);
 
@@ -72,7 +76,7 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   }, [hover, onShowCreateConnector, onHideCreateConnector]);
 
   return (
-    <g className="odc-base-node">
+    <g className="odc2-base-node">
       <NodeShadows />
       <g
         data-test-id="base-node-handler"
@@ -81,12 +85,16 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
         ref={refs}
       >
         <circle
-          className={classNames('odc-base-node__bg', { 'is-highlight': canDrop })}
+          className={classNames('odc2-base-node__bg', { 'is-highlight': canDrop })}
           ref={dndDropRef}
           cx={cx}
           cy={cy}
           r={outerRadius}
-          filter={hover || dragging ? NODE_SHADOW_FILTER_HOVER_URL : NODE_SHADOW_FILTER_URL}
+          filter={
+            hover || dragging || edgeDragging || dropTarget
+              ? NODE_SHADOW_FILTER_HOVER_URL
+              : NODE_SHADOW_FILTER_URL
+          }
         />
         <g className={contentsClasses}>
           <image
@@ -98,7 +106,7 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
           />
           {(kind || entity.getLabel()) && (
             <SvgBoxedText
-              className="odc-base-node__label"
+              className="odc2-base-node__label"
               x={cx}
               y={cy + outerRadius + 20}
               paddingX={8}
@@ -110,7 +118,7 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
             </SvgBoxedText>
           )}
           {selected && (
-            <circle className="odc-base-node__selection" cx={cx} cy={cy} r={outerRadius + 1} />
+            <circle className="odc2-base-node__selection" cx={cx} cy={cy} r={outerRadius + 1} />
           )}
           {children}
         </g>

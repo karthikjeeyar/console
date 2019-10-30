@@ -1,9 +1,9 @@
-.odc-connects-to {
+.odc2-connects-to {
   cursor: pointer;
   stroke-width: 0;
   fill: var(--pf-global--BackgroundColor--dark-200);
 
-  .odc-m-drag-active & {
+  .odc2-m-drag-active & {
     cursor: grab;
   }
 

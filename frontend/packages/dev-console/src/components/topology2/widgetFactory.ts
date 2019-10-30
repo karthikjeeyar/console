@@ -91,7 +91,7 @@ const widgetFactory: WidgetFactory = (
               withContextMenu(
                 workloadContextMenu,
                 document.getElementById('modal-container'),
-                'odc-topology-context-menu',
+                'odc2-topology-context-menu',
               )(WorkloadNodeWidget),
             ),
           ),

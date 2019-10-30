@@ -96,7 +96,7 @@ const WorkloadNodeWidget: React.FC<WorkloadNodeWidgetProps> = ({ entity, ...rest
                   build.metadata.name,
                   build.metadata.namespace,
                 )}/logs`}
-                className="odc-decorator__link"
+                className="odc2-decorator__link"
               >
                 <Decorator
                   x={cx - radius + decoratorRadius * 0.7}
