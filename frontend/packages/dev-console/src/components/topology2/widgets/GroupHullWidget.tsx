@@ -11,6 +11,7 @@ import { WithDndDropProps } from '@console/topology/src/behavior/useDndDrop';
 import { WithContextMenuProps } from '@console/topology/src/behavior/withContextMenu';
 import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
 import useHover from '@console/topology/src/utils/useHover';
+import { maxPadding } from '@console/topology/src/utils/geom-utils';
 import * as classNames from 'classnames';
 import SvgDropShadowFilter from '../../svg/SvgDropShadowFilter';
 import SvgBoxedText from '../../svg/SvgBoxedText';
@@ -64,7 +65,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   const hover = groupHover || groupLabelHover;
 
   // cast to number and coerce
-  const padding = +(entity.getStyle<GroupStyle>().padding as number);
+  const padding = maxPadding(entity.getStyle<GroupStyle>().padding);
   const hullPadding = (point: PointWithSize) => (point[2] || 0) + padding;
 
   if (!droppable || !pathRef.current) {

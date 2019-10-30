@@ -27,6 +27,7 @@ export type WorkloadNodeWidgetProps = {
   dragging?: boolean;
   highlight?: boolean;
   canDrop?: boolean;
+  urlAnchorRef?: React.Ref<SVGCircleElement>;
 } & WithSelectionProps &
   WithDragNodeProps &
   WithDndDragProps &
@@ -34,7 +35,11 @@ export type WorkloadNodeWidgetProps = {
   WithContextMenuProps &
   WithCreateConnectorProps;
 
-const WorkloadNodeWidget: React.FC<WorkloadNodeWidgetProps> = ({ entity, ...rest }) => {
+const WorkloadNodeWidget: React.FC<WorkloadNodeWidgetProps> = ({
+  entity,
+  urlAnchorRef,
+  ...rest
+}) => {
   const { width, height } = entity.getBounds();
   const workloadData = entity.getData().data;
   const size = Math.min(width, height);
@@ -77,6 +82,7 @@ const WorkloadNodeWidget: React.FC<WorkloadNodeWidgetProps> = ({ entity, ...rest
                 radius={decoratorRadius}
                 href={workloadData.url}
                 external
+                circleRef={urlAnchorRef}
               >
                 <g transform={`translate(-${decoratorRadius / 2}, -${decoratorRadius / 2})`}>
                   <ExternalLinkAltIcon style={{ fontSize: decoratorRadius }} alt="Open URL" />

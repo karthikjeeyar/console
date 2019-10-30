@@ -33,9 +33,9 @@ const KnativeServiceWidget: React.FC<EventSourceWidgetProps> = ({
   dragging,
   regrouping,
 }) => {
-  const trafficAnchor = useSvgAnchor(AnchorEnd.target, 'revision-traffic');
+  const trafficAnchor = useSvgAnchor(AnchorEnd.source, 'revision-traffic');
   useAnchor(RectAnchor);
-  const { width, height } = entity.getBounds();
+  const { x, y, width, height } = entity.getBounds();
   const { data } = entity.getData();
 
   return (
@@ -47,6 +47,8 @@ const KnativeServiceWidget: React.FC<EventSourceWidgetProps> = ({
             'is-selected': selected,
             'is-dragging': dragging,
           })}
+          x={x}
+          y={y}
           width={width}
           height={height}
           rx="5"
@@ -55,20 +57,27 @@ const KnativeServiceWidget: React.FC<EventSourceWidgetProps> = ({
       </Layer>
       {data.url ? (
         <Tooltip key="route" content="Open URL" position={TooltipPosition.right}>
-          <Decorator circleRef={trafficAnchor} x={width} y={0} radius={13} href={data.url} external>
+          <Decorator
+            circleRef={trafficAnchor}
+            x={x + width}
+            y={y}
+            radius={13}
+            href={data.url}
+            external
+          >
             <g transform="translate(-6.5, -6.5)">
               <ExternalLinkAltIcon style={{ fontSize: 13 }} alt="Open URL" />
             </g>
           </Decorator>
         </Tooltip>
       ) : (
-        <rect ref={trafficAnchor} x={width} y={0} height={0} width={0} fill="none" />
+        <circle ref={trafficAnchor} cx={width} cy={0} r={0} fill="none" />
       )}
       {(data.kind || entity.getLabel()) && (
         <SvgBoxedText
           className="odc-base-node__label"
-          x={width / 2}
-          y={height + 20}
+          x={x + width / 2}
+          y={y + height + 20}
           paddingX={8}
           paddingY={4}
           kind={data.kind}
