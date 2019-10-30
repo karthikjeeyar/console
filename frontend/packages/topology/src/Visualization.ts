@@ -18,6 +18,7 @@ import {
   LayoutFactory,
   Layout,
   isGraphEntity,
+  Node,
 } from './types';
 import defaultEntityFactory from './entities/defaultEntityFactory';
 import Stateful from './utils/Stateful';
@@ -52,8 +53,11 @@ export default class Visualization extends Stateful implements Controller {
     }
     const validIds: string[] = [];
 
+    const idToNode: { [id: string]: Node } = {};
+
     model.nodes &&
       model.nodes.forEach((n) => {
+        idToNode[n.id] = n;
         this.createEntity<NodeEntity>(ModelKind.node, n);
         validIds.push(n.id);
       });
@@ -69,7 +73,18 @@ export default class Visualization extends Stateful implements Controller {
       this.graph.setModel(model.graph);
     }
     if (model.nodes) {
-      model.nodes.forEach((n) => this.entities[n.id].setModel(n));
+      const processed: { [id: string]: boolean } = {};
+      const processNode = (node: Node): void => {
+        if (node.children) {
+          node.children.forEach((id) => processNode(idToNode[id]));
+        }
+        if (!processed[node.id]) {
+          processed[node.id] = true;
+          this.entities[node.id].setModel(node);
+        }
+      };
+      // process bottom up
+      model.nodes.forEach(processNode);
     }
     if (model.edges) {
       model.edges.forEach((e) => this.entities[e.id].setModel(e));
