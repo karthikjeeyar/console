@@ -75,29 +75,27 @@ export const useDragNode = <
         },
         drag: (event, monitor, p) => {
           const { dx, dy } = event;
-          let moveEntity = true;
-          if (entityRef.current.isGroup()) {
-            const nodeChildren = entityRef.current.getChildren().filter(isNodeEntity);
-            if (nodeChildren.length) {
-              moveEntity = false;
-              nodeChildren.forEach((c) => {
-                c.setBounds(
-                  c
-                    .getBounds()
-                    .clone()
-                    .translate(dx, dy),
-                );
-              });
+
+          function moveEntity(e: NodeEntity) {
+            let moved = true;
+            if (e.isGroup()) {
+              const nodeChildren = e.getChildren().filter(isNodeEntity);
+              if (nodeChildren.length) {
+                moved = false;
+                nodeChildren.forEach(moveEntity);
+              }
+            }
+            if (moved) {
+              e.setBounds(
+                e
+                  .getBounds()
+                  .clone()
+                  .translate(dx, dy),
+              );
             }
           }
-          if (moveEntity) {
-            entityRef.current.setBounds(
-              entityRef.current
-                .getBounds()
-                .clone()
-                .translate(dx, dy),
-            );
-          }
+
+          moveEntity(entityRef.current);
 
           spec && spec.drag && spec.drag(event, monitor, p);
 
