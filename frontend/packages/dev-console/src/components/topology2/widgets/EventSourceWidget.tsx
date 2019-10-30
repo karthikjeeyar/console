@@ -7,8 +7,9 @@ import { WithContextMenuProps } from '@console/topology/src/behavior/withContext
 import { useSvgAnchor } from '@console/topology/src/behavior/useSvgAnchor';
 import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
 import { WithDragNodeProps } from '@console/topology/src/behavior/useDragNode';
+import { createSvgIdUrl } from '../../../utils/svg-utils';
 import SvgBoxedText from '../../svg/SvgBoxedText';
-import NodeShadows, { NODE_SHADOW_FILTER_HOVER_URL, NODE_SHADOW_FILTER_URL } from './NodeShadows';
+import NodeShadows, { NODE_SHADOW_FILTER_ID_HOVER, NODE_SHADOW_FILTER_ID } from './NodeShadows';
 
 import './EventSourceWidget.scss';
 
@@ -38,7 +39,7 @@ const EventSourceWidget: React.FC<EventSourceWidgetProps> = ({
       <polygon
         className="odc-event-source"
         ref={svgAnchorRef}
-        filter={hover ? NODE_SHADOW_FILTER_HOVER_URL : NODE_SHADOW_FILTER_URL}
+        filter={createSvgIdUrl(hover ? NODE_SHADOW_FILTER_ID_HOVER : NODE_SHADOW_FILTER_ID)}
         points={`${width / 2}, ${(height - size) / 2} ${width - (width - size) / 2},${height /
           2} ${width / 2},${height - (height - size) / 2} ${(width - size) / 2},${height / 2}`}
       />

@@ -10,8 +10,9 @@ import { WithDndDropProps } from '@console/topology/src/behavior/useDndDrop';
 import { WithContextMenuProps } from '@console/topology/src/behavior/withContextMenu';
 import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
 import useHover from '@console/topology/src/utils/useHover';
+import { createSvgIdUrl } from '../../../utils/svg-utils';
 import SvgBoxedText from '../../svg/SvgBoxedText';
-import NodeShadows, { NODE_SHADOW_FILTER_HOVER_URL, NODE_SHADOW_FILTER_URL } from './NodeShadows';
+import NodeShadows, { NODE_SHADOW_FILTER_ID_HOVER, NODE_SHADOW_FILTER_ID } from './NodeShadows';
 
 import './BaseNodeWidget.scss';
 
@@ -90,11 +91,11 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
           cx={cx}
           cy={cy}
           r={outerRadius}
-          filter={
+          filter={createSvgIdUrl(
             hover || dragging || edgeDragging || dropTarget
-              ? NODE_SHADOW_FILTER_HOVER_URL
-              : NODE_SHADOW_FILTER_URL
-          }
+              ? NODE_SHADOW_FILTER_ID_HOVER
+              : NODE_SHADOW_FILTER_ID,
+          )}
         />
         <g className={contentsClasses}>
           <image
