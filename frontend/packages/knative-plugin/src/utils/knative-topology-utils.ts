@@ -1,14 +1,12 @@
 import * as _ from 'lodash';
-import { K8sResourceKind, apiVersionForModel, K8sKind } from '@console/internal/module/k8s';
+import { K8sResourceKind, apiVersionForModel, DeploymentKind } from '@console/internal/module/k8s';
 import {
   TransformResourceData,
-  OverviewItem,
-  isKnativeServing,
   getResourcePausedAlert,
   getBuildAlerts,
   getOwnedResources,
+  OverviewItem,
 } from '@console/shared';
-import { getImageForIconClass } from '@console/internal/components/catalog/catalog-item-icon';
 import {
   Node,
   Edge,
@@ -18,15 +16,11 @@ import {
   TopologyDataObject,
 } from '@console/dev-console/src/components/topology/topology-types';
 import {
-  getEditURL,
   getTopologyGroupItems,
+  createTopologyNodeData,
   getRoutesUrl,
+  getEditURL,
 } from '@console/dev-console/src/components/topology/topology-utils';
-import {
-  ServiceModel as KnServiceModel,
-  RevisionModel,
-  EventSourceCronJobModel,
-} from '@console/knative-plugin';
 import { DeploymentModel } from '@console/internal/models';
 import { KnativeItem } from './get-knative-resources';
 
@@ -56,93 +50,49 @@ export const getKnativeServiceData = (
 const createKnativeDeploymentItems = (
   resource: K8sResourceKind,
   resources: TopologyDataResources,
-  ResModel: K8sKind,
   utils?: Function[],
 ): OverviewItem => {
-  const obj: K8sResourceKind = {
-    ...resource,
-    apiVersion: apiVersionForModel(ResModel),
-    kind: ResModel.kind,
-  };
   const transformResourceData = new TransformResourceData(resources, utils);
   const associatedDeployment = getOwnedResources(resource, resources.deployments.data);
-  const depRes =
-    associatedDeployment && associatedDeployment.length ? associatedDeployment[0] : resource;
-  const depObj: K8sResourceKind = {
-    ...depRes,
-    apiVersion: apiVersionForModel(DeploymentModel),
-    kind: DeploymentModel.kind,
-  };
-  const replicaSets = transformResourceData.getReplicaSetsForResource(depObj);
-  const [current, previous] = replicaSets;
-  const isRollingOut = !!current && !!previous;
-  const buildConfigs = transformResourceData.getBuildConfigsForResource(depObj);
-  const services = transformResourceData.getServicesForResource(depObj);
-  const routes = transformResourceData.getRoutesForServices(services);
-  const alerts = {
-    ...getResourcePausedAlert(depObj),
-    ...getBuildAlerts(buildConfigs),
-  };
-  const overviewItems = {
-    obj,
-    alerts,
-    buildConfigs,
-    current,
-    isRollingOut,
-    previous,
-    pods: [..._.get(current, 'pods', []), ..._.get(previous, 'pods', [])],
-    routes,
-    services,
-  };
+  if (associatedDeployment && associatedDeployment.length) {
+    const depObj: K8sResourceKind = {
+      ...associatedDeployment[0],
+      apiVersion: apiVersionForModel(DeploymentModel),
+      kind: DeploymentModel.kind,
+    };
+    const replicaSets = transformResourceData.getReplicaSetsForResource(depObj);
+    const [current, previous] = replicaSets;
+    const isRollingOut = !!current && !!previous;
+    const buildConfigs = transformResourceData.getBuildConfigsForResource(depObj);
+    const services = transformResourceData.getServicesForResource(depObj);
+    const routes = transformResourceData.getRoutesForServices(services);
+    const alerts = {
+      ...getResourcePausedAlert(depObj),
+      ...getBuildAlerts(buildConfigs),
+    };
+    const overviewItems = {
+      obj: resource,
+      alerts,
+      buildConfigs,
+      current,
+      isRollingOut,
+      previous,
+      pods: [..._.get(current, 'pods', []), ..._.get(previous, 'pods', [])],
+      routes,
+      services,
+    };
 
-  if (utils) {
-    return utils.reduce((acc, element) => {
-      return { ...acc, ...element(depObj, resources) };
-    }, overviewItems);
+    if (utils) {
+      return utils.reduce((acc, element) => {
+        return { ...acc, ...element(depObj, resources) };
+      }, overviewItems);
+    }
+    return overviewItems;
   }
-  return overviewItems;
-};
-
-/**
- * create all data that need to be shown on a topology data
- */
-export const createTopologyRevNodeData = (
-  dc: OverviewItem,
-  cheURL?: string,
-  type?: string,
-): TopologyDataObject => {
-  const { obj: deploymentConfig, current, previous, isRollingOut, buildConfigs } = dc;
-  const dcUID = _.get(deploymentConfig, 'metadata.uid');
-  const deploymentsLabels = _.get(deploymentConfig, 'metadata.labels', {});
-  const deploymentsAnnotations = _.get(deploymentConfig, 'metadata.annotations', {});
-  return {
-    id: dcUID,
-    name:
-      _.get(deploymentConfig, 'metadata.name') || deploymentsLabels['app.kubernetes.io/instance'],
-    type: type || 'workload',
-    resources: { ...dc },
-    pods: dc.pods,
-    data: {
-      url: getRoutesUrl(dc.routes, _.get(dc, ['ksroutes'])),
-      kind: deploymentConfig.kind,
-      editUrl:
-        deploymentsAnnotations['app.openshift.io/edit-url'] ||
-        getEditURL(deploymentsAnnotations['app.openshift.io/vcs-uri'], cheURL),
-      builderImage:
-        getImageForIconClass(`icon-${deploymentsLabels['app.openshift.io/runtime']}`) ||
-        getImageForIconClass(`icon-${deploymentsLabels['app.kubernetes.io/name']}`) ||
-        getImageForIconClass(`icon-openshift`),
-      isKnativeResource: isKnativeServing(deploymentConfig, 'metadata.labels'),
-      build: _.get(buildConfigs[0], 'builds[0]'),
-      donutStatus: {
-        pods: dc.pods,
-        current,
-        previous,
-        isRollingOut,
-        dc: deploymentConfig,
-      },
-    },
-  };
+  const services = transformResourceData.getServicesForResource(resource);
+  const routes = transformResourceData.getRoutesForServices(services);
+  const knResources = getKnativeServiceData(resource, resources);
+  return { obj: resource, buildConfigs: [], routes, services, ...knResources };
 };
 
 /**
@@ -228,33 +178,6 @@ export const getTrafficTopologyEdgeItems = (resource: K8sResourceKind, { data })
 };
 
 /**
- * Form topology data for knative
- */
-const createTopologyKnativeData = (configData: OverviewItem, type: string, cheURL?: string) => {
-  const { obj: config } = configData;
-  const uid = _.get(config, 'metadata.uid');
-  const deploymentsLabels = _.get(config, 'metadata.labels', {});
-  const deploymentsAnnotations = _.get(config, 'metadata.annotations', {});
-  return {
-    id: uid,
-    name: _.get(config, 'metadata.name') || deploymentsLabels['app.kubernetes.io/instance'],
-    type,
-    resources: { ...configData },
-    data: {
-      kind: config.kind,
-      editUrl:
-        deploymentsAnnotations['app.openshift.io/edit-url'] ||
-        getEditURL(deploymentsAnnotations['app.openshift.io/vcs-uri'], cheURL),
-      builderImage:
-        getImageForIconClass(`icon-${deploymentsLabels['app.openshift.io/runtime']}`) ||
-        getImageForIconClass(`icon-${deploymentsLabels['app.kubernetes.io/name']}`) ||
-        getImageForIconClass(`icon-openshift`),
-      isKnativeResource: isKnativeServing(config, 'metadata.labels'),
-    },
-  };
-};
-
-/**
  * Form Group data for service sources
  */
 export const getTopologyServiceGroupItems = (
@@ -304,12 +227,43 @@ export const filterKnativeBasedOnActiveApplication = (
   });
 };
 
+/**
+ * create all data that need to be shown on a topology data for knative service
+ */
+export const createTopologyServiceNodeData = (
+  svcRes: OverviewItem,
+  operatorBackedServiceKinds: string[],
+  cheURL?: string,
+): TopologyDataObject => {
+  const { obj: knativeSvc } = svcRes;
+  const uid = _.get(knativeSvc, 'metadata.uid');
+  const labels = _.get(knativeSvc, 'metadata.labels', {});
+  const annotations = _.get(knativeSvc, 'metadata.annotations', {});
+  const nodeResourceKind = _.get(knativeSvc, 'metadata.ownerReferences[0].kind');
+  return {
+    id: uid,
+    name: _.get(knativeSvc, 'metadata.name') || labels['app.kubernetes.io/instance'],
+    type: 'eventsource',
+    resources: { ...svcRes },
+    operatorBackedService: operatorBackedServiceKinds.includes(nodeResourceKind),
+    data: {
+      url: getRoutesUrl(svcRes.routes, _.get(svcRes, ['ksroutes'])),
+      kind: knativeSvc.kind,
+      editUrl:
+        annotations['app.openshift.io/edit-url'] ||
+        getEditURL(annotations['app.openshift.io/vcs-uri'], cheURL),
+      isKnativeResource: true,
+    },
+  };
+};
+
 let groupsData = [];
 export const tranformKnNodeData = (
   knResourcesData: K8sResourceKind[],
   type: string,
   topologyGraphAndNodeData: TopologyDataModel,
   resources: TopologyDataResources,
+  operatorBackedServiceKinds: string[],
   utils?: Function[],
   cheURL?: string,
   application?: string,
@@ -322,29 +276,37 @@ export const tranformKnNodeData = (
     const uid = _.get(res, ['metadata', 'uid']);
     if (!_.some(topologyGraphAndNodeData.graph.nodes, { id: uid })) {
       nodesData = [...nodesData, getKnativeTopologyNodeItem(res, type, resources)];
+      const item = createKnativeDeploymentItems(res, resources, utils);
+      const { obj: knServiceData } = item;
+      const uidRes = _.get(knServiceData, ['metadata', 'uid']);
       switch (type) {
         case nodeType.EventSource: {
-          const item = createKnativeDeploymentItems(res, resources, EventSourceCronJobModel, utils);
-          const { obj: knServiceData } = item;
-          const uidRes = _.get(knServiceData, ['metadata', 'uid']);
-          dataToShowOnNodes[uidRes] = createTopologyKnativeData(item, type, cheURL);
+          dataToShowOnNodes[uidRes] = createTopologyNodeData(
+            item,
+            operatorBackedServiceKinds,
+            cheURL,
+            type,
+          );
           edgesData = [...edgesData, ...getEventTopologyEdgeItems(res, resources.ksservices)];
           groupsData = [...getTopologyGroupItems(res, topologyGraphAndNodeData.graph.groups)];
           break;
         }
         case nodeType.Revision: {
-          const item = createKnativeDeploymentItems(res, resources, RevisionModel, utils);
-          const { obj: knServiceData } = item;
-          const uidRes = _.get(knServiceData, ['metadata', 'uid']);
-          dataToShowOnNodes[uidRes] = createTopologyRevNodeData(item, cheURL, type);
+          dataToShowOnNodes[uidRes] = createTopologyNodeData(
+            item,
+            operatorBackedServiceKinds,
+            cheURL,
+            type,
+          );
           groupsData = [...getTopologyGroupItems(res, topologyGraphAndNodeData.graph.groups)];
           break;
         }
         case nodeType.KnService: {
-          const item = createKnativeDeploymentItems(res, resources, KnServiceModel);
-          const { obj: knServiceData } = item;
-          const uidRes = _.get(knServiceData, ['metadata', 'uid']);
-          dataToShowOnNodes[uidRes] = createTopologyKnativeData(item, type, cheURL);
+          dataToShowOnNodes[uidRes] = createTopologyServiceNodeData(
+            item,
+            operatorBackedServiceKinds,
+            cheURL,
+          );
           edgesData = [...edgesData, ...getTrafficTopologyEdgeItems(res, resources.revisions)];
           groupsData = [
             ...getTopologyServiceGroupItems(res, topologyGraphAndNodeData.graph.groups),
@@ -358,4 +320,14 @@ export const tranformKnNodeData = (
   });
 
   return { nodesData, edgesData, dataToShowOnNodes, groupsData };
+};
+
+/**
+ * Filter out deployments not created via revisions
+ */
+export const filterNonKnativeDeployments = (resources: DeploymentKind[]): DeploymentKind[] => {
+  const KNATIVE_CONFIGURATION = 'serving.knative.dev/configuration';
+  return resources.filter((d) => {
+    return !_.get(d, ['metadata', 'labels', KNATIVE_CONFIGURATION]);
+  });
 };

@@ -20,6 +20,8 @@ export const edgeProvider: EdgeProvider = (type) => {
   switch (type) {
     case 'connects-to':
       return ConnectsTo;
+    case 'service-binding':
+      return ConnectsTo;
     default:
       return DefaultEdge;
   }
