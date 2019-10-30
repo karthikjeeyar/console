@@ -18,7 +18,6 @@ import {
   LayoutFactory,
   Layout,
   isGraphEntity,
-  Node,
 } from './types';
 import defaultEntityFactory from './entities/defaultEntityFactory';
 import Stateful from './utils/Stateful';
@@ -53,42 +52,42 @@ export default class Visualization extends Stateful implements Controller {
     }
     const validIds: string[] = [];
 
-    const idToNode: { [id: string]: Node } = {};
+    const idToElement: { [id: string]: Element } = {};
 
     model.nodes &&
       model.nodes.forEach((n) => {
-        idToNode[n.id] = n;
+        idToElement[n.id] = n;
         this.createEntity<NodeEntity>(ModelKind.node, n);
         validIds.push(n.id);
       });
 
     model.edges &&
-      model.edges.forEach((n) => {
-        this.createEntity<EdgeEntity>(ModelKind.edge, n);
-        validIds.push(n.id);
+      model.edges.forEach((e) => {
+        idToElement[e.id] = e;
+        this.createEntity<EdgeEntity>(ModelKind.edge, e);
+        validIds.push(e.id);
       });
 
     // merge data
     if (model.graph && this.graph) {
       this.graph.setModel(model.graph);
     }
-    if (model.nodes) {
-      const processed: { [id: string]: boolean } = {};
-      const processNode = (node: Node): void => {
-        if (node.children) {
-          node.children.forEach((id) => processNode(idToNode[id]));
-        }
-        if (!processed[node.id]) {
-          processed[node.id] = true;
-          this.entities[node.id].setModel(node);
-        }
-      };
-      // process bottom up
-      model.nodes.forEach(processNode);
-    }
-    if (model.edges) {
-      model.edges.forEach((e) => this.entities[e.id].setModel(e));
-    }
+
+    const processed: { [id: string]: boolean } = {};
+
+    // process bottom up
+    const processElement = (element: Element): void => {
+      if (element.children) {
+        element.children.forEach((id) => processElement(idToElement[id]));
+      }
+      if (!processed[element.id]) {
+        processed[element.id] = true;
+        this.entities[element.id].setModel(element);
+      }
+    };
+
+    model.nodes && model.nodes.forEach(processElement);
+    model.edges && model.edges.forEach(processElement);
 
     // remove all stale entities
     _.forIn(this.entities, (entity) => {
