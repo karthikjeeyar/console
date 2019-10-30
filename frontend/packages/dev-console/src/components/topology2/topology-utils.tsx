@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Edge, EdgeEntity, Model, Node, NodeEntity } from '@console/topology/src/types';
+import { Edge, EdgeEntity, Model, Node, NodeEntity, NodeShape } from '@console/topology/src/types';
 import { confirmModal, errorModal } from '@console/internal/components/modals';
 import { TopologyDataModel } from '../topology/topology-types';
 import {
@@ -11,6 +11,20 @@ import { TYPE_APPLICATION_GROUP } from './consts';
 
 const topologyModelFromDataModel = (dataModel: TopologyDataModel): Model => {
   const nodes: Node[] = dataModel.graph.nodes.map((d) => {
+    if (d.type === 'knative-service') {
+      return {
+        id: d.id,
+        type: d.type,
+        label: dataModel.topology[d.id].name,
+        data: dataModel.topology[d.id],
+        children: d.children,
+        group: !!d.children,
+        shape: NodeShape.rect,
+        style: {
+          padding: 25,
+        },
+      };
+    }
     return {
       width: 104,
       height: 104,
@@ -47,9 +61,10 @@ const topologyModelFromDataModel = (dataModel: TopologyDataModel): Model => {
   );
 
   // create topology model
+  // passed [] to edge as brekaing with actulal edge and service group
   const model: Model = {
     nodes: [...nodes, ...groupNodes],
-    edges,
+    edges: [],
   };
 
   return model;
@@ -111,11 +126,11 @@ const createConnection = (
 
 const removeConnection = (edge: EdgeEntity): Promise<any> => {
   const message = (
-    <React.Fragment>
+    <>
       Are you sure you want to remove the connection from{' '}
       <strong>{edge.getSource().getLabel()}</strong> to{' '}
       <strong>{edge.getTarget().getLabel()}</strong>?
-    </React.Fragment>
+    </>
   );
 
   return confirmModal({

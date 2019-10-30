@@ -5,3 +5,4 @@ export const TYPE_CONNECTS_TO = 'connects-to';
 export const TYPE_APPLICATION_GROUP = 'part-of';
 export const TYPE_KNATIVE_SERVICE = 'knative-service';
 export const TYPE_REVISION_TRAFFIC = 'revision-traffic';
+export const TYPE_KNATIVE_REVISION = 'knative-revision';
