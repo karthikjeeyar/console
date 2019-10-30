@@ -158,12 +158,12 @@ const groupWorkoadDropTargetSpec: DropTargetSpec<
   }),
 };
 
-const edgeDragSourceSpec: DragSourceSpec<
+const edgeDragSourceSpec = (serviceBinding: boolean): DragSourceSpec<
   DragObjectWithType,
   NodeEntity,
   { dragging: boolean },
   EdgeEntityProps
-> = {
+> => ({
   item: { type: MOVE_CONNECTOR_DROP_TYPE },
   operation: MOVE_CONNECTOR_OPERATION,
   begin: (monitor, props) => {
@@ -176,16 +176,24 @@ const edgeDragSourceSpec: DragSourceSpec<
   end: (dropResult, monitor, props) => {
     props.entity.setEndPoint();
     if (monitor.didDrop() && dropResult) {
-      createConnection(props.entity.getSource(), dropResult, props.entity.getTarget());
+      createConnection(
+        props.entity.getSource(),
+        dropResult,
+        props.entity.getTarget(),
+        serviceBinding,
+      );
     }
   },
   collect: (monitor) => ({
     dragging: monitor.isDragging(),
   }),
-};
+});
 
-const createConnectorCallback = (source: NodeEntity, target: NodeEntity): any[] | null => {
-  createConnection(source, target);
+const createConnectorCallback = (serviceBinding: boolean) => (
+  source: NodeEntity,
+  target: NodeEntity,
+): any[] | null => {
+  createConnection(source, target, null, serviceBinding);
   return null;
 };
 

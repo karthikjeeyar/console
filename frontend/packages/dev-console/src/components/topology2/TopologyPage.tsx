@@ -13,8 +13,8 @@ import ProjectsExistWrapper from '../ProjectsExistWrapper';
 import ProjectListPage from '../projects/ProjectListPage';
 import { getCheURL } from '../topology/topology-utils';
 import ConnectedTopologyDataController, { RenderProps } from '../topology/TopologyDataController';
+import { ALLOW_SERVICE_BINDING } from '../../const';
 import Topology from './Topology';
-import {ALLOW_SERVICE_BINDING} from "../../const";
 
 interface StateProps {
   activeApplication: string;
@@ -45,7 +45,7 @@ const EmptyMsg = () => (
   />
 );
 
-export function renderTopology({ loaded, loadError, data }: RenderProps) {
+export function renderTopology({ loaded, loadError, serviceBinding, data }: RenderProps) {
   return (
     <StatusBox
       data={data ? data.graph.nodes : null}
@@ -65,17 +65,23 @@ export function renderTopology({ loaded, loadError, data }: RenderProps) {
           bottom: 0,
         }}
       >
-        <Topology data={data} />
+        <Topology data={data} serviceBinding={serviceBinding} />
       </div>
     </StatusBox>
   );
 }
 
-const TopologyPage: React.FC<Props> = ({ match, activeApplication, knative, cheURL, serviceBinding }) => {
+const TopologyPage: React.FC<Props> = ({
+  match,
+  activeApplication,
+  knative,
+  cheURL,
+  serviceBinding,
+}) => {
   const namespace = match.params.ns;
   const application = activeApplication === ALL_APPLICATIONS_KEY ? undefined : activeApplication;
   return (
-    <React.Fragment>
+    <>
       <Helmet>
         <title>Topology</title>
       </Helmet>
@@ -101,7 +107,7 @@ const TopologyPage: React.FC<Props> = ({ match, activeApplication, knative, cheU
           </ProjectsExistWrapper>
         </Firehose>
       </NamespacedPage>
-    </React.Fragment>
+    </>
   );
 };
 

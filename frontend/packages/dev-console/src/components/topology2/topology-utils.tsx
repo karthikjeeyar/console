@@ -100,12 +100,13 @@ const createConnection = (
   sourceNode: NodeEntity,
   targetNode: NodeEntity,
   replaceTargetNode: NodeEntity = null,
+  serviceBindingFlag: boolean,
 ): Promise<any> => {
   return createTopologyResourceConnection(
     sourceNode.getData(),
     targetNode.getData(),
     replaceTargetNode ? replaceTargetNode.getData() : null,
-    false,
+    serviceBindingFlag,
   );
 };
 
@@ -126,7 +127,7 @@ const removeConnection = (edge: EdgeEntity): Promise<any> => {
       return removeTopologyResourceConnection(
         edge.getSource().getData(),
         edge.getTarget().getData(),
-        edge.getData().sbr,
+        edge.getData().data && edge.getData().data.sbr,
         edge.getType(),
       ).catch((err) => {
         const error = err.message;

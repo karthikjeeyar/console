@@ -1,4 +1,9 @@
-import { ElementEntity, ModelKind, NodeEntity, WidgetFactory } from '@console/topology/src/types';
+import {
+  ElementEntity,
+  ModelKind,
+  NodeEntity,
+  WidgetFactory as TopologyWidgetFactory,
+} from '@console/topology/src/types';
 import { ComponentType } from 'react';
 import { withPanZoom } from '@console/topology/src/behavior/usePanZoom';
 import { withDragNode } from '@console/topology/src/behavior/useDragNode';
@@ -43,84 +48,95 @@ type NodeEntityProps = {
   entity: NodeEntity;
 };
 
-const widgetFactory: WidgetFactory = (
-  kind,
-  type,
-): ComponentType<{ entity: ElementEntity }> | undefined => {
-  switch (type) {
-    case TYPE_APPLICATION_GROUP:
-      return withDndDrop(groupWorkoadDropTargetSpec)(
-        withDragNode()(
-          withSelection(false, true)(
-            withContextMenu(
-              groupContextMenu,
-              document.getElementById('modal-container'),
-              'odc-topology-context-menu',
-            )(GroupHullWidget),
-          ),
-        ),
-      );
-    case TYPE_KNATIVE_SERVICE:
-      return withDragNode(nodeDragSourceSpec(type))(
-        withSelection(false, true)(
-          withContextMenu(
-            workloadContextMenu,
-            document.getElementById('modal-container'),
-            'odc-topology-context-menu',
-          )(KnativeServiceWidget),
-        ),
-      );
-    case TYPE_EVENT_SOURCE:
-      return withDragNode(nodeDragSourceSpec(type))(
-        // withSelection(false, true)(
-        withContextMenu(
-          workloadContextMenu,
-          document.getElementById('modal-container'),
-          'odc-topology-context-menu',
-        )(EventSourceWidget),
-        // ),
-      );
-    case TYPE_REVISION_TRAFFIC:
-      return TrafficLinkWidget;
-    case TYPE_WORKLOAD:
-      return withCreateConnector(createConnectorCallback)(
-        withDndDrop<
-          any,
-          any,
-          { droppable?: boolean; hover?: boolean; canDrop?: boolean },
-          NodeEntityProps
-        >(nodeDropTargetSpec)(
-          withDragNode(nodeDragSourceSpec(type))(
+class WidgetFactory {
+  private hasServiceBinding: boolean;
+
+  constructor(serviceBinding: boolean) {
+    this.hasServiceBinding = serviceBinding;
+  }
+
+  set serviceBinding(value: boolean) {
+    this.hasServiceBinding = value;
+  }
+
+  getFactory = (): TopologyWidgetFactory => {
+    return (kind, type): ComponentType<{ entity: ElementEntity }> | undefined => {
+      switch (type) {
+        case TYPE_APPLICATION_GROUP:
+          return withDndDrop(groupWorkoadDropTargetSpec)(
+            withDragNode()(
+              withSelection(false, true)(
+                withContextMenu(
+                  groupContextMenu,
+                  document.getElementById('modal-container'),
+                  'odc-topology-context-menu',
+                )(GroupHullWidget),
+              ),
+            ),
+          );
+        case TYPE_KNATIVE_SERVICE:
+          return withDragNode(nodeDragSourceSpec(type))(
             withSelection(false, true)(
               withContextMenu(
                 workloadContextMenu,
                 document.getElementById('modal-container'),
-                'odc2-topology-context-menu',
-              )(WorkloadNodeWidget),
+                'odc-topology-context-menu',
+              )(KnativeServiceWidget),
             ),
-          ),
-        ),
-      );
-    case TYPE_EVENT_SOURCE_LINK:
-      return EventSourceLinkWidget;
-    case TYPE_CONNECTS_TO:
-      return withTargetDrag(edgeDragSourceSpec)(
-        withRemoveConnector(removeConnectorCallback)(ConnectsToWidget),
-      );
-    case TYPE_SERVICE_BINDING:
-      return withTargetDrag(edgeDragSourceSpec)(
-        withRemoveConnector(removeConnectorCallback)(ServiceBindingWidget),
-      );
-    default:
-      switch (kind) {
-        case ModelKind.graph:
-          return withDndDrop(graphWorkloadDropTargetSpec)(
-            withPanZoom()(withSelection(false, true)(GraphWidget)),
+          );
+        case TYPE_EVENT_SOURCE:
+          return withDragNode(nodeDragSourceSpec(type))(
+            // withSelection(false, true)(
+            withContextMenu(
+              workloadContextMenu,
+              document.getElementById('modal-container'),
+              'odc-topology-context-menu',
+            )(EventSourceWidget),
+            // ),
+          );
+        case TYPE_REVISION_TRAFFIC:
+          return TrafficLinkWidget;
+        case TYPE_WORKLOAD:
+          return withCreateConnector(createConnectorCallback(this.hasServiceBinding))(
+            withDndDrop<
+              any,
+              any,
+              { droppable?: boolean; hover?: boolean; canDrop?: boolean },
+              NodeEntityProps
+            >(nodeDropTargetSpec)(
+              withDragNode(nodeDragSourceSpec(type))(
+                withSelection(false, true)(
+                  withContextMenu(
+                    workloadContextMenu,
+                    document.getElementById('modal-container'),
+                    'odc2-topology-context-menu',
+                  )(WorkloadNodeWidget),
+                ),
+              ),
+            ),
+          );
+        case TYPE_EVENT_SOURCE_LINK:
+          return EventSourceLinkWidget;
+        case TYPE_CONNECTS_TO:
+          return withTargetDrag(edgeDragSourceSpec(this.hasServiceBinding))(
+            withRemoveConnector(removeConnectorCallback)(ConnectsToWidget),
+          );
+        case TYPE_SERVICE_BINDING:
+          return withTargetDrag(edgeDragSourceSpec(this.hasServiceBinding))(
+            withRemoveConnector(removeConnectorCallback)(ServiceBindingWidget),
           );
         default:
-          return undefined;
+          switch (kind) {
+            case ModelKind.graph:
+              return withDndDrop(graphWorkloadDropTargetSpec)(
+                withPanZoom()(withSelection(false, true)(GraphWidget)),
+              );
+            default:
+              return undefined;
+          }
       }
-  }
-};
+    };
+  };
+}
 
-export default widgetFactory;
+export default WidgetFactory;

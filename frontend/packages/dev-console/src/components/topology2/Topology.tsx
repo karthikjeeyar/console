@@ -20,10 +20,11 @@ import TopologyResourcePanel from '../topology/TopologyResourcePanel';
 import TopologyApplicationPanel from '../topology/TopologyApplicationPanel';
 import { topologyModelFromDataModel } from './topology-utils';
 import layoutFactory from './layoutFactory';
-import widgetFactory from './widgetFactory';
+import WidgetFactory from './WidgetFactory';
 
 export interface TopologyProps {
   data: TopologyDataModel;
+  serviceBinding: boolean;
 }
 
 const graphModel: Model = {
@@ -34,15 +35,20 @@ const graphModel: Model = {
   },
 };
 
-const Topology: React.FC<TopologyProps> = ({ data }) => {
+const Topology: React.FC<TopologyProps> = ({ data, serviceBinding }) => {
   const visRef = React.useRef<Visualization | null>(null);
+  const widgetFactoryRef = React.useRef<WidgetFactory | null>(null);
   const [model, setModel] = React.useState<Model>();
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
+
+  if (!widgetFactoryRef.current) {
+    widgetFactoryRef.current = new WidgetFactory(serviceBinding);
+  }
 
   if (!visRef.current) {
     visRef.current = new Visualization();
     visRef.current.registerLayoutFactory(layoutFactory);
-    visRef.current.registerWidgetFactory(widgetFactory);
+    visRef.current.registerWidgetFactory(widgetFactoryRef.current.getFactory());
     visRef.current.addEventListener<SelectionEventListener>(SELECTION_EVENT, (ids: string[]) => {
       // set empty selection when selecting the graph
       if (ids.length > 0 && ids[0] === graphModel.graph.id) {
@@ -53,6 +59,11 @@ const Topology: React.FC<TopologyProps> = ({ data }) => {
     });
     visRef.current.fromModel(graphModel);
   }
+
+  React.useEffect(() => {
+    console.log('hello');
+    widgetFactoryRef.current.serviceBinding = serviceBinding;
+  }, [serviceBinding]);
 
   React.useEffect(() => {
     const newModel = topologyModelFromDataModel(data);
