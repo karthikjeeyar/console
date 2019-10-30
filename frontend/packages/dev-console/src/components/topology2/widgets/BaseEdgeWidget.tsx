@@ -33,6 +33,7 @@ const BaseEdgeWidget: React.FC<EdgeWidgetProps> = ({
     }
   }, [hover, dragging, onShowRemoveConnector, onHideRemoveConnector]);
 
+  console.log(`dragging: ${dragging}`);
   return (
     <Layer id={dragging || hover ? 'top' : undefined}>
       <g

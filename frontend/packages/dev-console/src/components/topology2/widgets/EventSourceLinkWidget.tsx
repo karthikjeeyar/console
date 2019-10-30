@@ -12,12 +12,7 @@ const ConnectsToWidget: React.FC<ConnectsToWidgetProps> = ({ entity }) => {
   const markerPoint = entity.getEndPoint();
   return (
     <EdgeWidget className="odc-event-source-link" entity={entity}>
-      <circle
-        className="odc-event-source-link__marker"
-        cx={markerPoint.x}
-        cy={markerPoint.y}
-        r={6}
-      />
+      <circle cx={markerPoint.x} cy={markerPoint.y} r={6} />
     </EdgeWidget>
   );
 };

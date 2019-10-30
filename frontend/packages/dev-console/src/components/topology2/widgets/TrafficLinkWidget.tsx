@@ -11,7 +11,7 @@ type TrafficLinkWidgetProps = {
 
 const TrafficLinkWidget: React.FC<TrafficLinkWidgetProps> = ({ entity }) => (
   <BaseEdgeWidget entity={entity} className="odc-traffic-link">
-    <ConnectorArrow edge={entity} className="odc-traffic-link__marker" />
+    <ConnectorArrow edge={entity} />
   </BaseEdgeWidget>
 );
 

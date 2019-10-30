@@ -1,25 +1,26 @@
 .odc2-base-edge {
-  --edge--cursor: pointer;
   --edge--drag-active--cursor: grab;
   --edge--stroke-width: 1px;
   --edge--stroke: var(--pf-global--BackgroundColor--dark-200);
   --edge--fill: var(--pf-global--BackgroundColor--dark-200);
+  --edge--opacity: 1;
   --edge--active--fill: var(--pf-global--active-color--400);
   --edge--active--stroke: var(--pf-global--active-color--400);
+  --edge--drag-active--opacity: 0.3;
   --edge__link--stroke: var(--pf-global--BackgroundColor--dark-200);
+  --edge__link--stroke-width: 2px;
   --edge__link--active--stroke: var(--pf-global--active-color--400);
+  --edge__arrow--cursor: default;
 
   cursor: var(--edge--cursor);
   stroke: var(--edge--stroke);
+  stroke-width: var(--edge--stroke-width);
   fill: var(--edge--fill);
-
-  .odc2-m-drag-active & {
-    cursor: var(--edge--drag-active--cursor);
-  }
+  opacity: var(--edge--opacity);
 
   .odc2-base-edge__link {
     stroke: var(--edge__link--stroke);
-    stroke-width: 2px;
+    stroke-width: var(--edge__link--stroke-width);
   }
 
   &.is-hover, &.is-highlight {
@@ -27,6 +28,25 @@
     stroke: var(--edge--active--stroke);
     .odc2-base-edge__link {
       stroke: var(--edge__link--active--stroke);
+    }
+  }
+  .topology-connector-arrow {
+    cursor: var(--edge__arrow--cursor);
+  }
+
+  &.is-highlight {
+    cursor: var(--edge--drag-active--cursor);
+    .topology-connector-arrow {
+      cursor: var(--edge--drag-active--cursor);
+    }
+  }
+}
+
+.odc2-m-drag-active {
+  .odc2-base-edge {
+    opacity: var(--edge--drag-active--opacity);
+    &.is-highlight {
+      opacity: var(--edge--opacity);
     }
   }
 }

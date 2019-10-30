@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import Point from '../geom/Point';
 import { EdgeEntity } from '../types';
@@ -69,7 +70,7 @@ const ConnectorArrow: React.FC<ConnectorArrowProps> = ({
     <g
       transform={`translate(${startPoint[0]}, ${startPoint[1]}) rotate(${angleDeg})`}
       ref={dragRef}
-      className={className}
+      className={classNames('topology-connector-arrow', className)}
     >
       <polygon points={pointsStringFromPoints(arrowPoints)} />
       <polygon points={pointsStringFromPoints(boundingBox)} fillOpacity={0} strokeWidth={0} />
