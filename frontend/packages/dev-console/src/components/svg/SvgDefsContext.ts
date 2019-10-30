@@ -5,6 +5,6 @@ export interface SvgDefsContextProps {
   removeDef(id: string): void;
 }
 
-const SvgDefsContext = createContext<SvgDefsContextProps>(undefined);
+const SvgDefsContext = createContext<SvgDefsContextProps>(undefined as any);
 
 export default SvgDefsContext;

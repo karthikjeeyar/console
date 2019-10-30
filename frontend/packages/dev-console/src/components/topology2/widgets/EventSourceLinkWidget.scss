@@ -1,0 +1,16 @@
+.odc-event-source-link {
+  & .odc-base-edge__link {
+    stroke: #bbbbbb;
+    stroke-width: 2px;
+  }
+  &__marker {
+    fill: #bbbbbb;
+    stroke-width: 0;
+  }
+}
+
+.odc-m-drag-active {
+  .odc-event-source-link {
+    opacity: 0.3;
+  }
+}
