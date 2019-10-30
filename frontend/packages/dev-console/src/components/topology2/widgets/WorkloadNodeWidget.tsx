@@ -5,7 +5,6 @@ import widget from '@console/topology/src/widget';
 import { WithCreateConnectorProps } from '@console/topology/src/behavior/withCreateConnector';
 import { WithDragNodeProps } from '@console/topology/src/behavior/useDragNode';
 import { WithSelectionProps } from '@console/topology/src/behavior/useSelection';
-import { WithDndDragProps } from '@console/topology/src/behavior/useDndDrag';
 import { WithDndDropProps } from '@console/topology/src/behavior/useDndDrop';
 import { WithContextMenuProps } from '@console/topology/src/behavior/withContextMenu';
 import '../../topology/shapes/BaseNode.scss';
@@ -30,7 +29,6 @@ export type WorkloadNodeWidgetProps = {
   urlAnchorRef?: React.Ref<SVGCircleElement>;
 } & WithSelectionProps &
   WithDragNodeProps &
-  WithDndDragProps &
   WithDndDropProps &
   WithContextMenuProps &
   WithCreateConnectorProps;
