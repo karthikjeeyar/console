@@ -7,6 +7,7 @@ import { WithContextMenuProps } from '@console/topology/src/behavior/withContext
 import { useSvgAnchor } from '@console/topology/src/behavior/useSvgAnchor';
 import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
 import { WithDragNodeProps } from '@console/topology/src/behavior/useDragNode';
+import SvgBoxedText from '../../svg/SvgBoxedText';
 import NodeShadows, { NODE_SHADOW_FILTER_HOVER_URL, NODE_SHADOW_FILTER_URL } from './NodeShadows';
 
 import './EventSourceWidget.scss';
@@ -29,6 +30,7 @@ const EventSourceWidget: React.FC<EventSourceWidgetProps> = ({
   const groupRefs = useCombineRefs(dragNodeRef, hoverRef);
   const { width, height } = entity.getBounds();
   const size = Math.min(width, height);
+  const { data } = entity.getData();
 
   return (
     <g onClick={onSelect} onContextMenu={onContextMenu} ref={groupRefs}>
@@ -58,6 +60,19 @@ const EventSourceWidget: React.FC<EventSourceWidgetProps> = ({
         // TODO replace with icon based on data
         xlinkHref="static/assets/openshift.svg"
       />
+      {(data.kind || entity.getLabel()) && (
+        <SvgBoxedText
+          className="odc-base-node__label"
+          x={width / 2}
+          y={(height + size) / 2 + 20}
+          paddingX={8}
+          paddingY={4}
+          kind={data.kind}
+          truncate={16}
+        >
+          {entity.getLabel()}
+        </SvgBoxedText>
+      )}
     </g>
   );
 };
