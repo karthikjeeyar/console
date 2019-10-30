@@ -41,15 +41,32 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
 
   @computed
   private get groupBounds(): Rect {
-    const rect = this.bounds.clone();
+    let rect: Rect | undefined;
     this.getChildren().forEach((c) => {
       if (isNodeEntity(c)) {
-        rect.union(c.getBounds());
+        const b = c.getBounds();
+        if (!rect) {
+          rect = b.clone();
+        } else {
+          rect.union(b);
+        }
       }
     });
 
+    if (!rect) {
+      rect = new Rect();
+    }
+
     const { padding } = this.getStyle<GroupStyle>();
-    return padding ? rect.expand(padding, padding) : rect;
+    const result = padding ? rect.expand(padding, padding) : rect;
+
+    // ensure size is at least the size of the set bounds
+    result.setSize(
+      Math.max(result.width, this.bounds.width),
+      Math.max(result.height, this.bounds.height),
+    );
+
+    return result;
   }
 
   @computed
