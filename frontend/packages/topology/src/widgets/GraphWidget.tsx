@@ -32,7 +32,7 @@ const EntityChildren: React.FC<EntityProps> = widget(({ entity }) => {
 // This inner Component will prevent re-rendering layers when the transform changes
 const Inner: React.FC<EntityProps> = React.memo(({ entity }) => (
   // TODO make layers configurable
-  <LayersProvider layers={['bottom', 'groups', DEFAULT_LAYER, 'top']}>
+  <LayersProvider layers={['bottom', 'groups', 'groups2', DEFAULT_LAYER, 'top']}>
     <EntityChildren entity={entity} />
   </LayersProvider>
 ));

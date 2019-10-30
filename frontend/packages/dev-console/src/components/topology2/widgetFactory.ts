@@ -8,8 +8,6 @@ import { withDndDrop } from '@console/topology/src/behavior/useDndDrop';
 import { withCreateConnector } from '@console/topology/src/behavior/withCreateConnector';
 import { withRemoveConnector } from '@console/topology/src/behavior/withRemoveConnector';
 import { withContextMenu } from '@console/topology/src/behavior/withContextMenu';
-import BaseNodeWidget from './widgets/BaseNodeWidget';
-import EdgeWidget from './widgets/BaseEdgeWidget';
 import GroupHullWidget from './widgets/GroupHullWidget';
 import ConnectsToWidget from './widgets/ConnectsToWidget';
 import EventSourceWidget from './widgets/EventSourceWidget';
@@ -20,8 +18,7 @@ import { workloadContextMenu, groupContextMenu } from './nodeContextMenu';
 import {
   graphWorkloadDropTargetSpec,
   nodeDragSourceSpec,
-  workloadDragSourceSpec,
-  workloadDropTargetSpec,
+  nodeDropTargetSpec,
   groupWorkoadDropTargetSpec,
   edgeDragSourceSpec,
   createConnectorCallback,
@@ -34,7 +31,11 @@ import {
   TYPE_CONNECTS_TO,
   TYPE_APPLICATION_GROUP,
   TYPE_EVENT_SOURCE_LINK,
+  TYPE_KNATIVE_SERVICE,
+  TYPE_REVISION_TRAFFIC,
 } from './consts';
+import KnativeServiceWidget from './widgets/KnativeServiceWidget';
+import TrafficLinkWidget from './widgets/TrafficLinkWidget';
 
 type NodeEntityProps = {
   entity: NodeEntity;
@@ -57,6 +58,16 @@ const widgetFactory: WidgetFactory = (
           ),
         ),
       );
+    case TYPE_KNATIVE_SERVICE:
+      return withDragNode(nodeDragSourceSpec(type))(
+        withSelection(false, true)(
+          withContextMenu(
+            workloadContextMenu,
+            document.getElementById('modal-container'),
+            'odc-topology-context-menu',
+          )(KnativeServiceWidget),
+        ),
+      );
     case TYPE_EVENT_SOURCE:
       return withSelection(false, true)(
         withContextMenu(
@@ -65,6 +76,8 @@ const widgetFactory: WidgetFactory = (
           'odc-topology-context-menu',
         )(EventSourceWidget),
       );
+    case TYPE_REVISION_TRAFFIC:
+      return TrafficLinkWidget;
     case TYPE_WORKLOAD:
       return withCreateConnector(createConnectorCallback)(
         withDndDrop<
@@ -72,8 +85,8 @@ const widgetFactory: WidgetFactory = (
           any,
           { droppable?: boolean; hover?: boolean; canDrop?: boolean },
           NodeEntityProps
-        >(workloadDropTargetSpec)(
-          withDragNode(workloadDragSourceSpec(type))(
+        >(nodeDropTargetSpec)(
+          withDragNode(nodeDragSourceSpec(type))(
             withSelection(false, true)(
               withContextMenu(
                 workloadContextMenu,
@@ -96,10 +109,6 @@ const widgetFactory: WidgetFactory = (
           return withDndDrop(graphWorkloadDropTargetSpec)(
             withPanZoom()(withSelection(false, true)(GraphWidget)),
           );
-        case ModelKind.node:
-          return withDragNode(nodeDragSourceSpec(type))(withSelection(false, true)(BaseNodeWidget));
-        case ModelKind.edge:
-          return EdgeWidget;
         default:
           return undefined;
       }

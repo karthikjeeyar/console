@@ -1,16 +1,12 @@
-.odc-event-source-link {
+.odc-traffic-link {
   & .odc-base-edge__link {
     stroke: #bbbbbb;
     stroke-width: 2px;
+    stroke-dasharray: 5, 5;
   }
+
   &__marker {
     fill: #bbbbbb;
     stroke-width: 0;
-  }
-}
-
-.odc-m-drag-active {
-  .odc-event-source-link {
-    opacity: 0.3;
   }
 }

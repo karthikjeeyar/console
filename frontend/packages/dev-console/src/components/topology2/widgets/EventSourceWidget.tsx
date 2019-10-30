@@ -39,7 +39,6 @@ const EventSourceWidget: React.FC<EventSourceWidgetProps> = ({
       {selected && (
         <polygon
           className="odc-event-source__selection"
-          strokeWidth={2}
           points={`${width / 2}, ${(height - size) / 2 - 2} ${width -
             (width - size) / 2 +
             2},${height / 2} ${width / 2},${height - (height - size) / 2 + 2} ${(width - size) / 2 -

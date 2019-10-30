@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useSize } from '@console/topology/src/utils/useSize';
+import useHover from '@console/topology/src/utils/useHover';
 import { createSvgIdUrl } from '../../utils/svg-utils';
 import SvgResourceIcon from '../topology/shapes/ResourceIcon';
 import SvgDropShadowFilter from './SvgDropShadowFilter';
@@ -13,13 +14,20 @@ export interface SvgBoxedTextProps {
   y?: number;
   cornerRadius?: number;
   kind?: string;
-  innerRef?: React.Ref<SVGGElement>;
+  truncate?: number;
   // TODO remove with 2.0
   onMouseEnter?: React.MouseEventHandler<SVGGElement>;
   onMouseLeave?: React.MouseEventHandler<SVGGElement>;
 }
 
 const FILTER_ID = 'SvgBoxedTextDropShadowFilterId';
+
+const truncateEnd = (text: string = '', length: number): string => {
+  if (text.length <= length) {
+    return text;
+  }
+  return `${text.substr(0, length - 1)}…`;
+};
 
 /**
  * Renders a `<text>` component with a `<rect>` box behind.
@@ -35,15 +43,16 @@ const SvgBoxedText: React.FC<SvgBoxedTextProps> = ({
   kind,
   onMouseEnter,
   onMouseLeave,
-  innerRef,
+  truncate,
   ...other
 }) => {
-  const [textSize, textRef] = useSize([children, className]);
+  const [labelHover, labelHoverRef] = useHover(200);
+  const [textSize, textRef] = useSize([children, className, labelHover]);
   const [iconSize, iconRef] = useSize([kind]);
   const iconSpace = kind && iconSize ? iconSize.width + paddingX : 0;
 
   return (
-    <g ref={innerRef} className={className}>
+    <g className={className} ref={typeof truncate === 'number' ? labelHoverRef : undefined}>
       <SvgDropShadowFilter id={FILTER_ID} />
       {textSize && (
         <rect
@@ -65,8 +74,8 @@ const SvgBoxedText: React.FC<SvgBoxedTextProps> = ({
         />
       )}
       <text
-        ref={textRef}
         {...other}
+        ref={textRef}
         x={x + iconSpace / 2}
         y={y}
         textAnchor="middle"
@@ -74,7 +83,11 @@ const SvgBoxedText: React.FC<SvgBoxedTextProps> = ({
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
-        {children}
+        {typeof truncate === 'number'
+          ? labelHover
+            ? children
+            : truncateEnd(children, truncate)
+          : children}
       </text>
     </g>
   );

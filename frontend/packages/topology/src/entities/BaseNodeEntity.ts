@@ -37,25 +37,16 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
   private group = false;
 
   @observable
-  private shape: NodeShape = NodeShape.circle;
+  private shape: NodeShape | undefined;
 
   @computed
   private get groupBounds(): Rect {
-    let rect: Rect | undefined;
+    const rect = this.bounds.clone();
     this.getChildren().forEach((c) => {
       if (isNodeEntity(c)) {
-        const b = c.getBounds();
-        if (!rect) {
-          rect = b.clone();
-        } else {
-          rect.union(b);
-        }
+        rect.union(c.getBounds());
       }
     });
-
-    if (!rect) {
-      rect = new Rect();
-    }
 
     const { padding } = this.getStyle<GroupStyle>();
     return padding ? rect.expand(padding, padding) : rect;
@@ -121,7 +112,7 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
   }
 
   getNodeShape(): NodeShape {
-    return this.shape;
+    return this.shape || (this.group ? NodeShape.rect : NodeShape.circle);
   }
 
   setNodeShape(shape: NodeShape): void {
@@ -174,7 +165,7 @@ export default class BaseNodeEntity<E extends Node = Node, D = any> extends Base
       this.group = !!model.group;
     }
     if ('shape' in model) {
-      this.shape = model.shape || NodeShape.circle;
+      this.shape = model.shape;
     }
   }
 

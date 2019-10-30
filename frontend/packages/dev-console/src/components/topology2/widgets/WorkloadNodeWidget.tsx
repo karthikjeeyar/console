@@ -24,6 +24,8 @@ export type WorkloadNodeWidgetProps = {
   entity: NodeEntity;
   droppable?: boolean;
   hover?: boolean;
+  dragging?: boolean;
+  highlight?: boolean;
   canDrop?: boolean;
 } & WithSelectionProps &
   WithDragNodeProps &

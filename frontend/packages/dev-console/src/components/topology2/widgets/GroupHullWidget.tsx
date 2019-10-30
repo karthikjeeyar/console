@@ -7,7 +7,6 @@ import { WithSelectionProps } from '@console/topology/src/behavior/useSelection'
 import Layer from '@console/topology/src/layers/Layer';
 import { NodeEntity, PointTuple, NodeShape, GroupStyle } from '@console/topology/src/types';
 import widget from '@console/topology/src/widget';
-import { WithDndDragProps } from '@console/topology/src/behavior/useDndDrag';
 import { WithDndDropProps } from '@console/topology/src/behavior/useDndDrop';
 import { WithContextMenuProps } from '@console/topology/src/behavior/withContextMenu';
 import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
@@ -24,7 +23,6 @@ type GroupHullWidgetProps = {
   canDrop?: boolean;
 } & WithSelectionProps &
   WithDragNodeProps &
-  WithDndDragProps &
   WithDndDropProps &
   WithContextMenuProps;
 
@@ -51,7 +49,6 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   selected,
   onSelect,
   dragNodeRef,
-  dndDragRef,
   dndDropRef,
   droppable,
   canDrop,
@@ -61,7 +58,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
   const [groupLabelHover, groupLabelHoverRef] = useHover();
   const [lowPoint, setLowPoint] = React.useState<[number, number]>([0, 0]);
   const pathRef = React.useRef<string | null>(null);
-  const refs = useCombineRefs<SVGPathElement>(dragNodeRef, dndDragRef, dndDropRef);
+  const refs = useCombineRefs<SVGPathElement>(dragNodeRef, dndDropRef);
 
   const hover = groupHover || groupLabelHover;
 
@@ -133,6 +130,7 @@ const GroupHullWidget: React.FC<GroupHullWidgetProps> = ({
           y={lowPoint[1] + hullPadding(lowPoint) + 30}
           paddingX={20}
           paddingY={5}
+          truncate={16}
         >
           {entity.getLabel()}
         </SvgBoxedText>

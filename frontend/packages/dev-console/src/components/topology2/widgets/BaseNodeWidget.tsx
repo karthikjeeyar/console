@@ -6,7 +6,6 @@ import { WithDragNodeProps } from '@console/topology/src/behavior/useDragNode';
 import { WithSelectionProps } from '@console/topology/src/behavior/useSelection';
 import { useAnchor } from '@console/topology/src/behavior/useAnchor';
 import EllipseAnchor from '@console/topology/src/anchors/EllipseAnchor';
-import { WithDndDragProps } from '@console/topology/src/behavior/useDndDrag';
 import { WithDndDropProps } from '@console/topology/src/behavior/useDndDrop';
 import { WithContextMenuProps } from '@console/topology/src/behavior/withContextMenu';
 import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
@@ -15,11 +14,6 @@ import SvgBoxedText from '../../svg/SvgBoxedText';
 import NodeShadows, { NODE_SHADOW_FILTER_HOVER_URL, NODE_SHADOW_FILTER_URL } from './NodeShadows';
 
 import './BaseNodeWidget.scss';
-
-export interface State {
-  hover?: boolean;
-  labelHover?: boolean;
-}
 
 export type BaseNodeProps = {
   outerRadius: number;
@@ -35,19 +29,9 @@ export type BaseNodeProps = {
   canDrop?: boolean;
 } & WithSelectionProps &
   WithDragNodeProps &
-  WithDndDragProps &
   WithDndDropProps &
   WithContextMenuProps &
   WithCreateConnectorProps;
-
-const MAX_LABEL_LENGTH = 16;
-
-const truncateEnd = (text: string = ''): string => {
-  if (text.length <= MAX_LABEL_LENGTH) {
-    return text;
-  }
-  return `${text.substr(0, MAX_LABEL_LENGTH - 1)}…`;
-};
 
 const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   outerRadius,
@@ -60,7 +44,6 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   children,
   attachments,
   dragNodeRef,
-  dndDragRef,
   dndDropRef,
   canDrop,
   dragging,
@@ -70,7 +53,6 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
   onContextMenu,
 }) => {
   const [hover, hoverRef] = useHover();
-  const [labelHover, labelHoverRef] = useHover(200);
   useAnchor(EllipseAnchor);
   const cx = entity.getBounds().width / 2;
   const cy = entity.getBounds().height / 2;
@@ -79,7 +61,7 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
     'is-highlight': canDrop || highlight,
     'is-dragging': dragging,
   });
-  const refs = useCombineRefs<SVGEllipseElement>(hoverRef, dragNodeRef, dndDragRef);
+  const refs = useCombineRefs<SVGEllipseElement>(hoverRef, dragNodeRef);
 
   React.useLayoutEffect(() => {
     if (hover) {
@@ -114,17 +96,17 @@ const BaseNodeWidget: React.FC<BaseNodeProps> = ({
             height={innerRadius * 2}
             xlinkHref={icon}
           />
-          {entity.getLabel() != null && (
+          {(kind || entity.getLabel()) && (
             <SvgBoxedText
-              innerRef={labelHoverRef}
               className="odc-base-node__label"
               x={cx}
               y={cy + outerRadius + 20}
               paddingX={8}
               paddingY={4}
               kind={kind}
+              truncate={16}
             >
-              {labelHover ? entity.getLabel() : truncateEnd(entity.getLabel())}
+              {entity.getLabel()}
             </SvgBoxedText>
           )}
           {selected && (
