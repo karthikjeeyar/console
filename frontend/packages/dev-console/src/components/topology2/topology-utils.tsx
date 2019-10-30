@@ -11,6 +11,22 @@ import { TYPE_APPLICATION_GROUP } from './consts';
 
 const topologyModelFromDataModel = (dataModel: TopologyDataModel): Model => {
   const nodes: Node[] = dataModel.graph.nodes.map((d) => {
+    if (d.type === 'knative-service') {
+      return {
+        width: 104,
+        height: 104,
+        id: d.id,
+        type: d.type,
+        label: dataModel.topology[d.id].name,
+        data: dataModel.topology[d.id],
+        children: d.children,
+        group: true,
+        shape: NodeShape.rect,
+        style: {
+          padding: [40, 50, 40, 25],
+        },
+      };
+    }
     return {
       width: 104,
       height: 104,

@@ -33,9 +33,18 @@ const EntityComponent: React.FC<EntityWidgetProps> = widget(({ entity }) => {
 const EntityChildren: React.FC<EntityWidgetProps> = widget(({ entity }) => {
   return (
     <>
-      {entity.getChildren().map((c) => (
-        <EntityWidget key={c.getId()} entity={c} />
-      ))}
+      {entity
+        .getChildren()
+        .filter(isEdgeEntity)
+        .map((e) => (
+          <EntityWidget key={e.getId()} entity={e} />
+        ))}
+      {entity
+        .getChildren()
+        .filter(isNodeEntity)
+        .map((e) => (
+          <EntityWidget key={e.getId()} entity={e} />
+        ))}
     </>
   );
 });

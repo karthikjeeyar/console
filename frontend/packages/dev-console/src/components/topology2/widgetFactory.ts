@@ -39,10 +39,12 @@ import {
   TYPE_KNATIVE_SERVICE,
   TYPE_REVISION_TRAFFIC,
   TYPE_SERVICE_BINDING,
+  TYPE_KNATIVE_REVISION,
 } from './consts';
 import KnativeServiceWidget from './widgets/KnativeServiceWidget';
 import TrafficLinkWidget from './widgets/TrafficLinkWidget';
 import ServiceBindingWidget from './widgets/ServiceBindingWidget';
+import RevisionWidget from './widgets/RevisionWidget';
 
 type NodeEntityProps = {
   entity: NodeEntity;
@@ -94,6 +96,25 @@ class WidgetFactory {
             )(EventSourceWidget),
             // ),
           );
+        case TYPE_KNATIVE_REVISION:
+            return withCreateConnector(createConnectorCallback(this.hasServiceBinding))(
+              withDndDrop<
+                any,
+                any,
+                { droppable?: boolean; hover?: boolean; canDrop?: boolean },
+                NodeEntityProps
+              >(nodeDropTargetSpec)(
+                withDragNode(nodeDragSourceSpec(type))(
+                  withSelection(false, true)(
+                    withContextMenu(
+                      workloadContextMenu,
+                      document.getElementById('modal-container'),
+                      'odc-topology-context-menu',
+                    )(RevisionWidget),
+                  ),
+                ),
+              ),
+            );
         case TYPE_REVISION_TRAFFIC:
           return TrafficLinkWidget;
         case TYPE_WORKLOAD:
