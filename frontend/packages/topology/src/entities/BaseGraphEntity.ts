@@ -113,14 +113,12 @@ export default class BaseGraphEntity<E extends Graph = Graph, D = any>
 
   fit(padding = 0): void {
     let rect: Rect | undefined;
-    this.getChildren().forEach((c) => {
-      if (isNodeEntity(c)) {
-        const b = c.getBounds();
-        if (!rect) {
-          rect = b.clone();
-        } else {
-          rect.union(b);
-        }
+    this.getNodes().forEach((c) => {
+      const b = c.getBounds();
+      if (!rect) {
+        rect = b.clone();
+      } else {
+        rect.union(b);
       }
     });
     if (!rect) {
