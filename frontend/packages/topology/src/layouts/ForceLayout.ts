@@ -269,10 +269,17 @@ export default class ForceLayout implements Layout {
     const nodes: D3Node[] = leafNodeEntities(this.graph.getNodes()).map(
       (e: NodeEntity) => new D3Node(e),
     );
-    const edges: D3Link[] = this.graph.getEdges().map((e: EdgeEntity) => {
-      e.setBendpoints([]);
-      return new D3Link(e);
-    });
+    const edges: D3Link[] = this.graph
+      .getEdges()
+      .filter(
+        (e) =>
+          nodes.find((n) => n.id === e.getSource().getId()) &&
+          nodes.find((n) => n.id === e.getTarget().getId()),
+      )
+      .map((e: EdgeEntity) => {
+        e.setBendpoints([]);
+        return new D3Link(e);
+      });
 
     // Create faux edges for the grouped nodes to form group clusters
     groups.forEach((group: NodeEntity) => {
