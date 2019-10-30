@@ -5,6 +5,8 @@ import useHover from '@console/topology/src/utils/useHover';
 import { WithSelectionProps } from '@console/topology/src/behavior/useSelection';
 import { WithContextMenuProps } from '@console/topology/src/behavior/withContextMenu';
 import { useSvgAnchor } from '@console/topology/src/behavior/useSvgAnchor';
+import useCombineRefs from '@console/topology/src/utils/useCombineRefs';
+import { WithDragNodeProps } from '@console/topology/src/behavior/useDragNode';
 import NodeShadows, { NODE_SHADOW_FILTER_HOVER_URL, NODE_SHADOW_FILTER_URL } from './NodeShadows';
 
 import './EventSourceWidget.scss';
@@ -12,6 +14,7 @@ import './EventSourceWidget.scss';
 export type EventSourceWidgetProps = {
   entity: NodeEntity;
 } & WithSelectionProps &
+  WithDragNodeProps &
   WithContextMenuProps;
 
 const EventSourceWidget: React.FC<EventSourceWidgetProps> = ({
@@ -19,14 +22,16 @@ const EventSourceWidget: React.FC<EventSourceWidgetProps> = ({
   selected,
   onSelect,
   onContextMenu,
+  dragNodeRef,
 }) => {
   const svgAnchorRef = useSvgAnchor();
   const [hover, hoverRef] = useHover();
+  const groupRefs = useCombineRefs(dragNodeRef, hoverRef);
   const { width, height } = entity.getBounds();
   const size = Math.min(width, height);
 
   return (
-    <g onClick={onSelect} onContextMenu={onContextMenu} ref={hoverRef}>
+    <g onClick={onSelect} onContextMenu={onContextMenu} ref={groupRefs}>
       <NodeShadows />
       <polygon
         className="odc-event-source"

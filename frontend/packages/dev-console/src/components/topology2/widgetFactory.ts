@@ -71,12 +71,14 @@ const widgetFactory: WidgetFactory = (
         ),
       );
     case TYPE_EVENT_SOURCE:
-      return withSelection(false, true)(
+      return withDragNode(nodeDragSourceSpec(type))(
+        // withSelection(false, true)(
         withContextMenu(
           workloadContextMenu,
           document.getElementById('modal-container'),
           'odc-topology-context-menu',
         )(EventSourceWidget),
+        // ),
       );
     case TYPE_REVISION_TRAFFIC:
       return TrafficLinkWidget;
