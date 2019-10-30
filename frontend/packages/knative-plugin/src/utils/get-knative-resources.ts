@@ -1,6 +1,16 @@
 import * as _ from 'lodash';
 import { K8sResourceKind } from '@console/internal/module/k8s';
+<<<<<<< HEAD
 import { KNATIVE_SERVING_LABEL } from '../const';
+=======
+import {
+  KNATIVE_SERVING_LABEL,
+  KNATIVE_EVENT_SOURCE_APIGROUP,
+  KNATIVE_SERVING_APIGROUP,
+} from '../const';
+import { connect } from 'react-redux';
+import { RootState } from '@console/internal/redux';
+>>>>>>> a7748770a... add sidebar support
 
 export type KnativeItem = {
   revisions?: K8sResourceKind[];
@@ -24,6 +34,23 @@ const getKsResource = (dc: K8sResourceKind, res: K8sResourceKind): K8sResourceKi
   }
   return ksResource;
 };
+<<<<<<< HEAD
+=======
+const mapStateToProps = (state: RootState): any => {
+  return {
+    kindsInFlight: state.k8s.getIn(['RESOURCES', 'inFlight']),
+    knativeModels: state.k8s
+      .getIn(['RESOURCES', 'models'])
+      .filter(
+        (model) =>
+          model.apiGroup === KNATIVE_SERVING_APIGROUP ||
+          model.apiGroup === KNATIVE_EVENT_SOURCE_APIGROUP,
+      ),
+  };
+};
+
+export const getKsResourceModel = (wrappedComponent) => connect(mapStateToProps)(wrappedComponent);
+>>>>>>> a7748770a... add sidebar support
 
 const getRevisions = (dc: K8sResourceKind, { revisions }): K8sResourceKind[] => {
   let revisionResource = [];

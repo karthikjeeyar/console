@@ -8,6 +8,7 @@ export type TopologyResourcePanelProps = {
 
 const TopologyResourcePanel: React.FC<TopologyResourcePanelProps> = ({ item }) => {
   const resourceItemToShowOnSideBar = item && item.resources;
+<<<<<<< HEAD
   return (
     resourceItemToShowOnSideBar && (
       <ResourceOverviewPage
@@ -16,6 +17,20 @@ const TopologyResourcePanel: React.FC<TopologyResourcePanelProps> = ({ item }) =
       />
     )
   );
+=======
+  if (_.get(item, 'data.isKnativeResource', false)) {
+    return <KnativeOverviewPage item={item.resources} />;
+  } else {
+    return (
+      resourceItemToShowOnSideBar && (
+        <ResourceOverviewPage
+          item={resourceItemToShowOnSideBar}
+          kind={resourceItemToShowOnSideBar.obj.kind}
+        />
+      )
+    );
+  }
+>>>>>>> a7748770a... add sidebar support
 };
 
 export default TopologyResourcePanel;
