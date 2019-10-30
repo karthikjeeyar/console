@@ -5,10 +5,8 @@ export default abstract class AbstractAnchor<E extends NodeEntity = NodeEntity>
   implements Anchor<E> {
   private owner: NodeEntity;
 
-  constructor(owner?: NodeEntity) {
-    if (owner) {
-      this.owner = owner;
-    }
+  constructor(owner: NodeEntity) {
+    this.owner = owner;
   }
 
   protected getOwner(): NodeEntity {

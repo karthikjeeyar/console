@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { isNodeEntity, Anchor, NodeEntity, AnchorEnd } from '../types';
 import EntityContext from '../utils/EntityContext';
 
-type AnchorConstructor = new () => Anchor;
+type AnchorConstructor = new (entity?: NodeEntity) => Anchor;
 
 export const useAnchor = (
   anchorCallback: ((entity: NodeEntity) => Anchor | undefined) | AnchorConstructor,
