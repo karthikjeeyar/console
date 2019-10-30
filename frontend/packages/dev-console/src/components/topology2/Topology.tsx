@@ -61,7 +61,6 @@ const Topology: React.FC<TopologyProps> = ({ data, serviceBinding }) => {
   }
 
   React.useEffect(() => {
-    console.log('hello');
     widgetFactoryRef.current.serviceBinding = serviceBinding;
   }, [serviceBinding]);
 
