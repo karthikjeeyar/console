@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from 'react';
+import { action } from 'mobx';
 import * as _ from 'lodash';
 import {
   TopologyView,
@@ -8,7 +9,6 @@ import {
   createTopologyControlButtons,
   defaultControlButtonsOptions,
 } from '@patternfly/react-topology';
-import { action } from '@storybook/addon-actions';
 import {
   Toolbar,
   ToolbarGroup,
@@ -136,7 +136,6 @@ const TopologyViewComponent: React.FC<TopologyViewComponentProps> = ({ vis, useS
   const [layout, setLayout] = React.useState('Force');
 
   vis.addEventListener<SelectionEventListener>(SELECTION_EVENT, (ids) => {
-    action(`Selection event`)(ids);
     setSelectedIds(ids);
   });
 
@@ -197,19 +196,19 @@ const TopologyViewComponent: React.FC<TopologyViewComponentProps> = ({ vis, useS
         <TopologyControlBar
           controlButtons={createTopologyControlButtons({
             ...defaultControlButtonsOptions,
-            zoomInCallback: () => {
+            zoomInCallback: action(() => {
               vis.getGraph().scaleBy(4 / 3);
-            },
-            zoomOutCallback: () => {
+            }),
+            zoomOutCallback: action(() => {
               vis.getGraph().scaleBy(0.75);
-            },
-            fitToScreenCallback: () => {
+            }),
+            fitToScreenCallback: action(() => {
               vis.getGraph().fit(80);
-            },
-            resetViewCallback: () => {
+            }),
+            resetViewCallback: action(() => {
               vis.getGraph().reset();
               vis.getGraph().layout();
-            },
+            }),
             legend: false,
           })}
         />
