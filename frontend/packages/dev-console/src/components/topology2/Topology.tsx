@@ -20,7 +20,7 @@ import TopologyResourcePanel from '../topology/TopologyResourcePanel';
 import TopologyApplicationPanel from '../topology/TopologyApplicationPanel';
 import { topologyModelFromDataModel } from './topology-utils';
 import layoutFactory from './layoutFactory';
-import WidgetFactory from './WidgetFactory';
+import WidgetFactory from './widgetFactory';
 
 export interface TopologyProps {
   data: TopologyDataModel;
