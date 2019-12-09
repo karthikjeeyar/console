@@ -22,6 +22,17 @@ describe('TopologyDataController', () => {
         resourceList={[]}
         application={undefined}
         namespace="namespace"
+        filters={{
+          display: {
+            podCount: true,
+            setTraffic: true,
+            eventSources: true,
+            knativeServices: true,
+            appGrouping: true,
+            operatorGrouping: true,
+          },
+          searchQuery: null,
+        }}
         {...props}
       />,
     );
