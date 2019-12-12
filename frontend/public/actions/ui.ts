@@ -9,6 +9,7 @@ import {
   ALL_NAMESPACES_KEY,
   LAST_NAMESPACE_NAME_LOCAL_STORAGE_KEY,
   LAST_PERSPECTIVE_LOCAL_STORAGE_KEY,
+  TOPOLOGGY_FILTERS_LOCAL_STORAGE_KEY,
 } from '../const';
 import { K8sResourceKind, PodKind } from '../module/k8s';
 import { allModels } from '../module/k8s/k8s-models';
@@ -185,6 +186,7 @@ export const setActivePerspective = (perspective: string) => {
 };
 
 export const setTopologyFilters = (topologyFilters) => {
+  localStorage.setItem(TOPOLOGGY_FILTERS_LOCAL_STORAGE_KEY, JSON.stringify(topologyFilters));
   return action(ActionType.SetTopologyFilters, { topologyFilters });
 };
 

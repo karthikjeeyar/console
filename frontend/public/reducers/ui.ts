@@ -8,6 +8,7 @@ import {
   LAST_NAMESPACE_NAME_LOCAL_STORAGE_KEY,
   NAMESPACE_LOCAL_STORAGE_KEY,
   LAST_PERSPECTIVE_LOCAL_STORAGE_KEY,
+  TOPOLOGGY_FILTERS_LOCAL_STORAGE_KEY,
 } from '../const';
 import { AlertStates, isSilenced, SilenceStates } from '../reducers/monitoring';
 import { legalNamePattern, getNamespace } from '../components/utils/link';
@@ -37,8 +38,8 @@ export function getDefaultPerspective() {
 }
 
 export const getDefaultTopologyFilters = () => {
-  // [TODO] get filters from local storage
-  return {
+  const filters = localStorage.getItem(TOPOLOGGY_FILTERS_LOCAL_STORAGE_KEY);
+  const defaultFilters = {
     display: {
       podCount: true,
       setTraffic: true,
@@ -49,6 +50,12 @@ export const getDefaultTopologyFilters = () => {
     },
     searchQuery: null,
   };
+
+  if (filters) {
+    return JSON.parse(filters);
+  }
+  localStorage.setItem(TOPOLOGGY_FILTERS_LOCAL_STORAGE_KEY, JSON.stringify(defaultFilters));
+  return defaultFilters;
 };
 
 const newQueryBrowserQuery = (): ImmutableMap<string, any> =>
