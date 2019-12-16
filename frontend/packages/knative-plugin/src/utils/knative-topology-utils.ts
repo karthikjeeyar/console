@@ -29,7 +29,7 @@ import {
   getTopologyEdgeItems,
   filterBasedOnActiveApplication,
 } from '@console/dev-console/src/components/topology/topology-utils';
-import { TopologyFilters } from '@console/dev-console/src/components/topology2/filters/filter-utils';
+import { TopologyFilters } from '@console/dev-console/src/components/topology/filters/filter-utils';
 import { DeploymentModel } from '@console/internal/models';
 import { ServiceModel as knServiceModel } from '../models';
 import { KnativeItem } from './get-knative-resources';

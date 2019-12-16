@@ -7,9 +7,10 @@ import {
   podRingLabel,
   usePodScalingAccessStatus,
 } from '@console/shared';
-import { modelFor } from '@console/internal/module/k8s';
+import { modelFor, referenceFor } from '@console/internal/module/k8s';
 import { ChartLabel } from '@patternfly/react-charts';
 import { DonutStatusData } from '../../topology-types';
+import './PodSet.scss';
 
 interface PodSetProps {
   size: number;
@@ -53,7 +54,7 @@ const PodSet: React.FC<PodSetProps> = ({ size, data, x = 0, y = 0, showPodCount 
   );
   const accessAllowed = usePodScalingAccessStatus(
     data.dc,
-    modelFor(data.dc.kind),
+    modelFor(referenceFor(data.dc)),
     get(data, ['current', 'pods'], []),
     true,
   );
@@ -72,12 +73,12 @@ const PodSet: React.FC<PodSetProps> = ({ size, data, x = 0, y = 0, showPodCount 
         subTitle={showPodCount && subTitle}
         {...showPodCount &&
           !accessAllowed && {
-            subTitleComponent: <ChartLabel style={{ fontSize: '14px' }} />,
+            subTitleComponent: <ChartLabel className="odc-pod-status__chart-label" />,
           }}
         title={showPodCount && title}
         {...showPodCount &&
           !obj.status.availableReplicas && {
-            titleComponent: <ChartLabel style={{ fontSize: '14px' }} />,
+            titleComponent: <ChartLabel className="odc-pod-status__chart-label" />,
           }}
       />
       {inProgressDeploymentData && (

@@ -24,7 +24,7 @@ import {
   removeServiceBinding,
   edgesFromServiceBinding,
 } from '../../utils/application-utils';
-import { TopologyFilters } from '../topology2/filters/filter-utils';
+import { TopologyFilters } from './filters/filter-utils';
 import {
   TopologyDataModel,
   TopologyDataResources,

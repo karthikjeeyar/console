@@ -24,7 +24,7 @@ const TopologyFilterBar: React.FC<TopologyFilterBarProps> = ({ filters, onFilter
   const onDisplayFilterChange = (displayFilters: DisplayFilters) =>
     onFilterChange({ display: displayFilters, searchQuery });
 
-  const onSearchFilterChange = (e: React.KeyboardEvent) =>
+  const onSearchQueryChange = (e: React.KeyboardEvent) =>
     onFilterChange({
       display,
       searchQuery: (e.target as HTMLInputElement).value,
@@ -38,7 +38,7 @@ const TopologyFilterBar: React.FC<TopologyFilterBarProps> = ({ filters, onFilter
       </ToolbarGroup>
       <ToolbarGroup className="odc-toplogy-filter-bar__search">
         <ToolbarItem>
-          <TextFilter label="name" value={filters.searchQuery} onChange={onSearchFilterChange} />
+          <TextFilter label="name" value={filters.searchQuery} onChange={onSearchQueryChange} />
         </ToolbarItem>
       </ToolbarGroup>
     </Toolbar>

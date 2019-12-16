@@ -16,6 +16,7 @@ import { allModels } from '../module/k8s/k8s-models';
 import { detectFeatures, clearSSARFlags } from './features';
 import { OverviewSpecialGroup } from '../components/overview/constants';
 import { OverviewItem } from '@console/shared';
+import { TopologyFilters } from '@console/dev-console/src/components/topology/filters/filter-utils';
 export enum ActionType {
   DismissOverviewDetails = 'dismissOverviewDetails',
   SelectOverviewDetailsTab = 'selectOverviewDetailsTab',
@@ -185,7 +186,7 @@ export const setActivePerspective = (perspective: string) => {
   return action(ActionType.SetActivePerspective, { perspective });
 };
 
-export const setTopologyFilters = (topologyFilters) => {
+export const setTopologyFilters = (topologyFilters: TopologyFilters) => {
   localStorage.setItem(TOPOLOGGY_FILTERS_LOCAL_STORAGE_KEY, JSON.stringify(topologyFilters));
   return action(ActionType.SetTopologyFilters, { topologyFilters });
 };

@@ -8,7 +8,7 @@ import { ClusterServiceVersionModel } from '@console/operator-lifecycle-manager/
 import { getTopologyFilters } from '@console/internal/reducers/ui';
 import { RootState } from '@console/internal/redux';
 import { ServiceBindingRequestModel } from '../../models';
-import { TopologyFilters } from '../topology2/filters/filter-utils';
+import { TopologyFilters } from './filters/filter-utils';
 import { allowedResources, transformTopologyData } from './topology-utils';
 import { TopologyDataModel, TopologyDataResources } from './topology-types';
 

@@ -55,12 +55,14 @@ export const usePodScalingAccessStatus = (
   resourceKind: K8sKind,
   pods: ExtPodKind[],
   enableScaling?: boolean,
-  impersonate?,
+  impersonate?: string,
 ) => {
   const [editable, setEditable] = React.useState(false);
   React.useEffect(() => {
     checkPodEditAccess(obj, resourceKind, impersonate)
-      .then((resp: SelfSubjectAccessReviewKind) => setEditable(resp.status.allowed))
+      .then((resp: SelfSubjectAccessReviewKind) =>
+        setEditable(_.get(resp, 'status.allowed', false)),
+      )
       .catch((error) => {
         throw error;
       });

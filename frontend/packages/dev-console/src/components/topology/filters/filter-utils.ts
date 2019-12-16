@@ -12,10 +12,10 @@ export enum ExpandFiltersKeyValue {
 
 export type TopologyFilters = {
   display: DisplayFilters;
-  searchQuery: SearchFilter;
+  searchQuery: SearchQuery;
 };
 
-export type SearchFilter = string;
+export type SearchQuery = string;
 
 export type DisplayFilters = {
   podCount: boolean;
