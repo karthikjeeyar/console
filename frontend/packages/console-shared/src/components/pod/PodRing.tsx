@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as _ from 'lodash';
 import { Button, Split, SplitItem, Bullseye } from '@patternfly/react-core';
 import { K8sResourceKind, k8sPatch, K8sKind } from '@console/internal/module/k8s';
-import { ChartLabel } from '@patternfly/react-charts';
 import { AngleUpIcon, AngleDownIcon } from '@patternfly/react-icons';
 import { podRingLabel, usePodScalingAccessStatus } from '../../utils';
 import { ExtPodKind } from '../../types';
@@ -56,7 +55,10 @@ const PodRing: React.FC<PodRingProps> = ({
     handleScaling(clickCount + operation);
   };
   const resourceObj = rc || obj;
-  const { title, subTitle } = podRingLabel(resourceObj, isScalingAllowed);
+  const { title, subTitle, titleComponent, subTitleComponent } = podRingLabel(
+    resourceObj,
+    isScalingAllowed,
+  );
 
   return (
     <Split>
@@ -66,13 +68,9 @@ const PodRing: React.FC<PodRingProps> = ({
             standalone
             data={pods}
             subTitle={subTitle}
-            {...!isScalingAllowed && {
-              subTitleComponent: <ChartLabel style={{ fontSize: '14px' }} />,
-            }}
             title={title}
-            {...!resourceObj.status.availableReplicas && {
-              titleComponent: <ChartLabel style={{ fontSize: '14px' }} />,
-            }}
+            titleComponent={titleComponent}
+            subTitleComponent={subTitleComponent}
           />
         </div>
       </SplitItem>
