@@ -1,3 +1,5 @@
+import { RootState } from '@console/internal/redux';
+
 export enum ShowFiltersKeyValue {
   podCount = 'Pod Count',
   setTraffic = 'Set Traffic',
@@ -9,6 +11,12 @@ export enum ExpandFiltersKeyValue {
   appGrouping = 'Application Groupings',
   operatorGrouping = 'Operator Groupings',
 }
+
+export const getTopologyFilters = ({
+  plugins: {
+    devconsole: { topology },
+  },
+}: RootState): any => topology.get('filters');
 
 export type TopologyFilters = {
   display: DisplayFilters;

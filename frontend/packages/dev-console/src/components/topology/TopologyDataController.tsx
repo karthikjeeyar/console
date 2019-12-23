@@ -5,10 +5,9 @@ import * as plugins from '@console/internal/plugins';
 import { getResourceList } from '@console/shared';
 import { referenceForModel } from '@console/internal/module/k8s';
 import { ClusterServiceVersionModel } from '@console/operator-lifecycle-manager/src/models';
-import { getTopologyFilters } from '@console/internal/reducers/ui';
 import { RootState } from '@console/internal/redux';
 import { ServiceBindingRequestModel } from '../../models';
-import { TopologyFilters } from './filters/filter-utils';
+import { TopologyFilters, getTopologyFilters } from './filters/filter-utils';
 import { allowedResources, transformTopologyData } from './topology-utils';
 import { TopologyDataModel, TopologyDataResources } from './topology-types';
 

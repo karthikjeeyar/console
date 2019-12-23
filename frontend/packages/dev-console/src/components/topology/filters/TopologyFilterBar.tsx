@@ -2,11 +2,10 @@ import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
 import { Toolbar, ToolbarGroup, ToolbarItem } from '@patternfly/react-core';
 import { RootState } from '@console/internal/redux';
-import { getTopologyFilters } from '@console/internal/reducers/ui';
-import { setTopologyFilters } from '@console/internal/actions/ui';
 import { TextFilter } from '@console/internal/components/factory';
+import { setTopologyFilters } from '../redux/action';
 import FilterDropdown from './FilterDropdown';
-import { TopologyFilters, DisplayFilters } from './filter-utils';
+import { TopologyFilters, DisplayFilters, getTopologyFilters } from './filter-utils';
 import './TopologyFilterBar.scss';
 
 type StateProps = {
@@ -31,7 +30,7 @@ const TopologyFilterBar: React.FC<TopologyFilterBarProps> = ({ filters, onFilter
     });
   return (
     <Toolbar className="co-namespace-bar odc-toplogy-filter-bar">
-      <ToolbarGroup className="odc-toplogy-filter-bar__dropdown">
+      <ToolbarGroup>
         <ToolbarItem>
           <FilterDropdown filters={filters.display} onChange={onDisplayFilterChange} />
         </ToolbarItem>
