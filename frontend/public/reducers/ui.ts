@@ -8,7 +8,6 @@ import {
   LAST_NAMESPACE_NAME_LOCAL_STORAGE_KEY,
   NAMESPACE_LOCAL_STORAGE_KEY,
   LAST_PERSPECTIVE_LOCAL_STORAGE_KEY,
-  TOPOLOGGY_FILTERS_LOCAL_STORAGE_KEY,
 } from '../const';
 import { AlertStates, isSilenced, SilenceStates } from '../reducers/monitoring';
 import { legalNamePattern, getNamespace } from '../components/utils/link';
@@ -36,27 +35,6 @@ export function getDefaultPerspective() {
   }
   return activePerspective || undefined;
 }
-
-export const getDefaultTopologyFilters = () => {
-  const filters = localStorage.getItem(TOPOLOGGY_FILTERS_LOCAL_STORAGE_KEY);
-  const defaultFilters = {
-    display: {
-      podCount: true,
-      setTraffic: true,
-      eventSources: true,
-      knativeServices: true,
-      appGrouping: true,
-      operatorGrouping: true,
-    },
-    searchQuery: null,
-  };
-
-  if (filters) {
-    return JSON.parse(filters);
-  }
-  localStorage.setItem(TOPOLOGGY_FILTERS_LOCAL_STORAGE_KEY, JSON.stringify(defaultFilters));
-  return defaultFilters;
-};
 
 const newQueryBrowserQuery = (): ImmutableMap<string, any> =>
   ImmutableMap({
@@ -89,7 +67,6 @@ export default (state: UIState, action: UIAction): UIState => {
       activeApplication: ALL_APPLICATIONS_KEY,
       activePerspective: getDefaultPerspective(),
       createProjectMessage: '',
-      topologyFilters: getDefaultTopologyFilters(),
       overview: ImmutableMap({
         metrics: {},
         resources: ImmutableMap({}),
@@ -134,9 +111,6 @@ export default (state: UIState, action: UIAction): UIState => {
       }
       return state.set('activeNamespace', ns);
     }
-
-    case ActionType.SetTopologyFilters:
-      return state.set('topologyFilters', action.payload.topologyFilters);
 
     case ActionType.BeginImpersonate:
       return state.set('impersonate', {
@@ -337,5 +311,3 @@ export const getActiveNamespace = ({ UI }: RootState): string => UI.get('activeN
 export const getActivePerspective = ({ UI }: RootState): string => UI.get('activePerspective');
 
 export const getActiveApplication = ({ UI }: RootState): string => UI.get('activeApplication');
-
-export const getTopologyFilters = ({ UI }: RootState): any => UI.get('topologyFilters');

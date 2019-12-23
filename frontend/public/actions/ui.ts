@@ -9,14 +9,12 @@ import {
   ALL_NAMESPACES_KEY,
   LAST_NAMESPACE_NAME_LOCAL_STORAGE_KEY,
   LAST_PERSPECTIVE_LOCAL_STORAGE_KEY,
-  TOPOLOGGY_FILTERS_LOCAL_STORAGE_KEY,
 } from '../const';
 import { K8sResourceKind, PodKind } from '../module/k8s';
 import { allModels } from '../module/k8s/k8s-models';
 import { detectFeatures, clearSSARFlags } from './features';
 import { OverviewSpecialGroup } from '../components/overview/constants';
 import { OverviewItem } from '@console/shared';
-import { TopologyFilters } from '@console/dev-console/src/components/topology/filters/filter-utils';
 export enum ActionType {
   DismissOverviewDetails = 'dismissOverviewDetails',
   SelectOverviewDetailsTab = 'selectOverviewDetailsTab',
@@ -27,7 +25,6 @@ export enum ActionType {
   SetCreateProjectMessage = 'setCreateProjectMessage',
   SetCurrentLocation = 'setCurrentLocation',
   SetMonitoringData = 'setMonitoringData',
-  SetTopologyFilters = 'setTopologyFilters',
   ToggleMonitoringGraphs = 'monitoringToggleGraphs',
   QueryBrowserAddQuery = 'queryBrowserAddQuery',
   QueryBrowserDeleteAllQueries = 'queryBrowserDeleteAllQueries',
@@ -186,11 +183,6 @@ export const setActivePerspective = (perspective: string) => {
   return action(ActionType.SetActivePerspective, { perspective });
 };
 
-export const setTopologyFilters = (topologyFilters: TopologyFilters) => {
-  localStorage.setItem(TOPOLOGGY_FILTERS_LOCAL_STORAGE_KEY, JSON.stringify(topologyFilters));
-  return action(ActionType.SetTopologyFilters, { topologyFilters });
-};
-
 export const beginImpersonate = (kind: string, name: string, subprotocols: string[]) =>
   action(ActionType.BeginImpersonate, { kind, name, subprotocols });
 export const endImpersonate = () => action(ActionType.EndImpersonate);
@@ -328,7 +320,6 @@ const uiActions = {
   setActiveApplication,
   setActiveNamespace,
   setActivePerspective,
-  setTopologyFilters,
   beginImpersonate,
   endImpersonate,
   sortList,
