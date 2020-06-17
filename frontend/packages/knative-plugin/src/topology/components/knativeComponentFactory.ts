@@ -23,6 +23,7 @@ import { Kebab, kebabOptionsToMenu } from '@console/internal/components/utils';
 import { modelFor, referenceFor } from '@console/internal/module/k8s';
 import { RevisionModel } from '../../models';
 import { getRevisionActions } from '../../actions/getRevisionActions';
+import { getDynamicChannelModelRefs } from '../../utils/fetch-dynamic-eventsources-utils';
 import {
   TYPE_EVENT_SOURCE,
   TYPE_EVENT_SOURCE_LINK,
@@ -50,10 +51,11 @@ import {
 export const knativeContextMenu = (element: Node) => {
   const item = getTopologyResourceObject(element.getData());
   const model = modelFor(referenceFor(item));
-
   const actions = [];
   if (model.kind === RevisionModel.kind) {
     actions.push(...getRevisionActions());
+  } else if (getDynamicChannelModelRefs().includes(referenceFor(item))) {
+    actions.push(ModifyApplication);
   } else {
     actions.push(
       ModifyApplication,
@@ -107,9 +109,7 @@ class KnativeComponentFactory extends AbstractSBRComponentFactory {
               { droppable?: boolean; hover?: boolean; canDrop?: boolean; dropTarget?: boolean },
               NodeComponentProps
             >(pubSubDropTargetSpec)(
-              withEditReviewAccess('update')(
-                withSelection(false, true)(withContextMenu(knativeContextMenu)(EventingPubSubNode)),
-              ),
+              withSelection(false, true)(withContextMenu(knativeContextMenu)(EventingPubSubNode)),
             ),
           );
         case TYPE_KNATIVE_REVISION:

@@ -19,3 +19,9 @@ export const addEventSource: KebabAction = createKebabAction(
   <EventSourceIcon />,
   ImportOptions.EVENTSOURCE,
 );
+
+export const addSubscription: KebabAction = createKebabAction(
+  'Add Subscription',
+  <EventSourceIcon />,
+  ImportOptions.EVENTPUBSUB,
+);

@@ -3,7 +3,8 @@ import { KebabOption } from '@console/internal/components/utils/kebab';
 import { modelFor, referenceFor, referenceForModel } from '@console/internal/module/k8s';
 import { Node } from '@console/topology';
 import { asAccessReview } from '@console/internal/components/utils';
-import { ServiceModel, addEventSource } from '@console/knative-plugin';
+import { ServiceModel, addEventSource, addSubscription } from '@console/knative-plugin';
+import { getDynamicChannelModelRefs } from '@console/knative-plugin/src/utils/fetch-dynamic-eventsources-utils';
 import { addResourceMenuWithoutCatalog } from '../../../actions/add-resources';
 import { TopologyDataMap, TopologyApplicationObject, GraphData } from '../topology-types';
 import { getTopologyResourceObject } from '../topology-utils';
@@ -66,6 +67,9 @@ const addResourcesMenu = (
   let resourceMenu = addResourceMenuWithoutCatalog;
   if (isKnativeService && graphData.eventSourceEnabled) {
     resourceMenu = [...addResourceMenuWithoutCatalog, addEventSource];
+  }
+  if (getDynamicChannelModelRefs().includes(connectorSource?.getData()?.data?.kind)) {
+    resourceMenu = [addSubscription];
   }
   return _.reduce(
     resourceMenu,

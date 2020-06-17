@@ -17,6 +17,7 @@ import {
   KNATIVE_GROUP_NODE_WIDTH,
   TYPE_EVENT_SOURCE,
   TYPE_KNATIVE_SERVICE,
+  TYPE_EVENT_PUB_SUB,
 } from './const';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -33,6 +34,20 @@ export const getKnativeNodeModel = (d: Node, model: DataModel, filters: Filters)
       id: d.id,
       type: d.type,
       visible: !hidden,
+      label: model.topology[d.id].name,
+      data: model.topology[d.id],
+      style: {
+        padding: NODE_PADDING,
+      },
+    };
+  }
+  if (d.type === TYPE_EVENT_PUB_SUB) {
+    return {
+      width: NODE_WIDTH,
+      height: NODE_HEIGHT / 2,
+      id: d.id,
+      type: d.type,
+      visible: true,
       label: model.topology[d.id].name,
       data: model.topology[d.id],
       style: {

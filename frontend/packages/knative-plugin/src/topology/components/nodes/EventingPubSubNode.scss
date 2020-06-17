@@ -20,20 +20,30 @@
     stroke-width: 2px;
     stroke: $selected-stroke-color;
   }
+
+  &.is-highlight &__bg {
+    fill: $group-node-fill-color;
+    stroke: $interactive-stroke-color;
+  }
+  &.is-dropTarget &__bg {
+    fill: $interactive-fill-color;
+    stroke: $interactive-stroke-color;
+  }
 }
 
 .odc-m-drag-active,
 .odc-m-filter-active {
-  .odc-event-source {
+  .odc-eventing-pubsub {
     opacity: $de-emphasize-opacity;
-    &.is-dragging {
+    &.is-dragging,
+    &.is-highlight {
       opacity: 1;
     }
   }
 }
 
 .odc-m-filter-active:not(.odc-m-drag-active) {
-  .odc-event-source {
+  .odc-eventing-pubsub {
     &.is-filtered {
       opacity: 1;
     }

@@ -13,6 +13,7 @@ import {
 } from '@console/internal/components/utils';
 import {
   TYPE_EVENT_SOURCE_LINK,
+  TYPE_EVENT_PUB_SUB_LINK,
   TYPE_REVISION_TRAFFIC,
 } from '@console/knative-plugin/src/topology/const';
 import { TYPE_CONNECTS_TO, TYPE_SERVICE_BINDING, TYPE_TRAFFIC_CONNECTOR } from './components/const';
@@ -41,6 +42,8 @@ const connectorTypeToTitle = (type: string): string => {
       return 'Event source connector';
     case TYPE_TRAFFIC_CONNECTOR:
       return 'Traffic connector';
+    case TYPE_EVENT_PUB_SUB_LINK:
+      return 'Subscription';
     default:
       return '';
   }

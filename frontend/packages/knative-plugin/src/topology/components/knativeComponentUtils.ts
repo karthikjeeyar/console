@@ -74,10 +74,10 @@ export const pubSubDropTargetSpec: DropTargetSpec<
 > = {
   accept: [EDGE_DRAG_TYPE],
   canDrop: (item, monitor, props) =>
-    item.getType() === TYPE_EVENT_SOURCE_LINK && item.getSource() !== props.element,
+    item.getType() === TYPE_EVENT_PUB_SUB_LINK && item.getSource() !== props.element,
   collect: (monitor, props) => ({
     canDrop:
-      monitor.isDragging() && monitor.getOperation()?.type === MOVE_EV_SRC_CONNECTOR_OPERATION,
+      monitor.isDragging() && monitor.getOperation()?.type === MOVE_PUB_SUB_CONNECTOR_OPERATION,
     dropTarget: monitor.isOver({ shallow: true }),
     edgeDragging: nodesEdgeIsDragging(monitor, props),
   }),

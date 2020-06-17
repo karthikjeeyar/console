@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { Node } from '@console/topology';
-import { ServiceModel, addEventSource } from '@console/knative-plugin';
+import { ServiceModel, addEventSource, addSubscription } from '@console/knative-plugin';
+import { getDynamicChannelModelRefs } from '@console/knative-plugin/src/utils/fetch-dynamic-eventsources-utils';
 import { referenceForModel } from '@console/internal/module/k8s';
 import { addResourceMenu, addResourceMenuWithoutCatalog } from '../../../actions/add-resources';
 import { GraphData } from '../topology-types';
@@ -11,6 +12,9 @@ export const graphActions = (graphData: GraphData, connectorSource?: Node) => {
     connectorSource?.getData()?.data?.kind === referenceForModel(ServiceModel);
   if (isKnativeService && graphData.eventSourceEnabled) {
     resourceMenu = [...addResourceMenuWithoutCatalog, addEventSource];
+  }
+  if (getDynamicChannelModelRefs().includes(connectorSource?.getData()?.data?.kind)) {
+    resourceMenu = [addSubscription];
   }
   return _.reduce(
     resourceMenu,
