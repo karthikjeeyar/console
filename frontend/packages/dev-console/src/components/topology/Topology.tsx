@@ -28,6 +28,8 @@ import { RootState } from '@console/internal/redux';
 import { getActiveApplication } from '@console/internal/reducers/ui';
 import { selectOverviewDetailsTab } from '@console/internal/actions/ui';
 import { getEventSourceStatus } from '@console/knative-plugin/src/topology/knative-topology-utils';
+import { TYPE_EVENT_PUB_SUB_LINK } from '@console/knative-plugin/src/topology/const';
+import KnativeResourceOverviewPage from '@console/knative-plugin/src/components/overview/KnativeResourceOverviewPage';
 import {
   getQueryArgument,
   setQueryArgument,
@@ -343,6 +345,10 @@ const Topology: React.FC<ComponentProps> = ({
     }
 
     if (isEdge(selectedEntity)) {
+      if (selectedEntity.getType() === TYPE_EVENT_PUB_SUB_LINK) {
+        const itemResources = selectedEntity.getData();
+        return <KnativeResourceOverviewPage item={itemResources.data.resources} />;
+      }
       return <ConnectedTopologyEdgePanel edge={selectedEntity as BaseEdge} data={data} />;
     }
     return null;

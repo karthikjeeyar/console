@@ -35,11 +35,14 @@ import {
   knativeServingResourcesConfigurations,
   knativeServingResourcesRoutes,
   knativeServingResourcesServices,
+  knativeEventingResourcesSubscription,
 } from './utils/get-knative-resources';
 import { getKebabActionsForKind } from './utils/kebab-actions';
 import {
   fetchEventSourcesCrd,
+  fetchChannelsCrd,
   getDynamicEventSourcesResourceList,
+  getDynamicChannelResourceList,
   hideDynamicEventSourceCard,
 } from './utils/fetch-dynamic-eventsources-utils';
 import * as eventSourceIcon from './imgs/event-source.svg';
@@ -60,6 +63,7 @@ type ConsumedExtensions =
 
 // Added it to perform discovery of Dynamic event sources on cluster on app load as kebab option needed models upfront
 fetchEventSourcesCrd();
+fetchChannelsCrd();
 const plugin: Plugin<ConsumedExtensions> = [
   {
     type: 'ModelDefinition',
@@ -216,6 +220,26 @@ const plugin: Plugin<ConsumedExtensions> = [
     type: 'Overview/CRD',
     properties: {
       resources: getDynamicEventSourcesResourceList,
+      utils: () => null,
+    },
+    flags: {
+      required: [FLAG_KNATIVE_EVENTING],
+    },
+  },
+  {
+    type: 'Overview/CRD',
+    properties: {
+      resources: knativeEventingResourcesSubscription,
+      utils: () => null,
+    },
+    flags: {
+      required: [FLAG_KNATIVE_EVENTING],
+    },
+  },
+  {
+    type: 'Overview/CRD',
+    properties: {
+      resources: getDynamicChannelResourceList,
       utils: () => null,
     },
     flags: {

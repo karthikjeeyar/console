@@ -7,8 +7,12 @@ import {
   TopologyDataResources,
   addToTopologyDataModel,
 } from '@console/dev-console/src/components/topology';
-import { getDynamicEventSourcesModelRefs } from '../utils/fetch-dynamic-eventsources-utils';
-import { NodeType, transformKnNodeData } from './knative-topology-utils';
+import {
+  NodeType,
+  transformKnNodeData,
+  getKnativeEventSources,
+  getKnativeChannelResources,
+} from './knative-topology-utils';
 
 /**
  * Filter out deployments not created via revisions/eventsources
@@ -53,14 +57,6 @@ const addKnativeTopologyData = (
   addToTopologyDataModel(knativeResourceDataModel, topologyDataModel);
 };
 
-const getKnativeEventSources = (resources: TopologyDataResources): K8sResourceKind[] => {
-  const evenSourceProps = getDynamicEventSourcesModelRefs();
-  return evenSourceProps.reduce((acc, currProp) => {
-    const currPropResource = resources[currProp]?.data ?? [];
-    return [...acc, ...currPropResource];
-  }, []);
-};
-
 export const getKnativeTopologyDataModel = (
   resources: TopologyDataResources,
   allResources: K8sResourceKind[],
@@ -75,6 +71,7 @@ export const getKnativeTopologyDataModel = (
   const knSvcResources: K8sResourceKind[] = _.get(resources, ['ksservices', 'data'], []);
   const knEventSources: K8sResourceKind[] = getKnativeEventSources(resources);
   const knRevResources: K8sResourceKind[] = _.get(resources, ['revisions', 'data'], []);
+  const knChannelResources: K8sResourceKind[] = getKnativeChannelResources(resources);
 
   addKnativeTopologyData(
     knativeTopologyDataModel,
@@ -99,6 +96,15 @@ export const getKnativeTopologyDataModel = (
     knRevResources,
     allResources,
     NodeType.Revision,
+    resources,
+    operatorBackedServiceKindMap,
+    utils,
+  );
+  addKnativeTopologyData(
+    knativeTopologyDataModel,
+    knChannelResources,
+    allResources,
+    NodeType.PubSub,
     resources,
     operatorBackedServiceKindMap,
     utils,

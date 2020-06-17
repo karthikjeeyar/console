@@ -29,16 +29,22 @@ import {
   TYPE_KNATIVE_REVISION,
   TYPE_KNATIVE_SERVICE,
   TYPE_REVISION_TRAFFIC,
+  TYPE_EVENT_PUB_SUB,
+  TYPE_EVENT_PUB_SUB_LINK,
 } from '../const';
 import KnativeService from './groups/KnativeService';
 import RevisionNode from './nodes/RevisionNode';
 import TrafficLink from './edges/TrafficLink';
 import EventSourceLink from './edges/EventSourceLink';
+import EventingPubSubLink from './edges/EventingPubSubLink';
 import EventSource from './nodes/EventSource';
+import EventingPubSubNode from './nodes/EventingPubSubNode';
 import {
   eventSourceLinkDragSourceSpec,
+  eventingPubSubLinkDragSourceSpec,
   eventSourceTargetSpec,
-  knativeServiceDropTargetSpec,
+  eventSourceSinkDropTargetSpec,
+  pubSubDropTargetSpec,
 } from './knativeComponentUtils';
 
 export const knativeContextMenu = (element: Node) => {
@@ -74,7 +80,7 @@ class KnativeComponentFactory extends AbstractSBRComponentFactory {
               any,
               { droppable?: boolean; hover?: boolean; canDrop?: boolean; dropTarget?: boolean },
               NodeComponentProps
-            >(knativeServiceDropTargetSpec)(
+            >(eventSourceSinkDropTargetSpec)(
               withEditReviewAccess('update')(
                 withSelection(false, true)(withContextMenu(knativeContextMenu)(KnativeService)),
               ),
@@ -93,6 +99,19 @@ class KnativeComponentFactory extends AbstractSBRComponentFactory {
               ),
             ),
           );
+        case TYPE_EVENT_PUB_SUB:
+          return this.withAddResourceConnector()(
+            withDndDrop<
+              any,
+              any,
+              { droppable?: boolean; hover?: boolean; canDrop?: boolean; dropTarget?: boolean },
+              NodeComponentProps
+            >(pubSubDropTargetSpec)(
+              withEditReviewAccess('update')(
+                withSelection(false, true)(withContextMenu(knativeContextMenu)(EventingPubSubNode)),
+              ),
+            ),
+          );
         case TYPE_KNATIVE_REVISION:
           return withDragNode(nodeDragSourceSpec(type, false))(
             withSelection(
@@ -104,6 +123,8 @@ class KnativeComponentFactory extends AbstractSBRComponentFactory {
           return TrafficLink;
         case TYPE_EVENT_SOURCE_LINK:
           return withTargetDrag(eventSourceLinkDragSourceSpec())(EventSourceLink);
+        case TYPE_EVENT_PUB_SUB_LINK:
+          return withTargetDrag(eventingPubSubLinkDragSourceSpec())(EventingPubSubLink);
         default:
           return undefined;
       }
