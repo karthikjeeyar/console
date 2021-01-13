@@ -30,6 +30,8 @@ export const pipelineRunStatus = (pipelineRun): string => {
       case 'ExceededNodeResources':
       case 'ExceededResourceQuota':
         return 'Pending';
+      case 'ConditionCheckFailed':
+        return 'Skipped';
       default:
         return status;
     }

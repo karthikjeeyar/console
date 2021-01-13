@@ -48,6 +48,7 @@ export interface TaskStatus {
   Succeeded: number;
   Cancelled: number;
   Failed: number;
+  Skipped: number;
 }
 
 export interface PipelineTaskRef {
@@ -77,6 +78,11 @@ export interface PipelineTaskResource {
   resource?: string;
   from?: string[];
 }
+export interface WhenExpression {
+  Input: string;
+  Operator: string;
+  Values: string[];
+}
 export interface PipelineTask {
   name: string;
   runAfter?: string[];
@@ -85,6 +91,7 @@ export interface PipelineTask {
   params?: PipelineTaskParam[];
   resources?: PipelineTaskResources;
   workspaces?: PipelineTaskWorkspace[];
+  when?: WhenExpression[];
 }
 export interface PipelineTaskWorkspace {
   name: string;
@@ -218,6 +225,9 @@ export interface PipelineRun extends K8sResourceKind {
     completionTime?: string;
     taskRuns?: PLRTaskRuns;
     pipelineSpec: PipelineSpec;
+    skippedTasks?: {
+      name: string;
+    }[];
   };
 }
 
@@ -484,6 +494,7 @@ export const getTaskStatus = (pipelinerun: PipelineRun): TaskStatus => {
       ? Object.keys(pipelinerun.status.taskRuns)
       : [];
   const plrTaskLength = plrTasks.length;
+  const skippedTaskLength = (pipelinerun.status?.skippedTasks || []).length;
   const taskStatus: TaskStatus = {
     PipelineNotStarted: 0,
     Pending: 0,
@@ -491,6 +502,7 @@ export const getTaskStatus = (pipelinerun: PipelineRun): TaskStatus => {
     Succeeded: 0,
     Failed: 0,
     Cancelled: 0,
+    Skipped: skippedTaskLength,
   };
   if (pipelinerun && pipelinerun.status && pipelinerun.status.taskRuns) {
     plrTasks.forEach((taskRun) => {
@@ -510,7 +522,8 @@ export const getTaskStatus = (pipelinerun: PipelineRun): TaskStatus => {
 
     const pipelineRunHasFailure = taskStatus[runStatus.Failed] > 0;
     const pipelineRunIsCancelled = pipelineRunFilterReducer(pipelinerun) === runStatus.Cancelled;
-    const unhandledTasks = totalTasks >= plrTaskLength ? totalTasks - plrTaskLength : totalTasks;
+    const unhandledTasks =
+      totalTasks >= plrTaskLength ? totalTasks - plrTaskLength - skippedTaskLength : totalTasks;
 
     if (pipelineRunHasFailure || pipelineRunIsCancelled) {
       taskStatus[runStatus.Cancelled] += unhandledTasks;

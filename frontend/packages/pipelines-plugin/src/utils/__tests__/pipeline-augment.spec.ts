@@ -254,6 +254,22 @@ describe('PipelineAugment test correct task status state is pulled from pipeline
       expect(sumTaskStatuses(taskStatus)).toEqual(taskCount);
     });
   });
+
+  describe('Skipped pipelines', () => {
+    // When a pipeline run skips certain task based on the when expression/condtion
+    const sumSkippedTaskStatus = (status: TaskStatus): number => status.Skipped;
+    const sumSuccededTaskStatus = (status: TaskStatus): number => status.Succeeded;
+    const complexTestData = pipelineTestData[PipelineExampleNames.CONDITIONAL_PIPELINE];
+
+    it(`expect to return the skipped task status count if whenExpression is used`, () => {
+      const expected = { succeeded: 1, skipped: 1 };
+      const taskCount = getExpectedTaskCount(complexTestData.pipeline);
+      const taskStatus = getTaskStatus(complexTestData.pipelineRuns[DataState.SKIPPED]);
+      expect(sumSkippedTaskStatus(taskStatus)).toEqual(expected.skipped);
+      expect(sumSuccededTaskStatus(taskStatus)).toEqual(expected.succeeded);
+      expect(sumTaskStatuses(taskStatus)).toEqual(taskCount);
+    });
+  });
 });
 
 describe('PipelineAugment test successfully determine Task type', () => {
